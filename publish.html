@@ -65,9 +65,24 @@
             background-position: left 1rem center;
             background-size: 1.5rem;
         }
+
+        /* زر عائم لإضافة إعلان */
+        .fab-button {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4), 0 8px 10px -6px rgba(79, 70, 229, 0.2);
+            transition: all 0.3s ease;
+        }
+        .fab-button:hover {
+            transform: translateX(-50%) translateY(-4px);
+            box-shadow: 0 20px 35px -5px rgba(79, 70, 229, 0.5), 0 10px 15px -6px rgba(79, 70, 229, 0.3);
+        }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen pb-24">
 
     <!-- ═══════════════════════════════════════════════ -->
     <!-- شريط التنقل العلوي                            -->
@@ -286,8 +301,8 @@
                     </div>
                 </div>
 
-                <!-- صحة البطارية -->
-                <div class="mb-5">
+                <!-- صحة البطارية - تظهر فقط للآيفون -->
+                <div id="batterySection" class="mb-5 hidden">
                     <label class="block text-sm font-bold text-slate-700 mb-2">صحة البطارية (Battery Health)</label>
                     <div class="relative">
                         <input 
@@ -300,7 +315,7 @@
                         >
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">%</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">نسبة صحة البطارية الحالية</p>
+                    <p class="text-xs text-slate-500 mt-1">نسبة صحة البطارية الحالية (متاحة فقط لأجهزة iPhone)</p>
                 </div>
 
                 <!-- مقاومة الماء -->
@@ -367,7 +382,7 @@
         <!-- ═══════════════════════════════════════ -->
         <div id="step-3" class="step-content">
             <h2 class="text-xl font-bold text-slate-900 mb-2">صور الهاتف</h2>
-            <p class="text-slate-500 mb-6 text-sm">أضف 3 صور على الأقل للهاتف</p>
+            <p class="text-slate-500 mb-6 text-sm">أضف 3 صور على الأقل للهاتف. <span class="text-indigo-600 font-bold">الصورة الأولى ستكون الرئيسية</span></p>
 
             <form onsubmit="nextStep(4); return false;">
                 <!-- منطقة الرفع -->
@@ -477,7 +492,7 @@
                         <label class="radio-card flex items-center gap-4 p-4 border-2 border-slate-200 rounded-xl cursor-pointer" onclick="selectStatus(this, 'used')">
                             <input type="radio" name="status" value="used" class="hidden">
                             <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-hand-holding text-orange-600 text-xl"></i>
+                                <i class="fas fa-mobile-screen text-orange-600 text-xl"></i>
                             </div>
                             <div class="flex-1">
                                 <p class="font-bold text-slate-900">مستعمل</p>
@@ -531,7 +546,6 @@
                         <option value="kassala">كسلا</option>
                         <option value="gedaref">القضارف</option>
                         <option value="sennar">سنار</option>
-                        <option value="white-nile">النيل الأبيض</option>
                         <option value="northern">شمالية</option>
                         <option value="river-nile">نهر النيل</option>
                         <option value="red-sea">البحر الأحمر</option>
@@ -717,16 +731,19 @@
                 </div>
                 
                 <div class="mb-4">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">رقم الهاتف</label>
-                    <div class="relative">
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">+249</span>
-                        <input type="tel" id="regPhone" class="input-field w-full pr-20 pl-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left" maxlength="9" required>
-                    </div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
+                    <input type="email" id="regEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left" placeholder="example@email.com" required>
                 </div>
                 
-                <div class="mb-6">
+                <div class="mb-4">
                     <label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label>
                     <input type="password" id="regPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">تأكيد كلمة المرور</label>
+                    <input type="password" id="regPasswordConfirm" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
+                    <p id="passwordMatchError" class="text-sm text-red-500 mt-2 hidden">كلمتا المرور غير متطابقتين</p>
                 </div>
                 
                 <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition-colors">
@@ -736,6 +753,14 @@
         </div>
 
     </main>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- زر عائم لإضافة إعلان في منتصف أسفل الشاشة     -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <button onclick="scrollToTop()" class="fab-button bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-4 rounded-full font-bold flex items-center gap-2">
+        <i class="fas fa-plus-circle text-lg"></i>
+        <span>إضافة إعلان</span>
+    </button>
 
     <!-- ═══════════════════════════════════════════════ -->
     <!-- JavaScript                                      -->
@@ -828,11 +853,14 @@
         let currentStep = 1;
         let uploadedImages = [];
         let formData = {};
+        let selectedBrand = '';
 
         // ════════════════════════════════════════════
         // اختيار الشركة وتحديث قائمة الهواتف
         // ════════════════════════════════════════════
         function selectBrand(element, brand) {
+            selectedBrand = brand;
+            
             // تحديث UI
             document.querySelectorAll('input[name="brand"]').forEach(input => {
                 input.closest('.radio-card').classList.remove('selected');
@@ -963,6 +991,17 @@
         function nextStep(step) {
             saveStepData(currentStep);
             
+            // التحقق من إظهار/إخفاء قسم البطارية
+            if (step === 2) {
+                const batterySection = document.getElementById('batterySection');
+                if (selectedBrand === 'apple') {
+                    batterySection.classList.remove('hidden');
+                } else {
+                    batterySection.classList.add('hidden');
+                    document.getElementById('batteryHealth').value = '';
+                }
+            }
+            
             document.getElementById(`step-${currentStep}`).classList.remove('active');
             document.getElementById(`step-${step}`).classList.add('active');
             
@@ -1009,7 +1048,7 @@
         // ════════════════════════════════════════════
         function saveStepData(step) {
             if (step === 1) {
-                formData.brand = document.querySelector('input[name="brand"]:checked')?.value;
+                formData.brand = selectedBrand;
                 formData.phoneModel = document.getElementById('phoneModel').value;
                 formData.color = document.getElementById('color').value;
             } else if (step === 2) {
@@ -1154,10 +1193,14 @@
                 document.getElementById(`step-${currentStep}`).classList.remove('active');
                 document.querySelector('.progress-line').parentElement.parentElement.classList.add('hidden');
                 document.getElementById('success-step').classList.remove('hidden');
+                
+                // إخفاء زر الإضافة العائم
+                document.querySelector('.fab-button').classList.add('hidden');
             } else {
                 // نشر مباشرة
                 await saveToFirestore();
-                window.location.href = '/my-ads.html';
+                // عرض رسالة نجاح بدلاً من التحويل لصفحة غير موجودة
+                showSuccessMessage('تم نشر إعلانك بنجاح!');
             }
         }
 
@@ -1184,17 +1227,52 @@
             e.preventDefault();
             
             const name = document.getElementById('regName').value;
-            const phone = '+249' + document.getElementById('regPhone').value;
+            const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
             
-            // TODO: إنشاء حساب في Firebase Auth
+            // التحقق من تطابق كلمة المرور
+            if (password !== passwordConfirm) {
+                document.getElementById('passwordMatchError').classList.remove('hidden');
+                return;
+            } else {
+                document.getElementById('passwordMatchError').classList.add('hidden');
+            }
+            
+            // TODO: إنشاء حساب في Firebase Auth باستخدام البريد الإلكتروني
             
             // استرجاع الإعلان ونشره
             const pendingAd = JSON.parse(localStorage.getItem('pendingPhoneAd') || '{}');
             await saveToFirestore(pendingAd);
             
             localStorage.removeItem('pendingPhoneAd');
-            window.location.href = '/my-ads.html?new=true';
+            
+            // عرض رسالة نجاح بدلاً من التحويل لصفحة غير موجودة
+            showSuccessMessage('تم إنشاء حسابك ونشر إعلانك بنجاح!');
+        }
+
+        // ════════════════════════════════════════════
+        // عرض رسالة النجاح
+        // ════════════════════════════════════════════
+        function showSuccessMessage(message) {
+            const main = document.querySelector('main');
+            main.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-check text-4xl text-green-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4">${message}</h2>
+                    <p class="text-slate-500 mb-8">يمكنك الآن متابعة إعلاناتك من لوحة التحكم</p>
+                    <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition-colors">
+                        نشر إعلان جديد
+                    </button>
+                </div>
+            `;
+            
+            // إخفاء شريط التقدم
+            document.querySelector('.progress-line').parentElement.parentElement.classList.add('hidden');
+            // إخفاء زر الإضافة العائم
+            document.querySelector('.fab-button').classList.add('hidden');
         }
 
         // ════════════════════════════════════════════
@@ -1203,6 +1281,14 @@
         async function saveToFirestore(data) {
             // TODO: حفظ في Firebase Firestore
             console.log('Saving to Firestore:', data);
+            return true;
+        }
+
+        // ════════════════════════════════════════════
+        // التمرير لأعلى
+        // ════════════════════════════════════════════
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
