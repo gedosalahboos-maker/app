@@ -51,13 +51,11 @@
             transform: scale(1.02);
         }
         
-        /* تنسيق السعر */
         .price-input {
             direction: ltr;
             text-align: left;
         }
         
-        /* قائمة منسدلة مخصصة */
         .custom-select {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
@@ -66,23 +64,20 @@
             background-size: 1.5rem;
         }
 
-        /* زر عائم لإضافة إعلان */
-        .fab-button {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 50;
-            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4), 0 8px 10px -6px rgba(79, 70, 229, 0.2);
-            transition: all 0.3s ease;
+        /* تبويبات تسجيل الدخول/الإنشاء */
+        .auth-tab {
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
         }
-        .fab-button:hover {
-            transform: translateX(-50%) translateY(-4px);
-            box-shadow: 0 20px 35px -5px rgba(79, 70, 229, 0.5), 0 10px 15px -6px rgba(79, 70, 229, 0.3);
+        .auth-tab.active {
+            border-bottom-color: #4f46e5;
+            color: #4f46e5;
+            font-weight: 700;
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-24">
+<body class="bg-slate-50 min-h-screen">
 
     <!-- ═══════════════════════════════════════════════ -->
     <!-- شريط التنقل العلوي                            -->
@@ -106,7 +101,7 @@
     <!-- ═══════════════════════════════════════════════ -->
     <!-- شريط التقدم                                   -->
     <!-- ═══════════════════════════════════════════════ -->
-    <div class="bg-white border-b border-slate-200 py-6">
+    <div class="bg-white border-b border-slate-200 py-6" id="progressBar">
         <div class="max-w-3xl mx-auto px-4">
             <div class="flex items-center justify-between relative">
                 <div class="absolute top-1/2 left-0 right-0 h-1 bg-slate-200 -translate-y-1/2 z-0"></div>
@@ -139,7 +134,7 @@
     <!-- ═══════════════════════════════════════════════ -->
     <!-- المحتوى الرئيسي                               -->
     <!-- ═══════════════════════════════════════════════ -->
-    <main class="max-w-2xl mx-auto px-4 py-8">
+    <main class="max-w-2xl mx-auto px-4 py-8" id="mainContent">
 
         <!-- ═══════════════════════════════════════ -->
         <!-- الخطوة 1: اختيار الهاتف                 -->
@@ -198,7 +193,7 @@
                     </div>
                 </div>
 
-                <!-- اسم الهاتف (قائمة منسدلة حسب الشركة) -->
+                <!-- اسم الهاتف -->
                 <div class="mb-5">
                     <label class="block text-sm font-bold text-slate-700 mb-2">
                         نوع الهاتف <span class="text-red-500">*</span>
@@ -688,86 +683,112 @@
         </div>
 
         <!-- ═══════════════════════════════════════ -->
-        <!-- نجاح النشر + طلب التسجيل                 -->
+        <!-- شاشة التحقق من الحساب (تسجيل/دخول)       -->
         <!-- ═══════════════════════════════════════ -->
-        <div id="success-step" class="hidden text-center py-12">
+        <div id="auth-step" class="hidden">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-lock text-3xl text-amber-600"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">أكمل نشر إعلانك</h2>
+                <p class="text-slate-500">لقد تم حفظ بيانات إعلانك مؤقتاً. سجل دخول أو أنشئ حساباً لإتمام النشر.</p>
+            </div>
+
+            <!-- تبويبات -->
+            <div class="flex border-b border-slate-200 mb-6">
+                <div class="auth-tab active flex-1 text-center py-3" onclick="switchAuthTab('login')">
+                    تسجيل الدخول
+                </div>
+                <div class="auth-tab flex-1 text-center py-3" onclick="switchAuthTab('register')">
+                    إنشاء حساب جديد
+                </div>
+            </div>
+
+            <!-- نموذج تسجيل الدخول -->
+            <div id="loginForm">
+                <form onsubmit="handleLogin(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="loginEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left" placeholder="example@email.com" required>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label>
+                        <input type="password" id="loginPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition-colors mb-4">
+                        تسجيل الدخول ونشر الإعلان
+                    </button>
+                    
+                    <button type="button" onclick="backToAd()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
+                        رجوع للإعلان
+                    </button>
+                </form>
+            </div>
+
+            <!-- نموذج إنشاء حساب -->
+            <div id="registerForm" class="hidden">
+                <form onsubmit="handleRegister(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label>
+                        <input type="text" id="regName" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="regEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left" placeholder="example@email.com" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label>
+                        <input type="password" id="regPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">تأكيد كلمة المرور</label>
+                        <input type="password" id="regPasswordConfirm" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
+                        <p id="passwordMatchError" class="text-sm text-red-500 mt-2 hidden">كلمتا المرور غير متطابقتين</p>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition-colors mb-4">
+                        إنشاء حساب ونشر الإعلان
+                    </button>
+                    
+                    <button type="button" onclick="backToAd()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
+                        رجوع للإعلان
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- شاشة النجاح النهائي                       -->
+        <!-- ═══════════════════════════════════════ -->
+        <div id="final-success" class="hidden text-center py-12">
             <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i class="fas fa-check text-4xl text-green-600"></i>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900 mb-2">تم حفظ الإعلان!</h2>
-            <p class="text-slate-500 mb-2">لكن لنشره يجب تسجيل حساب</p>
-            <p class="text-sm text-slate-400 mb-8">العملية سريعة ولا تستغرق دقيقة</p>
-            
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-right">
-                <p class="font-bold text-amber-900 mb-2">لماذا نطلب التسجيل؟</p>
-                <ul class="text-sm text-amber-800 space-y-1">
-                    <li>✓ حماية البائعين والمشترين</li>
-                    <li>✓ متابعة إعلاناتك</li>
-                    <li>✓ توثيق الهوية</li>
-                </ul>
-            </div>
-            
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">تم نشر إعلانك بنجاح!</h2>
+            <p class="text-slate-500 mb-8">يمكنك الآن متابعة إعلاناتك من لوحة التحكم</p>
             <div class="flex gap-3 justify-center">
-                <button onclick="showRegister()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition-colors">
-                    إنشاء حساب سريع
-                </button>
-                <a href="/" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold transition-colors">
-                    لاحقاً
+                <a href="/" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition-colors">
+                    الصفحة الرئيسية
                 </a>
-            </div>
-        </div>
-
-        <!-- ═══════════════════════════════════════ -->
-        <!-- نموذج التسجيل السريع (يظهر بعد النشر)    -->
-        <!-- ═══════════════════════════════════════ -->
-        <div id="quick-register" class="hidden">
-            <h2 class="text-xl font-bold text-slate-900 mb-2">إنشاء حساب</h2>
-            <p class="text-slate-500 mb-6 text-sm">أكمل بياناتك لنشر إعلانك</p>
-            
-            <form onsubmit="completeRegistration(event)">
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label>
-                    <input type="text" id="regName" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" required>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
-                    <input type="email" id="regEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left" placeholder="example@email.com" required>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label>
-                    <input type="password" id="regPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
-                </div>
-
-                <div class="mb-6">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">تأكيد كلمة المرور</label>
-                    <input type="password" id="regPasswordConfirm" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
-                    <p id="passwordMatchError" class="text-sm text-red-500 mt-2 hidden">كلمتا المرور غير متطابقتين</p>
-                </div>
-                
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition-colors">
-                    إنشاء حساب ونشر الإعلان
+                <button onclick="location.reload()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold transition-colors">
+                    نشر إعلان جديد
                 </button>
-            </form>
+            </div>
         </div>
 
     </main>
-
-    <!-- ═══════════════════════════════════════════════ -->
-    <!-- زر عائم لإضافة إعلان في منتصف أسفل الشاشة     -->
-    <!-- ═══════════════════════════════════════════════ -->
-    <button onclick="scrollToTop()" class="fab-button bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-4 rounded-full font-bold flex items-center gap-2">
-        <i class="fas fa-plus-circle text-lg"></i>
-        <span>إضافة إعلان</span>
-    </button>
 
     <!-- ═══════════════════════════════════════════════ -->
     <!-- JavaScript                                      -->
     <!-- ═══════════════════════════════════════════════ -->
     <script>
         // ════════════════════════════════════════════
-        // قاعدة بيانات الهواتف المسجلة مسبقاً
+        // قاعدة بيانات الهواتف
         // ════════════════════════════════════════════
         const phoneDatabase = {
             'apple': [
@@ -854,21 +875,20 @@
         let uploadedImages = [];
         let formData = {};
         let selectedBrand = '';
+        let authMode = 'login';
 
         // ════════════════════════════════════════════
-        // اختيار الشركة وتحديث قائمة الهواتف
+        // اختيار الشركة
         // ════════════════════════════════════════════
         function selectBrand(element, brand) {
             selectedBrand = brand;
             
-            // تحديث UI
             document.querySelectorAll('input[name="brand"]').forEach(input => {
                 input.closest('.radio-card').classList.remove('selected');
             });
             element.classList.add('selected');
             element.querySelector('input').checked = true;
 
-            // تحديث قائمة الهواتف
             const phoneSelect = document.getElementById('phoneModel');
             phoneSelect.disabled = false;
             phoneSelect.innerHTML = '<option value="">اختر نوع الهاتف</option>';
@@ -930,7 +950,7 @@
         }
 
         // ════════════════════════════════════════════
-        // تحديث المدن حسب الولاية
+        // تحديث المدن
         // ════════════════════════════════════════════
         function updateCities() {
             const state = document.getElementById('state').value;
@@ -949,7 +969,7 @@
         }
 
         // ════════════════════════════════════════════
-        // تنسيق السعر مع فواصل
+        // تنسيق السعر
         // ════════════════════════════════════════════
         function formatPrice(input) {
             let value = input.value.replace(/[^\d]/g, '');
@@ -961,8 +981,6 @@
                 } else {
                     document.getElementById('priceError').classList.add('hidden');
                 }
-                
-                // إضافة فواصل
                 input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             } else {
                 input.value = '';
@@ -991,7 +1009,6 @@
         function nextStep(step) {
             saveStepData(currentStep);
             
-            // التحقق من إظهار/إخفاء قسم البطارية
             if (step === 2) {
                 const batterySection = document.getElementById('batterySection');
                 if (selectedBrand === 'apple') {
@@ -1044,7 +1061,7 @@
         }
 
         // ════════════════════════════════════════════
-        // حفظ بيانات كل خطوة
+        // حفظ بيانات الخطوة
         // ════════════════════════════════════════════
         function saveStepData(step) {
             if (step === 1) {
@@ -1122,7 +1139,6 @@
                 `).join('');
             }
             
-            // تفعيل زر التالي إذا كان هناك 3 صور
             nextBtn.disabled = uploadedImages.length < 3;
             if (uploadedImages.length >= 3) {
                 nextBtn.classList.remove('opacity-50');
@@ -1163,12 +1179,13 @@
         }
 
         // ════════════════════════════════════════════
-        // نشر الإعلان (التسجيل الخادع)
+        // نشر الإعلان
         // ════════════════════════════════════════════
         async function publishAd(e) {
             e.preventDefault();
             
             const btn = document.getElementById('publishBtn');
+            const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
             btn.disabled = true;
 
@@ -1182,26 +1199,24 @@
             formData.neighborhood = document.getElementById('neighborhood').value;
             formData.contactMethods = Array.from(document.querySelectorAll('input[name="contactMethods"]:checked')).map(cb => cb.value);
 
-            // حفظ في localStorage
+            // حفظ الإعلان مؤقتاً في localStorage
             localStorage.setItem('pendingPhoneAd', JSON.stringify(formData));
 
             // التحقق من تسجيل الدخول
             const isLoggedIn = await checkAuth();
             
             if (!isLoggedIn) {
-                // إظهار شاشة النجاح + طلب التسجيل
+                // الانتقال لشاشة التحقق من الحساب (داخل نفس الصفحة)
                 document.getElementById(`step-${currentStep}`).classList.remove('active');
-                document.querySelector('.progress-line').parentElement.parentElement.classList.add('hidden');
-                document.getElementById('success-step').classList.remove('hidden');
-                
-                // إخفاء زر الإضافة العائم
-                document.querySelector('.fab-button').classList.add('hidden');
+                document.getElementById('auth-step').classList.remove('hidden');
+                document.getElementById('progressBar').classList.add('hidden');
             } else {
                 // نشر مباشرة
-                await saveToFirestore();
-                // عرض رسالة نجاح بدلاً من التحويل لصفحة غير موجودة
-                showSuccessMessage('تم نشر إعلانك بنجاح!');
+                await finalizePublish();
             }
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
 
         // ════════════════════════════════════════════
@@ -1209,21 +1224,56 @@
         // ════════════════════════════════════════════
         async function checkAuth() {
             // TODO: التحقق من Firebase Auth
-            return false; // للاختبار
+            // return !!firebase.auth().currentUser;
+            return false; // للاختبار - المستخدم غير مسجل
         }
 
         // ════════════════════════════════════════════
-        // إظهار نموذج التسجيل
+        // التبديل بين تبويبات تسجيل الدخول/الإنشاء
         // ════════════════════════════════════════════
-        function showRegister() {
-            document.getElementById('success-step').classList.add('hidden');
-            document.getElementById('quick-register').classList.remove('hidden');
+        function switchAuthTab(mode) {
+            authMode = mode;
+            
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (mode === 'login') {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+            } else {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('registerForm').classList.remove('hidden');
+            }
         }
 
         // ════════════════════════════════════════════
-        // إكمال التسجيل
+        // تسجيل الدخول
         // ════════════════════════════════════════════
-        async function completeRegistration(e) {
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                // TODO: Firebase Auth - signInWithEmailAndPassword
+                // await firebase.auth().signInWithEmailAndPassword(email, password);
+                
+                console.log('تسجيل دخول:', email);
+                
+                // بعد النجاح، نشر الإعلان
+                await finalizePublish();
+            } catch (error) {
+                alert('خطأ في تسجيل الدخول: ' + error.message);
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // إنشاء حساب جديد
+        // ════════════════════════════════════════════
+        async function handleRegister(e) {
             e.preventDefault();
             
             const name = document.getElementById('regName').value;
@@ -1239,56 +1289,52 @@
                 document.getElementById('passwordMatchError').classList.add('hidden');
             }
             
-            // TODO: إنشاء حساب في Firebase Auth باستخدام البريد الإلكتروني
-            
-            // استرجاع الإعلان ونشره
+            try {
+                // TODO: Firebase Auth - createUserWithEmailAndPassword
+                // const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                // await userCredential.user.updateProfile({ displayName: name });
+                
+                console.log('إنشاء حساب:', email, name);
+                
+                // بعد النجاح، نشر الإعلان
+                await finalizePublish();
+            } catch (error) {
+                alert('خطأ في إنشاء الحساب: ' + error.message);
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // إتمام النشر النهائي
+        // ════════════════════════════════════════════
+        async function finalizePublish() {
             const pendingAd = JSON.parse(localStorage.getItem('pendingPhoneAd') || '{}');
-            await saveToFirestore(pendingAd);
             
+            // TODO: حفظ في Firebase Firestore
+            console.log('نشر الإعلان:', pendingAd);
+            
+            // حذف البيانات المؤقتة
             localStorage.removeItem('pendingPhoneAd');
             
-            // عرض رسالة نجاح بدلاً من التحويل لصفحة غير موجودة
-            showSuccessMessage('تم إنشاء حسابك ونشر إعلانك بنجاح!');
+            // عرض شاشة  النجاح
+            document.getElementById('auth-step').classList.add('hidden');
+            document.getElementById('final-success').classList.remove('hidden');
         }
 
         // ════════════════════════════════════════════
-        // عرض رسالة النجاح
+        // الرجوع للإعلان من شاشة التحقق
         // ════════════════════════════════════════════
-        function showSuccessMessage(message) {
-            const main = document.querySelector('main');
-            main.innerHTML = `
-                <div class="text-center py-12">
-                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-check text-4xl text-green-600"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-900 mb-4">${message}</h2>
-                    <p class="text-slate-500 mb-8">يمكنك الآن متابعة إعلاناتك من لوحة التحكم</p>
-                    <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition-colors">
-                        نشر إعلان جديد
-                    </button>
-                </div>
-            `;
-            
-            // إخفاء شريط التقدم
-            document.querySelector('.progress-line').parentElement.parentElement.classList.add('hidden');
-            // إخفاء زر الإضافة العائم
-            document.querySelector('.fab-button').classList.add('hidden');
+        function backToAd() {
+            document.getElementById('auth-step').classList.add('hidden');
+            document.getElementById('progressBar').classList.remove('hidden');
+            document.getElementById(`step-${currentStep}`).classList.add('active');
         }
 
         // ════════════════════════════════════════════
-        // حفظ في Firestore
+        // حفظ في Firestore (للاستخدام المستقبلي)
         // ════════════════════════════════════════════
         async function saveToFirestore(data) {
-            // TODO: حفظ في Firebase Firestore
             console.log('Saving to Firestore:', data);
             return true;
-        }
-
-        // ════════════════════════════════════════════
-        // التمرير لأعلى
-        // ════════════════════════════════════════════
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
