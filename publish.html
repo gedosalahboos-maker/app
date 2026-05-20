@@ -3,27 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نشر إعلان - سوق فون</title>
+    <title>نشر إعلان - سوق الهواتف السودان</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Firebase SDK (Modular v10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
+            authDomain: "phone-soug.firebaseapp.com",
+            databaseURL: "https://phone-soug-default-rtdb.firebaseio.com",
+            projectId: "phone-soug",
+            storageBucket: "phone-soug.firebasestorage.app",
+            messagingSenderId: "224588578227",
+            appId: "1:224588578227:web:46b4cb96ff2535a1521fc6",
+            measurementId: "G-T3DSBNJ5MQ"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Cloudinary Configuration
+        const CLOUDINARY_CLOUD_NAME = "dxbfupupw";
+        const CLOUDINARY_UPLOAD_PRESET = "Ob7uqufu";
+
+        // Export for global use
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseAuthFns = { 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged,
+            updateProfile
+        };
+        window.firebaseFirestoreFns = { 
+            collection, 
+            addDoc, 
+            serverTimestamp 
+        };
+        window.cloudinaryConfig = {
+            cloudName: CLOUDINARY_CLOUD_NAME,
+            uploadPreset: CLOUDINARY_UPLOAD_PRESET
+        };
+
+        console.log("✅ Firebase initialized successfully");
+    </script>
+    
     <style>
         * { font-family: 'Cairo', sans-serif; }
-        .radio-card { transition: all 0.2s ease; cursor: pointer; }
-        .radio-card:hover { border-color: #4f46e5; }
-        .radio-card.selected { border-color: #4f46e5; background: #eef2ff; }
-        .step-content { display: none; }
-        .step-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .radio-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .radio-card:hover {
+            border-color: #4f46e5;
+        }
+        .radio-card.selected {
+            border-color: #4f46e5;
+            background: #eef2ff;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .progress-line {
+            transition: width 0.5s ease;
+        }
+        
+        .image-preview {
+            transition: all 0.3s ease;
+        }
+        .image-preview:hover {
+            transform: scale(1.02);
+        }
+        
+        .price-input {
+            direction: ltr;
+            text-align: left;
+        }
+        
+        .custom-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 1rem center;
+            background-size: 1.5rem;
+        }
+
+        .auth-tab {
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        .auth-tab.active {
+            border-bottom-color: #4f46e5;
+            color: #4f46e5;
+            font-weight: 700;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4f46e5;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Upload progress */
+        .upload-progress {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .upload-progress-bar {
+            height: 100%;
+            background: #4f46e5;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
 
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- شريط التنقل العلوي                            -->
+    <!-- ═══════════════════════════════════════════════ -->
     <nav class="bg-white border-b border-slate-200 sticky top-0 z-40">
         <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="index.html" class="flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-colors">
+            <a href="/" class="flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-colors">
                 <i class="fas fa-arrow-right"></i>
                 <span class="font-semibold">رجوع</span>
             </a>
@@ -37,319 +193,1211 @@
         </div>
     </nav>
 
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- شريط التقدم                                   -->
+    <!-- ═══════════════════════════════════════════════ -->
     <div class="bg-white border-b border-slate-200 py-6" id="progressBar">
         <div class="max-w-3xl mx-auto px-4">
             <div class="flex items-center justify-between relative">
                 <div class="absolute top-1/2 left-0 right-0 h-1 bg-slate-200 -translate-y-1/2 z-0"></div>
-                <div id="progressFill" class="absolute top-1/2 right-0 h-1 bg-indigo-600 -translate-y-1/2 z-0" style="width: 0%"></div>
-                <div class="relative z-10 flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow">1</div><span class="text-xs font-semibold mt-2 text-indigo-600">الهاتف</span></div>
-                <div class="relative z-10 flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow">2</div><span class="text-xs font-semibold mt-2 text-slate-500">المواصفات</span></div>
-                <div class="relative z-10 flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow">3</div><span class="text-xs font-semibold mt-2 text-slate-500">الصور</span></div>
-                <div class="relative z-10 flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow">4</div><span class="text-xs font-semibold mt-2 text-slate-500">السعر</span></div>
-                <div class="relative z-10 flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow">5</div><span class="text-xs font-semibold mt-2 text-slate-500">التواصل</span></div>
+                <div id="progressFill" class="absolute top-1/2 right-0 h-1 bg-indigo-600 -translate-y-1/2 z-0 progress-line" style="width: 0%"></div>
+                
+                <div class="step-indicator relative z-10 flex flex-col items-center" data-step="1">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow">1</div>
+                    <span class="text-xs font-semibold mt-2 text-indigo-600">الهاتف</span>
+                </div>
+                <div class="step-indicator relative z-10 flex flex-col items-center" data-step="2">
+                    <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow">2</div>
+                    <span class="text-xs font-semibold mt-2 text-slate-500">المواصفات</span>
+                </div>
+                <div class="step-indicator relative z-10 flex flex-col items-center" data-step="3">
+                    <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow">3</div>
+                    <span class="text-xs font-semibold mt-2 text-slate-500">الصور</span>
+                </div>
+                <div class="step-indicator relative z-10 flex flex-col items-center" data-step="4">
+                    <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow">4</div>
+                    <span class="text-xs font-semibold mt-2 text-slate-500">السعر</span>
+                </div>
+                <div class="step-indicator relative z-10 flex flex-col items-center" data-step="5">
+                    <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow">5</div>
+                    <span class="text-xs font-semibold mt-2 text-slate-500">التواصل</span>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- المحتوى الرئيسي                               -->
+    <!-- ═══════════════════════════════════════════════ -->
     <main class="max-w-2xl mx-auto px-4 py-8" id="mainContent">
-        <!-- Step 1 -->
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- الخطوة 1: اختيار الهاتف                 -->
+        <!-- ═══════════════════════════════════════ -->
         <div id="step-1" class="step-content active">
             <h2 class="text-xl font-bold text-slate-900 mb-2">اختيار الهاتف</h2>
+            <p class="text-slate-500 mb-6 text-sm">اختر الشركة ثم نوع الهاتف من القائمة</p>
+
             <form onsubmit="nextStep(2); return false;">
+                <!-- الشركة المصنعة -->
                 <div class="mb-5">
-                    <label class="block text-sm font-bold text-slate-700 mb-3">الشركة المصنعة <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-bold text-slate-700 mb-3">
+                        الشركة المصنعة <span class="text-red-500">*</span>
+                    </label>
                     <div class="grid grid-cols-4 gap-3">
-                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'apple')"><input type="radio" name="brand" value="apple" class="hidden" required><i class="fab fa-apple text-2xl text-slate-700 mb-1 block"></i><span class="text-xs font-bold">Apple</span></label>
-                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'samsung')"><input type="radio" name="brand" value="samsung" class="hidden"><i class="fab fa-android text-2xl text-blue-600 mb-1 block"></i><span class="text-xs font-bold">Samsung</span></label>
-                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'xiaomi')"><input type="radio" name="brand" value="xiaomi" class="hidden"><span class="text-xl font-black text-orange-600 block mb-1">Mi</span><span class="text-xs font-bold">Xiaomi</span></label>
-                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'oppo')"><input type="radio" name="brand" value="oppo" class="hidden"><span class="text-xl font-black text-green-600 block mb-1">OP</span><span class="text-xs font-bold">OPPO</span></label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'apple')">
+                            <input type="radio" name="brand" value="apple" class="hidden" required>
+                            <i class="fab fa-apple text-2xl text-slate-700 mb-1 block"></i>
+                            <span class="text-xs font-bold">Apple</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'samsung')">
+                            <input type="radio" name="brand" value="samsung" class="hidden">
+                            <i class="fab fa-android text-2xl text-blue-600 mb-1 block"></i>
+                            <span class="text-xs font-bold">Samsung</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'xiaomi')">
+                            <input type="radio" name="brand" value="xiaomi" class="hidden">
+                            <span class="text-xl font-black text-orange-600 block mb-1">Mi</span>
+                            <span class="text-xs font-bold">Xiaomi</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'oppo')">
+                            <input type="radio" name="brand" value="oppo" class="hidden">
+                            <span class="text-xl font-black text-green-600 block mb-1">OP</span>
+                            <span class="text-xs font-bold">OPPO</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'huawei')">
+                            <input type="radio" name="brand" value="huawei" class="hidden">
+                            <i class="fas fa-wifi text-2xl text-red-600 mb-1 block"></i>
+                            <span class="text-xs font-bold">Huawei</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'google')">
+                            <input type="radio" name="brand" value="google" class="hidden">
+                            <i class="fab fa-google text-2xl text-blue-500 mb-1 block"></i>
+                            <span class="text-xs font-bold">Google</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'oneplus')">
+                            <input type="radio" name="brand" value="oneplus" class="hidden">
+                            <span class="text-xl font-black text-red-600 block mb-1">1+</span>
+                            <span class="text-xs font-bold">OnePlus</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectBrand(this, 'realme')">
+                            <input type="radio" name="brand" value="realme" class="hidden">
+                            <span class="text-xl font-black text-yellow-500 block mb-1">rl</span>
+                            <span class="text-xs font-bold">Realme</span>
+                        </label>
                     </div>
                 </div>
+
+                <!-- اسم الهاتف -->
                 <div class="mb-5">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">نوع الهاتف <span class="text-red-500">*</span></label>
-                    <select id="phoneModel" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" required disabled><option value="">اختر الشركة أولاً</option></select>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        نوع الهاتف <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        id="phoneModel" 
+                        class="custom-select input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 pr-4"
+                        required
+                        disabled
+                    >
+                        <option value="">اختر الشركة أولاً</option>
+                    </select>
                 </div>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition-colors">التالي</button>
+
+                <!-- اللون -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">اللون (اختياري)</label>
+                    <input 
+                        type="text" 
+                        id="color"
+                        placeholder="مثال: أسود، أبيض، ذهبي"
+                        class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
+                    >
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+                    التالي
+                    <i class="fas fa-arrow-left"></i>
+                </button>
             </form>
         </div>
 
-        <!-- Step 2 -->
+        <!-- ═══════════════════════════════════════ -->
+        <!-- الخطوة 2: المواصفات التقنية              -->
+        <!-- ═══════════════════════════════════════ -->
         <div id="step-2" class="step-content">
             <h2 class="text-xl font-bold text-slate-900 mb-2">المواصفات التقنية</h2>
+            <p class="text-slate-500 mb-6 text-sm">أدخل مواصفات الهاتف التقنية</p>
+
             <form onsubmit="nextStep(3); return false;">
+                <!-- الرام -->
                 <div class="mb-5">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">الرام</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">الذاكرة العشوائية (RAM)</label>
                     <div class="grid grid-cols-4 gap-3">
-                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '4')"><input type="radio" name="ram" value="4" class="hidden"><span class="font-bold">4 GB</span></label>
-                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '6')"><input type="radio" name="ram" value="6" class="hidden"><span class="font-bold">6 GB</span></label>
-                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '8')"><input type="radio" name="ram" value="8" class="hidden"><span class="font-bold">8 GB</span></label>
-                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '12')"><input type="radio" name="ram" value="12" class="hidden"><span class="font-bold">12 GB</span></label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '2')">
+                            <input type="radio" name="ram" value="2" class="hidden">
+                            <span class="font-bold text-slate-700">2 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '4')">
+                            <input type="radio" name="ram" value="4" class="hidden">
+                            <span class="font-bold text-slate-700">4 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '6')">
+                            <input type="radio" name="ram" value="6" class="hidden">
+                            <span class="font-bold text-slate-700">6 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '8')">
+                            <input type="radio" name="ram" value="8" class="hidden">
+                            <span class="font-bold text-slate-700">8 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '12')">
+                            <input type="radio" name="ram" value="12" class="hidden">
+                            <span class="font-bold text-slate-700">12 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectRam(this, '16')">
+                            <input type="radio" name="ram" value="16" class="hidden">
+                            <span class="font-bold text-slate-700">16 GB</span>
+                        </label>
                     </div>
                 </div>
-                <div class="flex gap-3">
-                    <button type="button" onclick="prevStep(1)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold">رجوع</button>
-                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold">التالي</button>
-                </div>
-            </form>
-        </div>
 
-        <!-- Step 3 -->
-        <div id="step-3" class="step-content">
-            <h2 class="text-xl font-bold text-slate-900 mb-2">صور الهاتف</h2>
-            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center mb-6 cursor-pointer hover:border-indigo-400 transition-colors" onclick="document.getElementById('imageInput').click()">
-                <input type="file" id="imageInput" multiple accept="image/*" class="hidden" onchange="handleImages(this.files)">
-                <i class="fas fa-camera text-4xl text-indigo-600 mb-4"></i>
-                <p class="font-semibold">اضغط لاختيار الصور</p>
-            </div>
-            <div id="imagePreview" class="grid grid-cols-3 gap-3 mb-6 hidden"></div>
-            <div class="flex gap-3">
-                <button type="button" onclick="prevStep(2)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold">رجوع</button>
-                <button type="button" onclick="nextStep(4)" id="nextToPrice" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold" disabled>التالي</button>
-            </div>
-        </div>
-
-        <!-- Step 4 -->
-        <div id="step-4" class="step-content">
-            <h2 class="text-xl font-bold text-slate-900 mb-2">السعر والحالة</h2>
-            <form onsubmit="nextStep(5); return false;">
+                <!-- التخزين -->
                 <div class="mb-5">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">السعر <span class="text-red-500">*</span></label>
-                    <input type="text" id="price" placeholder="300,000" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-2xl font-bold" oninput="formatPrice(this)" required>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">سعة التخزين</label>
+                    <div class="grid grid-cols-4 gap-3">
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectStorage(this, '32')">
+                            <input type="radio" name="storage" value="32" class="hidden">
+                            <span class="font-bold text-slate-700">32 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectStorage(this, '64')">
+                            <input type="radio" name="storage" value="64" class="hidden">
+                            <span class="font-bold text-slate-700">64 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectStorage(this, '128')">
+                            <input type="radio" name="storage" value="128" class="hidden">
+                            <span class="font-bold text-slate-700">128 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectStorage(this, '256')">
+                            <input type="radio" name="storage" value="256" class="hidden">
+                            <span class="font-bold text-slate-700">256 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectStorage(this, '512')">
+                            <input type="radio" name="storage" value="512" class="hidden">
+                            <span class="font-bold text-slate-700">512 GB</span>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-3 text-center" onclick="selectStorage(this, '1024')">
+                            <input type="radio" name="storage" value="1024" class="hidden">
+                            <span class="font-bold text-slate-700">1 TB</span>
+                        </label>
+                    </div>
                 </div>
-                <div class="flex gap-3">
-                    <button type="button" onclick="prevStep(3)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold">رجوع</button>
-                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold">التالي</button>
-                </div>
-            </form>
-        </div>
 
-        <!-- Step 5 -->
-        <div id="step-5" class="step-content">
-            <h2 class="text-xl font-bold text-slate-900 mb-2">الموقع والتواصل</h2>
-            <form onsubmit="publishAd(event)">
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">المدينة <span class="text-red-500">*</span></label>
-                    <input type="text" id="city" placeholder="الخرطوم" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" required>
+                <!-- صحة البطارية - تظهر فقط للآيفون -->
+                <div id="batterySection" class="mb-5 hidden">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">صحة البطارية (Battery Health)</label>
+                    <div class="relative">
+                        <input 
+                            type="number" 
+                            id="batteryHealth"
+                            min="0" 
+                            max="100"
+                            placeholder="مثال: 85"
+                            class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left pl-12"
+                        >
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">%</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">نسبة صحة البطارية الحالية (متاحة فقط لأجهزة iPhone)</p>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">رقم الهاتف <span class="text-red-500">*</span></label>
-                    <input type="tel" id="contactPhone" placeholder="+249912345678" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" required>
+
+                <!-- مقاومة الماء -->
+                <div class="mb-5">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">مقاومة الماء</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-4 flex items-center gap-3" onclick="selectWaterResistant(this, true)">
+                            <input type="radio" name="waterResistant" value="true" class="hidden">
+                            <i class="fas fa-tint text-blue-500 text-xl"></i>
+                            <div>
+                                <p class="font-bold text-slate-700">نعم</p>
+                                <p class="text-xs text-slate-500">IP67 / IP68</p>
+                            </div>
+                        </label>
+                        <label class="radio-card border-2 border-slate-200 rounded-xl p-4 flex items-center gap-3" onclick="selectWaterResistant(this, false)">
+                            <input type="radio" name="waterResistant" value="false" class="hidden">
+                            <i class="fas fa-times-circle text-slate-400 text-xl"></i>
+                            <div>
+                                <p class="font-bold text-slate-700">لا</p>
+                                <p class="text-xs text-slate-500">غير مقاوم</p>
+                            </div>
+                        </label>
+                    </div>
                 </div>
+
+                <!-- الكاميرا -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">الكاميرا الرئيسية</label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="camera"
+                            placeholder="مثال: 48MP أو 108MP"
+                            class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
+                        >
+                    </div>
+                </div>
+
+                <!-- الوصف -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">وصف إضافي (اختياري)</label>
+                    <textarea 
+                        id="description"
+                        rows="3"
+                        placeholder="اكتب أي تفاصيل إضافية عن الهاتف..."
+                        class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 resize-none"
+                    ></textarea>
+                </div>
+
                 <div class="flex gap-3">
-                    <button type="button" onclick="prevStep(4)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold">رجوع</button>
-                    <button type="submit" id="publishBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2">
-                        <span>نشر الإعلان</span><i class="fas fa-check"></i>
+                    <button type="button" onclick="prevStep(1)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
+                        رجوع
+                    </button>
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+                        التالي
+                        <i class="fas fa-arrow-left"></i>
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- Auth Step -->
+        <!-- ═══════════════════════════════════════ -->
+        <!-- الخطوة 3: رفع الصور (3 صور إلزامية)     -->
+        <!-- ═══════════════════════════════════════ -->
+        <div id="step-3" class="step-content">
+            <h2 class="text-xl font-bold text-slate-900 mb-2">صور الهاتف</h2>
+            <p class="text-slate-500 mb-6 text-sm">أضف 3 صور على الأقل للهاتف. <span class="text-indigo-600 font-bold">الصورة الأولى ستكون الرئيسية</span></p>
+
+            <form onsubmit="nextStep(4); return false;">
+                <!-- منطقة الرفع -->
+                <div 
+                    id="dropZone"
+                    class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center mb-6 cursor-pointer hover:border-indigo-400 transition-colors"
+                    onclick="document.getElementById('imageInput').click()"
+                    ondragover="handleDragOver(event)"
+                    ondragleave="handleDragLeave(event)"
+                    ondrop="handleDrop(event)"
+                >
+                    <input type="file" id="imageInput" multiple accept="image/*" class="hidden" onchange="handleImages(this.files)">
+                    <div id="uploadPrompt">
+                        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-camera text-2xl text-indigo-600"></i>
+                        </div>
+                        <p class="font-semibold text-slate-700 mb-1">اضغط أو اسحب الصور هنا</p>
+                        <p class="text-sm text-slate-500">3 صور كحد أقصى</p>
+                        <p class="text-xs text-slate-400 mt-1">PNG, JPG - حتى 5MB</p>
+                    </div>
+                </div>
+
+                <!-- معاينة الصور -->
+                <div id="imagePreview" class="grid grid-cols-3 gap-3 mb-6 hidden">
+                    <!-- تُملأ ديناميكياً -->
+                </div>
+
+                <!-- عداد الصور -->
+                <div class="flex items-center justify-between mb-6 bg-slate-50 rounded-xl p-4">
+                    <span class="text-sm font-semibold text-slate-700">الصور المرفوعة:</span>
+                    <span id="imageCount" class="text-lg font-bold text-indigo-600">0/3</span>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="prevStep(2)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
+                        رجوع
+                    </button>
+                    <button type="submit" id="nextToPrice" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2" disabled>
+                        التالي
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- الخطوة 4: السعر والحالة                  -->
+        <!-- ═══════════════════════════════════════ -->
+        <div id="step-4" class="step-content">
+            <h2 class="text-xl font-bold text-slate-900 mb-2">السعر والحالة</h2>
+            <p class="text-slate-500 mb-6 text-sm">حدد سعر الهاتف وحالته</p>
+
+            <form onsubmit="nextStep(5); return false;">
+                <!-- السعر -->
+                <div class="mb-5">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        السعر <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="price"
+                            placeholder="300,000"
+                            class="price-input input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-2xl font-bold"
+                            oninput="formatPrice(this)"
+                            required
+                        >
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">ج.س</span>
+                    </div>
+                    <p id="priceError" class="text-sm text-red-500 mt-2 hidden">السعر يجب أن يكون 1,000 على الأقل</p>
+                </div>
+
+                <!-- حالة الهاتف -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-3">
+                        حالة الهاتف <span class="text-red-500">*</span>
+                    </label>
+                    <div class="space-y-3">
+                        <label class="radio-card flex items-center gap-4 p-4 border-2 border-slate-200 rounded-xl cursor-pointer" onclick="selectStatus(this, 'new')">
+                            <input type="radio" name="status" value="new" class="hidden" required>
+                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-box-open text-green-600 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-slate-900">جديد</p>
+                                <p class="text-sm text-slate-500">لم يُستخدم، بالعلبة الأصلية</p>
+                            </div>
+                            <div class="w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center check-circle">
+                                <div class="w-3 h-3 rounded-full bg-indigo-600 hidden"></div>
+                            </div>
+                        </label>
+
+                        <label class="radio-card flex items-center gap-4 p-4 border-2 border-slate-200 rounded-xl cursor-pointer" onclick="selectStatus(this, 'like-new')">
+                            <input type="radio" name="status" value="like-new" class="hidden">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-star text-blue-600 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-slate-900">شبه جديد</p>
+                                <p class="text-sm text-slate-500">استخدام خفيف، لا يوجد خدوش</p>
+                            </div>
+                            <div class="w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center check-circle">
+                                <div class="w-3 h-3 rounded-full bg-indigo-600 hidden"></div>
+                            </div>
+                        </label>
+
+                        <label class="radio-card flex items-center gap-4 p-4 border-2 border-slate-200 rounded-xl cursor-pointer" onclick="selectStatus(this, 'used')">
+                            <input type="radio" name="status" value="used" class="hidden">
+                            <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-mobile-screen text-orange-600 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-slate-900">مستعمل</p>
+                                <p class="text-sm text-slate-500">استخدام واضح، يعمل بشكل جيد</p>
+                            </div>
+                            <div class="w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center check-circle">
+                                <div class="w-3 h-3 rounded-full bg-indigo-600 hidden"></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="prevStep(3)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
+                        رجوع
+                    </button>
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+                        التالي
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- الخطوة 5: الموقع وطرق التواصل            -->
+        <!-- ═══════════════════════════════════════ -->
+        <div id="step-5" class="step-content">
+            <h2 class="text-xl font-bold text-slate-900 mb-2">الموقع والتواصل</h2>
+            <p class="text-slate-500 mb-6 text-sm">حدد موقعك وكيف يمكن التواصل معك</p>
+
+            <form onsubmit="publishAd(event)">
+                <!-- الولاية -->
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        الولاية <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        id="state" 
+                        onchange="updateCities()"
+                        class="custom-select input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
+                        required
+                    >
+                        <option value="">اختر الولاية</option>
+                        <option value="khartoum">الخرطوم</option>
+                        <option value="omdurman">أم درمان</option>
+                        <option value="bahri">بحري</option>
+                        <option value="jazeera">الجزيرة</option>
+                        <option value="white-nile">النيل الأبيض</option>
+                        <option value="blue-nile">النيل الأزرق</option>
+                        <option value="kassala">كسلا</option>
+                        <option value="gedaref">القضارف</option>
+                        <option value="sennar">سنار</option>
+                        <option value="northern">شمالية</option>
+                        <option value="river-nile">نهر النيل</option>
+                        <option value="red-sea">البحر الأحمر</option>
+                        <option value="kordofan">كردفان</option>
+                        <option value="darfur">دارفور</option>
+                    </select>
+                </div>
+
+                <!-- المدينة -->
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        المدينة <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        id="city" 
+                        class="custom-select input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
+                        required
+                    >
+                        <option value="">اختر الولاية أولاً</option>
+                    </select>
+                </div>
+
+                <!-- الحي / المنطقة -->
+                <div class="mb-5">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        الحي / المنطقة <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="neighborhood"
+                        placeholder="مثال: الرياض، العمارات، بري"
+                        class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
+                        required
+                    >
+                </div>
+
+                <!-- رقم الهاتف -->
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        رقم الهاتف للتواصل <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">+249</span>
+                        <input 
+                            type="tel" 
+                            id="contactPhone"
+                            placeholder="912345678"
+                            class="input-field w-full pr-20 pl-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left"
+                            maxlength="9"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- نفس الرقم لواتساب -->
+                <label class="flex items-center gap-2 mb-4 cursor-pointer">
+                    <input type="checkbox" id="sameWhatsApp" onchange="toggleWhatsApp()" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" checked>
+                    <span class="text-sm text-slate-700">رقم الواتساب نفس رقم الهاتف</span>
+                </label>
+
+                <!-- رقم واتساب مختلف -->
+                <div id="whatsAppSection" class="mb-5 hidden">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">رقم الواتساب</label>
+                    <div class="relative">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">+249</span>
+                        <input 
+                            type="tel" 
+                            id="whatsAppNumber"
+                            placeholder="912345678"
+                            class="input-field w-full pr-20 pl-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left"
+                            maxlength="9"
+                        >
+                    </div>
+                </div>
+
+                <!-- طرق التواصل -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-3">
+                        طرق التواصل المتاحة <span class="text-red-500">*</span>
+                    </label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                            <input type="checkbox" name="contactMethods" value="whatsapp" class="w-5 h-5 rounded border-slate-300 text-green-600 focus:ring-green-500" checked>
+                            <i class="fab fa-whatsapp text-green-500 text-xl"></i>
+                            <div>
+                                <p class="font-semibold text-slate-700">واتساب</p>
+                                <p class="text-xs text-slate-500">تواصل عبر واتساب</p>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                            <input type="checkbox" name="contactMethods" value="call" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                            <i class="fas fa-phone text-blue-500 text-xl"></i>
+                            <div>
+                                <p class="font-semibold text-slate-700">اتصال هاتفي</p>
+                                <p class="text-xs text-slate-500">اتصال مباشر</p>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                            <input type="checkbox" name="contactMethods" value="message" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            <i class="fas fa-comment-dots text-indigo-500 text-xl"></i>
+                            <div>
+                                <p class="font-semibold text-slate-700">رسائل داخلية</p>
+                                <p class="text-xs text-slate-500">مراسلة عبر المنصة</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ملخص سريع -->
+                <div class="bg-slate-100 rounded-xl p-4 mb-6">
+                    <h3 class="font-bold text-slate-900 mb-3 text-sm">ملخص الإعلان</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">الهاتف:</span>
+                            <span id="summaryName" class="font-semibold text-slate-900">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">السعر:</span>
+                            <span id="summaryPrice" class="font-semibold text-indigo-600">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">الموقع:</span>
+                            <span id="summaryLocation" class="font-semibold text-slate-900">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="prevStep(4)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
+                        رجوع
+                    </button>
+                    <button type="submit" id="publishBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+                        <span>نشر الإعلان</span>
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- شاشة التحقق من الحساب (تسجيل/دخول)       -->
+        <!-- ═══════════════════════════════════════ -->
         <div id="auth-step" class="hidden">
             <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-slate-900 mb-2">تسجيل الدخول مطلوب</h2>
-                <p class="text-slate-500">سجل دخول لإتمام نشر الإعلان</p>
+                <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-lock text-3xl text-amber-600"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">أكمل نشر إعلانك</h2>
+                <p class="text-slate-500">لقد تم حفظ بيانات إعلانك مؤقتاً. سجل دخول أو أنشئ حساباً لإتمام النشر.</p>
             </div>
+
+            <!-- تبويبات -->
             <div class="flex border-b border-slate-200 mb-6">
-                <div class="flex-1 text-center py-3 border-b-2 border-indigo-600 text-indigo-600 font-bold cursor-pointer" onclick="switchAuthTab('login')">تسجيل الدخول</div>
-                <div class="flex-1 text-center py-3 text-slate-500 cursor-pointer" onclick="switchAuthTab('register')">إنشاء حساب</div>
+                <div class="auth-tab active flex-1 text-center py-3" onclick="switchAuthTab('login')">
+                    تسجيل الدخول
+                </div>
+                <div class="auth-tab flex-1 text-center py-3" onclick="switchAuthTab('register')">
+                    إنشاء حساب جديد
+                </div>
             </div>
+
+            <!-- نموذج تسجيل الدخول -->
             <div id="loginForm">
                 <form onsubmit="handleLogin(event)">
-                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" class="w-full px-4 py-3 border border-slate-200 rounded-xl mb-4" required>
-                    <input type="password" id="loginPassword" placeholder="كلمة المرور" class="w-full px-4 py-3 border border-slate-200 rounded-xl mb-6" required>
-                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold mb-4">تسجيل الدخول</button>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="loginEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left" placeholder="example@email.com" required>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label>
+                        <input type="password" id="loginPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
+                    </div>
+                    
+                    <button type="submit" id="loginSubmitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition-colors mb-4 flex items-center justify-center gap-2">
+                        <span>تسجيل الدخول ونشر الإعلان</span>
+                    </button>
+                    
+                    <button type="button" onclick="backToAd()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
+                        رجوع للإعلان
+                    </button>
                 </form>
             </div>
+
+            <!-- نموذج إنشاء حساب -->
             <div id="registerForm" class="hidden">
                 <form onsubmit="handleRegister(event)">
-                    <input type="text" id="regName" placeholder="الاسم" class="w-full px-4 py-3 border border-slate-200 rounded-xl mb-4" required>
-                    <input type="email" id="regEmail" placeholder="البريد الإلكتروني" class="w-full px-4 py-3 border border-slate-200 rounded-xl mb-4" required>
-                    <input type="password" id="regPassword" placeholder="كلمة المرور" class="w-full px-4 py-3 border border-slate-200 rounded-xl mb-6" required>
-                    <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold mb-4">إنشاء حساب</button>
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label>
+                        <input type="text" id="regName" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="regEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left" placeholder="example@email.com" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label>
+                        <input type="password" id="regPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">تأكيد كلمة المرور</label>
+                        <input type="password" id="regPasswordConfirm" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" minlength="6" required>
+                        <p id="passwordMatchError" class="text-sm text-red-500 mt-2 hidden">كلمتا المرور غير متطابقتين</p>
+                    </div>
+                    
+                    <button type="submit" id="registerSubmitBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition-colors mb-4 flex items-center justify-center gap-2">
+                        <span>إنشاء حساب ونشر الإعلان</span>
+                    </button>
+                    
+                    <button type="button" onclick="backToAd()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
+                        رجوع للإعلان
+                    </button>
                 </form>
             </div>
         </div>
 
-        <!-- Success -->
+        <!-- ═══════════════════════════════════════ -->
+        <!-- شاشة النجاح النهائي                       -->
+        <!-- ═══════════════════════════════════════ -->
         <div id="final-success" class="hidden text-center py-12">
             <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i class="fas fa-check text-4xl text-green-600"></i>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900 mb-2">تم النشر بنجاح!</h2>
-            <a href="index.html" class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold mt-4">الصفحة الرئيسية</a>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">تم نشر إعلانك بنجاح!</h2>
+            <p class="text-slate-500 mb-8">يمكنك الآن متابعة إعلاناتك من لوحة التحكم</p>
+            <div class="flex gap-3 justify-center">
+                <a href="/" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition-colors">
+                    الصفحة الرئيسية
+                </a>
+                <button onclick="location.reload()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold transition-colors">
+                    نشر إعلان جديد
+                </button>
+            </div>
         </div>
+
     </main>
 
-    <!-- Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
-            authDomain: "phone-soug.firebaseapp.com",
-            projectId: "phone-soug",
-            storageBucket: "phone-soug.firebasestorage.app",
-            messagingSenderId: "224588578227",
-            appId: "1:224588578227:web:46b4cb96ff2535a1521fc6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        window.firebaseAuth = auth;
-        window.firebaseDb = db;
-        window.firebaseFns = { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, collection, addDoc, serverTimestamp };
-    </script>
-
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- JavaScript                                      -->
+    <!-- ═══════════════════════════════════════════════ -->
     <script>
+        // ════════════════════════════════════════════
+        // قاعدة بيانات الهواتف
+        // ════════════════════════════════════════════
         const phoneDatabase = {
-            'apple': ['iPhone 16 Pro Max', 'iPhone 15 Pro', 'iPhone 14', 'iPhone 13', 'iPhone 12', 'iPhone 11', 'iPhone SE'],
-            'samsung': ['Galaxy S24 Ultra', 'Galaxy S23', 'Galaxy S22', 'Galaxy Z Fold', 'Galaxy Z Flip', 'Galaxy A55'],
-            'xiaomi': ['Xiaomi 14', 'Xiaomi 13', 'Redmi Note 13', 'POCO F6', 'POCO X6'],
-            'oppo': ['Find X7', 'Reno 11', 'A98', 'F25 Pro']
+            'apple': [
+                'iPhone 16 Pro Max', 'iPhone 16 Pro', 'iPhone 16 Plus', 'iPhone 16',
+                'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15',
+                'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14 Plus', 'iPhone 14',
+                'iPhone 13 Pro Max', 'iPhone 13 Pro', 'iPhone 13', 'iPhone 13 mini',
+                'iPhone 12 Pro Max', 'iPhone 12 Pro', 'iPhone 12', 'iPhone 12 mini',
+                'iPhone 11 Pro Max', 'iPhone 11 Pro', 'iPhone 11', 'iPhone SE',
+                'iPhone XS Max', 'iPhone XS', 'iPhone XR', 'iPhone X'
+            ],
+            'samsung': [
+                'Galaxy S24 Ultra', 'Galaxy S24 Plus', 'Galaxy S24',
+                'Galaxy S23 Ultra', 'Galaxy S23 Plus', 'Galaxy S23',
+                'Galaxy S22 Ultra', 'Galaxy S22 Plus', 'Galaxy S22',
+                'Galaxy Z Fold 6', 'Galaxy Z Fold 5', 'Galaxy Z Fold 4',
+                'Galaxy Z Flip 6', 'Galaxy Z Flip 5', 'Galaxy Z Flip 4',
+                'Galaxy A75', 'Galaxy A55', 'Galaxy A35', 'Galaxy A25',
+                'Galaxy M55', 'Galaxy M35', 'Galaxy M15'
+            ],
+            'xiaomi': [
+                'Xiaomi 14 Ultra', 'Xiaomi 14 Pro', 'Xiaomi 14',
+                'Xiaomi 13 Ultra', 'Xiaomi 13 Pro', 'Xiaomi 13',
+                'Redmi Note 13 Pro Plus', 'Redmi Note 13 Pro', 'Redmi Note 13',
+                'Redmi Note 12 Pro Plus', 'Redmi Note 12 Pro', 'Redmi Note 12',
+                'POCO F6 Pro', 'POCO F6', 'POCO X6 Pro', 'POCO X6',
+                'POCO M6 Pro', 'POCO M6'
+            ],
+            'oppo': [
+                'Find X7 Ultra', 'Find X7', 'Find X6 Pro', 'Find X6',
+                'Reno 11 Pro', 'Reno 11', 'Reno 10 Pro', 'Reno 10',
+                'A98', 'A78', 'A58', 'A38',
+                'F25 Pro', 'F23', 'F21s'
+            ],
+            'huawei': [
+                'Mate 60 Pro', 'Mate 60', 'Mate 50 Pro', 'Mate 50',
+                'P60 Pro', 'P60', 'P50 Pro', 'P50',
+                'nova 12 Ultra', 'nova 12 Pro', 'nova 12',
+                'nova 11 Pro', 'nova 11', 'nova Y91', 'nova Y72'
+            ],
+            'google': [
+                'Pixel 8 Pro', 'Pixel 8', 'Pixel 8a',
+                'Pixel 7 Pro', 'Pixel 7', 'Pixel 7a',
+                'Pixel 6 Pro', 'Pixel 6', 'Pixel 6a',
+                'Pixel Fold'
+            ],
+            'oneplus': [
+                'OnePlus 12', 'OnePlus 12R', 'OnePlus 11',
+                'OnePlus Open', 'OnePlus 10 Pro', 'OnePlus 10T',
+                'OnePlus Nord 4', 'OnePlus Nord 3', 'OnePlus Nord CE 4'
+            ],
+            'realme': [
+                'GT 6', 'GT 6T', 'GT 5 Pro', 'GT 5',
+                '12 Pro Plus', '12 Pro', '12',
+                '11 Pro Plus', '11 Pro', '11',
+                'C67', 'C65', 'C55', 'C53'
+            ]
         };
 
-        let currentStep = 1, uploadedImages = [], formData = {}, selectedBrand = '';
+        // ════════════════════════════════════════════
+        // المدن حسب الولاية
+        // ════════════════════════════════════════════
+        const citiesByState = {
+            'khartoum': ['الخرطوم', 'جبل أولياء', 'شرق النيل', 'كرري'],
+            'omdurman': ['أم درمان', 'الثورة', 'بانت', 'الحاج يوسف'],
+            'bahri': ['بحري', 'الشعبية', 'الدروشاب', 'الصافية'],
+            'jazeera': ['ود مدني', 'الحصاحيصا', 'الكاملين', 'رفاعة'],
+            'white-nile': ['ربك', 'الدويم', 'القطينة', 'كوستي'],
+            'blue-nile': ['الدمازين', 'الروصيرص', 'قيسان'],
+            'kassala': ['كسلا', 'خشم القربة', 'تلكوك', 'ريف كسلا'],
+            'gedaref': ['القضارف', 'الفاو', 'الرهد', 'البطانة'],
+            'sennar': ['سنار', 'سنجة', 'الدندر', 'السوكي'],
+            'northern': ['دنقلا', 'كرمة', 'الدبة', 'وادي حلفا'],
+            'river-nile': ['عطبرة', 'البحيرة', 'شندي', 'بربر'],
+            'red-sea': ['بورتسودان', 'سواكن', 'القنب والاوليب', 'حلايب'],
+            'kordofan': ['الأبيض', 'الفولة', 'النهود', 'بابنوسة'],
+            'darfur': ['الفاشر', 'نيالا', 'الجنينة', 'زالنجي']
+        };
 
-        function selectBrand(el, brand) {
+        // ════════════════════════════════════════════
+        // المتغيرات العامة
+        // ════════════════════════════════════════════
+        let currentStep = 1;
+        let uploadedImages = [];
+        let formData = {};
+        let selectedBrand = '';
+        let authMode = 'login';
+        let isUploading = false;
+
+        // ════════════════════════════════════════════
+        // انتظار تهيئة Firebase
+        // ════════════════════════════════════════════
+        async function waitForFirebase() {
+            let attempts = 0;
+            while ((!window.firebaseAuth || !window.firebaseDb) && attempts < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                attempts++;
+            }
+            if (!window.firebaseAuth) {
+                throw new Error('Firebase لم يتم تهيئته. تأكد من الاتصال بالإنترنت.');
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // رفع صورة إلى Cloudinary
+        // ════════════════════════════════════════════
+        async function uploadToCloudinary(file) {
+            const { cloudName, uploadPreset } = window.cloudinaryConfig;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', uploadPreset);
+            formData.append('cloud_name', cloudName);
+
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'فشل رفع الصورة');
+            }
+
+            const data = await response.json();
+            return {
+                url: data.secure_url,
+                publicId: data.public_id
+            };
+        }
+
+        // ═══════════════════════════════════════════=
+        // رفع جميع الصور إلى Cloudinary
+        // ═══════════════════════════════════════════=
+        async function uploadAllImages() {
+            const uploadedUrls = [];
+            
+            for (let i = 0; i < uploadedImages.length; i++) {
+                try {
+                    const result = await uploadToCloudinary(uploadedImages[i].file);
+                    uploadedUrls.push(result);
+                } catch (error) {
+                    console.error('خطأ في رفع الصورة:', error);
+                    throw new Error(`فشل رفع الصورة ${i + 1}: ${error.message}`);
+                }
+            }
+            
+            return uploadedUrls;
+        }
+
+        // ════════════════════════════════════════════
+        // اختيار الشركة
+        // ════════════════════════════════════════════
+        function selectBrand(element, brand) {
             selectedBrand = brand;
-            document.querySelectorAll('input[name="brand"]').forEach(i => i.closest('.radio-card').classList.remove('selected'));
-            el.classList.add('selected');
-            el.querySelector('input').checked = true;
-            const sel = document.getElementById('phoneModel');
-            sel.disabled = false;
-            sel.innerHTML = '<option value="">اختر نوع الهاتف</option>';
-            (phoneDatabase[brand] || []).forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; sel.appendChild(o); });
+            
+            document.querySelectorAll('input[name="brand"]').forEach(input => {
+                input.closest('.radio-card').classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
+
+            const phoneSelect = document.getElementById('phoneModel');
+            phoneSelect.disabled = false;
+            phoneSelect.innerHTML = '<option value="">اختر نوع الهاتف</option>';
+            
+            const phones = phoneDatabase[brand] || [];
+            phones.forEach(phone => {
+                const option = document.createElement('option');
+                option.value = phone;
+                option.textContent = phone;
+                phoneSelect.appendChild(option);
+            });
         }
 
-        function selectRam(el, v) {
-            document.querySelectorAll('input[name="ram"]').forEach(i => i.closest('.radio-card').classList.remove('selected'));
-            el.classList.add('selected');
-            el.querySelector('input').checked = true;
+        // ════════════════════════════════════════════
+        // اختيار الرام
+        // ════════════════════════════════════════════
+        function selectRam(element, value) {
+            document.querySelectorAll('input[name="ram"]').forEach(input => {
+                input.closest('.radio-card').classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
         }
 
-        function nextStep(s) {
-            saveData(currentStep);
-            document.getElementById('step-' + currentStep).classList.remove('active');
-            document.getElementById('step-' + s).classList.add('active');
-            updateProgress(s);
-            currentStep = s;
+        // ════════════════════════════════════════════
+        // اختيار التخزين
+        // ════════════════════════════════════════════
+        function selectStorage(element, value) {
+            document.querySelectorAll('input[name="storage"]').forEach(input => {
+                input.closest('.radio-card').classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
         }
 
-        function prevStep(s) {
-            document.getElementById('step-' + currentStep).classList.remove('active');
-            document.getElementById('step-' + s).classList.add('active');
-            updateProgress(s);
-            currentStep = s;
+        // ════════════════════════════════════════════
+        // اختيار مقاومة الماء
+        // ════════════════════════════════════════════
+        function selectWaterResistant(element, value) {
+            document.querySelectorAll('input[name="waterResistant"]').forEach(input => {
+                input.closest('.radio-card').classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
         }
 
-        function updateProgress(s) {
-            document.getElementById('progressFill').style.width = ((s - 1) / 4 * 100) + '%';
+        // ════════════════════════════════════════════
+        // اختيار الحالة
+        // ════════════════════════════════════════════
+        function selectStatus(element, status) {
+            document.querySelectorAll('input[name="status"]').forEach(input => {
+                const card = input.closest('.radio-card');
+                card.classList.remove('selected');
+                card.querySelector('.check-circle div').classList.add('hidden');
+            });
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
+            element.querySelector('.check-circle div').classList.remove('hidden');
         }
 
-        function saveData(step) {
-            if (step === 1) { formData.brand = selectedBrand; formData.phoneModel = document.getElementById('phoneModel').value; }
-            else if (step === 2) { formData.ram = document.querySelector('input[name="ram"]:checked')?.value; }
-            else if (step === 4) { formData.price = document.getElementById('price').value.replace(/,/g, ''); }
+        // ════════════════════════════════════════════
+        // تحديث المدن
+        // ════════════════════════════════════════════
+        function updateCities() {
+            const state = document.getElementById('state').value;
+            const citySelect = document.getElementById('city');
+            
+            citySelect.innerHTML = '<option value="">اختر المدينة</option>';
+            
+            if (state && citiesByState[state]) {
+                citiesByState[state].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // تنسيق السعر
+        // ════════════════════════════════════════════
+        function formatPrice(input) {
+            let value = input.value.replace(/[^\d]/g, '');
+            
+            if (value) {
+                const numValue = parseInt(value);
+                if (numValue < 1000) {
+                    document.getElementById('priceError').classList.remove('hidden');
+                } else {
+                    document.getElementById('priceError').classList.add('hidden');
+                }
+                input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            } else {
+                input.value = '';
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // تبديل واتساب
+        // ════════════════════════════════════════════
+        function toggleWhatsApp() {
+            const isSame = document.getElementById('sameWhatsApp').checked;
+            const section = document.getElementById('whatsAppSection');
+            
+            if (isSame) {
+                section.classList.add('hidden');
+                document.getElementById('whatsAppNumber').required = false;
+            } else {
+                section.classList.remove('hidden');
+                document.getElementById('whatsAppNumber').required = true;
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // التنقل بين الخطوات
+        // ════════════════════════════════════════════
+        function nextStep(step) {
+            saveStepData(currentStep);
+            
+            if (step === 2) {
+                const batterySection = document.getElementById('batterySection');
+                if (selectedBrand === 'apple') {
+                    batterySection.classList.remove('hidden');
+                } else {
+                    batterySection.classList.add('hidden');
+                    document.getElementById('batteryHealth').value = '';
+                }
+            }
+            
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            updateProgress(step);
+            currentStep = step;
+            
+            if (step === 5) updateSummary();
+        }
+
+        function prevStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.getElementById(`step-${step}`).classList.add('active');
+            updateProgress(step);
+            currentStep = step;
+        }
+
+        function updateProgress(step) {
+            const percent = ((step - 1) / 4) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+            
+            document.querySelectorAll('.step-indicator').forEach((el, index) => {
+                const circle = el.querySelector('div');
+                const label = el.querySelector('span');
+                const stepNum = index + 1;
+                
+                if (stepNum < step) {
+                    circle.className = 'w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow';
+                    circle.innerHTML = '<i class="fas fa-check text-xs"></i>';
+                    label.className = 'text-xs font-semibold mt-2 text-green-600';
+                } else if (stepNum === step) {
+                    circle.className = 'w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow';
+                    circle.innerHTML = stepNum;
+                    label.className = 'text-xs font-semibold mt-2 text-indigo-600';
+                } else {
+                    circle.className = 'w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow';
+                    circle.innerHTML = stepNum;
+                    label.className = 'text-xs font-semibold mt-2 text-slate-500';
+                }
+            });
+        }
+
+        // ════════════════════════════════════════════
+        // حفظ بيانات الخطوة
+        // ════════════════════════════════════════════
+        function saveStepData(step) {
+            if (step === 1) {
+                formData.brand = selectedBrand;
+                formData.phoneModel = document.getElementById('phoneModel').value;
+                formData.color = document.getElementById('color').value;
+            } else if (step === 2) {
+                formData.ram = document.querySelector('input[name="ram"]:checked')?.value;
+                formData.storage = document.querySelector('input[name="storage"]:checked')?.value;
+                formData.batteryHealth = document.getElementById('batteryHealth').value;
+                formData.waterResistant = document.querySelector('input[name="waterResistant"]:checked')?.value;
+                formData.camera = document.getElementById('camera').value;
+                formData.description = document.getElementById('description').value;
+            } else if (step === 3) {
+                formData.images = uploadedImages;
+            } else if (step === 4) {
+                formData.price = document.getElementById('price').value.replace(/,/g, '');
+                formData.status = document.querySelector('input[name="status"]:checked')?.value;
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // رفع الصور
+        // ════════════════════════════════════════════
+        function handleDragOver(e) {
+            e.preventDefault();
+            document.getElementById('dropZone').classList.add('border-indigo-400', 'bg-indigo-50');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            document.getElementById('dropZone').classList.remove('border-indigo-400', 'bg-indigo-50');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            document.getElementById('dropZone').classList.remove('border-indigo-400', 'bg-indigo-50');
+            handleImages(e.dataTransfer.files);
         }
 
         function handleImages(files) {
-            Array.from(files).slice(0, 3 - uploadedImages.length).forEach(file => {
+            const remainingSlots = 3 - uploadedImages.length;
+            const filesToProcess = Array.from(files).slice(0, remainingSlots);
+            
+            filesToProcess.forEach(file => {
                 const reader = new FileReader();
-                reader.onload = e => { uploadedImages.push({ file, preview: e.target.result }); updateImageUI(); };
+                reader.onload = function(e) {
+                    uploadedImages.push({
+                        file: file,
+                        preview: e.target.result
+                    });
+                    updateImageUI();
+                };
                 reader.readAsDataURL(file);
             });
         }
 
         function updateImageUI() {
             const preview = document.getElementById('imagePreview');
-            preview.classList.remove('hidden');
-            preview.innerHTML = uploadedImages.map((img, i) => `
-                <div class="relative aspect-square rounded-xl overflow-hidden border">
-                    <img src="${img.preview}" class="w-full h-full object-cover">
-                    <button onclick="removeImage(${i})" class="absolute top-2 left-2 w-8 h-8 bg-red-500 text-white rounded-lg"><i class="fas fa-times"></i></button>
-                </div>`).join('');
-            document.getElementById('nextToPrice').disabled = uploadedImages.length < 1;
-        }
-
-        function removeImage(i) { uploadedImages.splice(i, 1); updateImageUI(); }
-
-        function formatPrice(input) {
-            let v = input.value.replace(/[^\d]/g, '');
-            input.value = v ? v.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
-        }
-
-        async function publishAd(e) {
-            e.preventDefault();
-            saveData(5);
-            formData.city = document.getElementById('city').value;
-            formData.contactPhone = document.getElementById('contactPhone').value;
-
-            const btn = document.getElementById('publishBtn');
-            btn.innerHTML = '<span class="spinner"></span> جاري الحفظ...';
-            btn.disabled = true;
-
-            try {
-                await waitForFirebase();
-                const user = window.firebaseAuth.currentUser;
-
-                if (!user) {
-                    document.getElementById('step-5').classList.remove('active');
-                    document.getElementById('auth-step').classList.remove('hidden');
-                    btn.innerHTML = '<span>نشر الإعلان</span><i class="fas fa-check"></i>';
-                    btn.disabled = false;
-                    return;
-                }
-
-                // Upload images to Cloudinary first (or skip if not configured)
-                const imageUrls = uploadedImages.length > 0 ? await uploadToCloudinary(uploadedImages[0].file) : { url: '' };
-
-                const adData = {
-                    name: formData.phoneModel,
-                    brand: formData.brand,
-                    price: parseInt(formData.price) || 0,
-                    ram: formData.ram,
-                    status: 'used',
-                    city: formData.city,
-                    sellerName: user.displayName || user.email,
-                    sellerPhone: formData.contactPhone,
-                    whatsapp: formData.contactPhone,
-                    mainImage: imageUrls.url,
-                    createdAt: window.firebaseFns.serverTimestamp(),
-                    userId: user.uid
-                };
-
-                await window.firebaseFns.addDoc(window.firebaseFns.collection(window.firebaseDb, 'phones'), adData);
-                document.getElementById('step-5').classList.remove('active');
-                document.getElementById('final-success').classList.remove('hidden');
-            } catch (err) {
-                alert('خطأ: ' + err.message);
-                console.error(err);
-                btn.innerHTML = '<span>نشر الإعلان</span><i class="fas fa-check"></i>';
-                btn.disabled = false;
+            const countEl = document.getElementById('imageCount');
+            const nextBtn = document.getElementById('nextToPrice');
+            
+            countEl.textContent = `${uploadedImages.length}/3`;
+            
+            if (uploadedImages.length > 0) {
+                preview.classList.remove('hidden');
+                preview.innerHTML = uploadedImages.map((img, index) => `
+                    <div class="image-preview relative aspect-square rounded-xl overflow-hidden border border-slate-200 group">
+                        <img src="${img.preview}" class="w-full h-full object-cover">
+                        <button type="button" onclick="removeImage(${index})" class="absolute top-2 left-2 w-8 h-8 bg-red-500 text-white rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        ${index === 0 ? '<span class="absolute top-2 right-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded-lg">الرئيسية</span>' : ''}
+                    </div>
+                `).join('');
+            }
+            
+            nextBtn.disabled = uploadedImages.length < 3;
+            if (uploadedImages.length >= 3) {
+                nextBtn.classList.remove('opacity-50');
+                document.getElementById('uploadPrompt').innerHTML = `
+                    <i class="fas fa-check-circle text-3xl text-green-500 mb-2"></i>
+                    <p class="font-semibold text-slate-700">تم رفع 3 صور</p>
+                `;
             }
         }
 
-        async function uploadToCloudinary(file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', 'phone_soug_unsigned');
-            const res = await fetch('https://api.cloudinary.com/v1_1/dxbfupupw/image/upload', { method: 'POST', body: formData });
-            const data = await res.json();
-            return { url: data.secure_url };
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            updateImageUI();
+            
+            if (uploadedImages.length === 0) {
+                document.getElementById('imagePreview').classList.add('hidden');
+                document.getElementById('uploadPrompt').innerHTML = `
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-camera text-2xl text-indigo-600"></i>
+                    </div>
+                    <p class="font-semibold text-slate-700 mb-1">اضغط أو اسحب الصور هنا</p>
+                    <p class="text-sm text-slate-500">3 صور كحد أقصى</p>
+                `;
+            }
         }
 
-        async function waitForFirebase() {
-            let attempts = 0;
-            while (!window.firebaseAuth && attempts < 30) { await new Promise(r => setTimeout(r, 100)); attempts++; }
-            if (!window.firebaseAuth) throw new Error('Firebase not initialized');
+        // ════════════════════════════════════════════
+        // تحديث الملخص
+        // ════════════════════════════════════════════
+        function updateSummary() {
+            document.getElementById('summaryName').textContent = formData.phoneModel || '-';
+            document.getElementById('summaryPrice').textContent = formData.price ? parseInt(formData.price).toLocaleString() + ' ج.س' : '-';
+            
+            const state = document.getElementById('state');
+            const city = document.getElementById('city');
+            const location = state.value && city.value ? `${state.options[state.selectedIndex].text} - ${city.value}` : '-';
+            document.getElementById('summaryLocation').textContent = location;
         }
 
+        // ════════════════════════════════════════════
+        // نشر الإعلان
+        // ════════════════════════════════════════════
+        async function publishAd(e) {
+            e.preventDefault();
+            if (isUploading) return;
+            
+            const btn = document.getElementById('publishBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner"></span> جاري الحفظ...';
+            btn.disabled = true;
+            isUploading = true;
+
+            try {
+                // حفظ بيانات التواصل
+                formData.contactPhone = '+249' + document.getElementById('contactPhone').value;
+                formData.whatsApp = document.getElementById('sameWhatsApp').checked 
+                    ? formData.contactPhone 
+                    : '+249' + document.getElementById('whatsAppNumber').value;
+                formData.state = document.getElementById('state').value;
+                formData.city = document.getElementById('city').value;
+                formData.neighborhood = document.getElementById('neighborhood').value;
+                formData.contactMethods = Array.from(document.querySelectorAll('input[name="contactMethods"]:checked')).map(cb => cb.value);
+
+                // حفظ الإعلان مؤقتاً في localStorage
+                localStorage.setItem('pendingPhoneAd', JSON.stringify(formData));
+
+                // انتظار تهيئة Firebase
+                await waitForFirebase();
+
+                // التحقق من تسجيل الدخول
+                const user = window.firebaseAuth.currentUser;
+                
+                if (!user) {
+                    // الانتقال لشاشة التحقق من الحساب
+                    document.getElementById(`step-${currentStep}`).classList.remove('active');
+                    document.getElementById('auth-step').classList.remove('hidden');
+                    document.getElementById('progressBar').classList.add('hidden');
+                } else {
+                    // نشر مباشرة
+                    await finalizePublish();
+                }
+            } catch (error) {
+                console.error('خطأ:', error);
+                alert('حدث خطأ: ' + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                isUploading = false;
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // التبديل بين تبويبات تسجيل الدخول/الإنشاء
+        // ════════════════════════════════════════════
         function switchAuthTab(mode) {
+            authMode = mode;
+            
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
             if (mode === 'login') {
                 document.getElementById('loginForm').classList.remove('hidden');
                 document.getElementById('registerForm').classList.add('hidden');
@@ -359,30 +1407,211 @@
             }
         }
 
+        // ════════════════════════════════════════════
+        // تسجيل الدخول
+        // ════════════════════════════════════════════
         async function handleLogin(e) {
             e.preventDefault();
+            if (isUploading) return;
+            
+            const btn = document.getElementById('loginSubmitBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner"></span> جاري تسجيل الدخول...';
+            btn.disabled = true;
+            isUploading = true;
+
             try {
                 await waitForFirebase();
-                const { signInWithEmailAndPassword } = window.firebaseFns;
-                await signInWithEmailAndPassword(window.firebaseAuth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
-                document.getElementById('auth-step').classList.add('hidden');
-                document.getElementById('step-5').classList.add('active');
-                publishAd({ preventDefault: () => {} });
-            } catch (err) { alert('خطأ في تسجيل الدخول: ' + err.message); }
+                
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                const { signInWithEmailAndPassword } = window.firebaseAuthFns;
+                await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+                
+                // بعد النجاح، نشر الإعلان
+                await finalizePublish();
+            } catch (error) {
+                console.error('خطأ في تسجيل الدخول:', error);
+                let message = 'خطأ في تسجيل الدخول';
+                if (error.code === 'auth/user-not-found') message = 'البريد الإلكتروني غير مسجل';
+                else if (error.code === 'auth/wrong-password') message = 'كلمة المرور غير صحيحة';
+                else if (error.code === 'auth/invalid-email') message = 'البريد الإلكتروني غير صالح';
+                else message = error.message;
+                alert(message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                isUploading = false;
+            }
         }
 
+        // ════════════════════════════════════════════
+        // إنشاء حساب جديد
+        // ════════════════════════════════════════════
         async function handleRegister(e) {
             e.preventDefault();
+            if (isUploading) return;
+            
+            const btn = document.getElementById('registerSubmitBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner"></span> جاري إنشاء الحساب...';
+            btn.disabled = true;
+            isUploading = true;
+
             try {
                 await waitForFirebase();
-                const { createUserWithEmailAndPassword, updateProfile } = window.firebaseFns;
-                const cred = await createUserWithEmailAndPassword(window.firebaseAuth, document.getElementById('regEmail').value, document.getElementById('regPassword').value);
-                await updateProfile(cred.user, { displayName: document.getElementById('regName').value });
-                document.getElementById('auth-step').classList.add('hidden');
-                document.getElementById('step-5').classList.add('active');
-                publishAd({ preventDefault: () => {} });
-            } catch (err) { alert('خطأ: ' + err.message); }
+                
+                const name = document.getElementById('regName').value;
+                const email = document.getElementById('regEmail').value;
+                const password = document.getElementById('regPassword').value;
+                const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+                
+                // التحقق من تطابق كلمة المرور
+                if (password !== passwordConfirm) {
+                    document.getElementById('passwordMatchError').classList.remove('hidden');
+                    return;
+                } else {
+                    document.getElementById('passwordMatchError').classList.add('hidden');
+                }
+                
+                const { createUserWithEmailAndPassword, updateProfile } = window.firebaseAuthFns;
+                const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+                
+                // تحديث اسم المستخدم
+                await updateProfile(userCredential.user, { displayName: name });
+                
+                // بعد النجاح، نشر الإعلان
+                await finalizePublish();
+            } catch (error) {
+                console.error('خطأ في إنشاء الحساب:', error);
+                let message = 'خطأ في إنشاء الحساب';
+                if (error.code === 'auth/email-already-in-use') message = 'البريد الإلكتروني مستخدم بالفعل';
+                else if (error.code === 'auth/invalid-email') message = 'البريد الإلكتروني غير صالح';
+                else if (error.code === 'auth/weak-password') message = 'كلمة المرور ضعيفة (6 أحرف على الأقل)';
+                else message = error.message;
+                alert(message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                isUploading = false;
+            }
         }
+
+        // ════════════════════════════════════════════
+        // إتمام النشر النهائي
+        // ════════════════════════════════════════════
+        async function finalizePublish() {
+            try {
+                // 1. رفع الصور إلى Cloudinary
+                console.log('جاري رفع الصور إلى Cloudinary...');
+                const imageUrls = await uploadAllImages();
+                console.log('✅ تم رفع الصور:', imageUrls);
+                
+                // 2. استرجاع بيانات الإعلان
+                const pendingAd = JSON.parse(localStorage.getItem('pendingPhoneAd') || '{}');
+                const user = window.firebaseAuth.currentUser;
+                
+                if (!user) {
+                    throw new Error('المستخدم غير مسجل الدخول');
+                }
+                
+                // 3. إعداد بيانات الإعلان النهائية
+                const adData = {
+                    // معلومات الهاتف
+                    brand: pendingAd.brand,
+                    phoneModel: pendingAd.phoneModel,
+                    color: pendingAd.color || null,
+                    
+                    // المواصفات
+                    ram: pendingAd.ram || null,
+                    storage: pendingAd.storage || null,
+                    batteryHealth: pendingAd.batteryHealth || null,
+                    waterResistant: pendingAd.waterResistant === 'true',
+                    camera: pendingAd.camera || null,
+                    description: pendingAd.description || null,
+                    
+                    // الصور (من Cloudinary)
+                    images: imageUrls,
+                    mainImage: imageUrls.length > 0 ? imageUrls[0].url : null,
+                    
+                    // السعر والحالة
+                    price: parseInt(pendingAd.price) || 0,
+                    status: pendingAd.status,
+                    
+                    // الموقع
+                    state: pendingAd.state,
+                    city: pendingAd.city,
+                    neighborhood: pendingAd.neighborhood,
+                    
+                    // التواصل
+                    contactPhone: pendingAd.contactPhone,
+                    whatsApp: pendingAd.whatsApp,
+                    contactMethods: pendingAd.contactMethods || [],
+                    
+                    // معلومات الناشر
+                    userId: user.uid,
+                    userName: user.displayName || user.email,
+                    userEmail: user.email,
+                    
+                    // التواريخ
+                    createdAt: window.firebaseFirestoreFns.serverTimestamp(),
+                    updatedAt: window.firebaseFirestoreFns.serverTimestamp(),
+                    
+                    // الحالة
+                    isActive: true,
+                    isSold: false,
+                    views: 0
+                };
+                
+                // 4. حفظ في Firestore
+                console.log('جاري حفظ الإعلان في Firestore...');
+                const { collection, addDoc } = window.firebaseFirestoreFns;
+                const docRef = await addDoc(collection(window.firebaseDb, 'ads'), adData);
+                console.log('✅ تم نشر الإعلان برقم:', docRef.id);
+                
+                // 5. حذف البيانات المؤقتة
+                localStorage.removeItem('pendingPhoneAd');
+                
+                // 6. عرض شاشة النجاح
+                document.getElementById('auth-step').classList.add('hidden');
+                document.getElementById('final-success').classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('خطأ في النشر:', error);
+                alert('حدث خطأ أثناء نشر الإعلان: ' + error.message);
+                throw error;
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // الرجوع للإعلان من شاشة التحقق
+        // ════════════════════════════════════════════
+        function backToAd() {
+            document.getElementById('auth-step').classList.add('hidden');
+            document.getElementById('progressBar').classList.remove('hidden');
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+        }
+
+        // ════════════════════════════════════════════
+        // مراقبة حالة تسجيل الدخول
+        // ════════════════════════════════════════════
+        document.addEventListener('DOMContentLoaded', () => {
+            // انتظار تهيئة Firebase ثم مراقبة حالة المستخدم
+            const checkAuth = setInterval(() => {
+                if (window.firebaseAuth) {
+                    clearInterval(checkAuth);
+                    const { onAuthStateChanged } = window.firebaseAuthFns;
+                    onAuthStateChanged(window.firebaseAuth, (user) => {
+                        if (user) {
+                            console.log('✅ المستخدم مسجل الدخول:', user.email);
+                        } else {
+                            console.log('ℹ️ لا يوجد مستخدم مسجل');
+                        }
+                    });
+                }
+            }, 100);
+        });
     </script>
 </body>
 </html>
