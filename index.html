@@ -2,227 +2,405 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>سوق فون - Sudan Phone Market</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <style>
-        * { font-family: 'Cairo', sans-serif; }
-        .phone-card { transition: all 0.3s ease; }
-        .phone-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+        * { font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        body { background: #f1f5f9; overflow-x: hidden; }
+
+        /* شريط دعائي - مستطيلات متقلبة */
+        .promo-banner {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+            position: relative;
+            overflow: hidden;
+            min-height: 160px;
+        }
+        .promo-shape {
+            position: absolute;
+            border-radius: 16px;
+            opacity: 0.12;
+            animation: shapeFloat 6s ease-in-out infinite;
+        }
+        .promo-shape-1 { width: 100px; height: 70px; background: white; top: 15px; right: -10px; transform: rotate(12deg); animation-delay: 0s; }
+        .promo-shape-2 { width: 70px; height: 100px; background: white; bottom: 5px; left: 5px; transform: rotate(-8deg); animation-delay: 1.5s; }
+        .promo-shape-3 { width: 50px; height: 50px; background: white; top: 40%; right: 25%; transform: rotate(20deg); animation-delay: 3s; }
+        .promo-shape-4 { width: 80px; height: 40px; background: white; bottom: 25px; right: 15%; transform: rotate(-3deg); animation-delay: 2s; }
+        .promo-shape-5 { width: 35px; height: 80px; background: white; top: 5px; left: 35%; transform: rotate(18deg); animation-delay: 4s; }
+        .promo-shape-6 { width: 60px; height: 60px; background: white; bottom: 40%; left: -5px; transform: rotate(30deg); animation-delay: 0.5s; }
+        @keyframes shapeFloat {
+            0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); opacity: 0.08; }
+            50% { transform: translateY(-15px) rotate(calc(var(--rot, 0deg) + 8deg)); opacity: 0.18; }
+        }
+
+        /* Navbar */
+        .app-nav {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226,232,240,0.6);
+        }
+
+        /* بطاقات الهواتف الفاخرة */
+        .phone-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        .phone-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed, #a855f7);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .phone-card:hover::before { opacity: 1; }
+        .phone-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(79, 70, 229, 0.12), 0 0 0 1px rgba(79, 70, 229, 0.1);
+        }
+        .phone-card:active { transform: scale(0.97); }
+        .card-corner {
+            position: absolute;
+            top: -15px; left: -15px;
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 50%;
+            opacity: 0.08;
+            transition: all 0.3s ease;
+        }
+        .phone-card:hover .card-corner { opacity: 0.15; transform: scale(1.3); }
+
         .status-new { background: linear-gradient(135deg, #22c55e, #16a34a); }
         .status-like-new { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
         .status-used { background: linear-gradient(135deg, #f59e0b, #ea580c); }
-        .stores-scroll { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
-        .store-card { scroll-snap-align: start; flex-shrink: 0; }
-        .search-box:focus-within { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
-        .loading-skeleton {
-            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-            background-size: 200% 100%; animation: skeleton 1.5s infinite;
-        }
-        @keyframes skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .thumb-img { transition: all 0.2s ease; cursor: pointer; border: 2px solid transparent; }
-        .thumb-img.active { border-color: #4f46e5; opacity: 1; }
-        .thumb-img:hover { opacity: 0.8; }
-    </style>
-</head>
-<body class="bg-slate-50 min-h-screen">
 
-    <!-- Navbar -->
-    <nav class="fixed top-0 right-0 left-0 z-50 bg-white/95 backdrop-blur-lg border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16 gap-4">
-                <a href="index.html" class="flex items-center gap-2 flex-shrink-0">
-                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <i class="fas fa-mobile-alt text-white text-lg"></i>
+        .fav-btn {
+            transition: all 0.2s ease;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+        }
+        .fav-btn:active { transform: scale(0.8); }
+        .fav-btn.liked { color: #ef4444; animation: heartBeat 0.3s ease; }
+        @keyframes heartBeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        /* معرض الصور */
+        .gallery-container { position: relative; overflow: hidden; border-radius: 20px; }
+        .gallery-track { display: flex; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .gallery-slide { min-width: 100%; flex-shrink: 0; }
+        .gallery-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10; }
+        .gallery-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); transition: all 0.3s ease; cursor: pointer; }
+        .gallery-dot.active { width: 28px; border-radius: 4px; background: white; }
+        .gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(255,255,255,0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.2s ease; }
+        .gallery-nav:hover { transform: translateY(-50%) scale(1.1); background: white; }
+        .gallery-nav.prev { right: 12px; }
+        .gallery-nav.next { left: 12px; }
+
+        /* فلتر */
+        .filter-chip { transition: all 0.2s ease; border: 2px solid transparent; }
+        .filter-chip.active { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; box-shadow: 0 4px 16px rgba(79,70,229,0.3); }
+        .filter-chip:not(.active) { background: white; border-color: #e2e8f0; color: #64748b; }
+        .filter-chip:not(.active):hover { border-color: #4f46e5; color: #4f46e5; background: #eef2ff; }
+
+        /* بطاقات المتاجر */
+        .store-card {
+            min-width: 280px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .store-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+        .store-card:active { transform: scale(0.97); }
+        .store-header { position: relative; height: 100px; overflow: hidden; }
+        .store-header-bg { width: 100%; height: 100%; object-fit: cover; }
+        .store-header-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 100%); }
+        .store-avatar { position: absolute; bottom: -30px; right: 16px; width: 64px; height: 64px; border-radius: 20px; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); object-fit: cover; background: white; }
+        .store-body { padding: 40px 16px 16px; }
+
+        /* Modal المتجر */
+        .store-modal-header { position: relative; height: 200px; overflow: hidden; }
+        .store-modal-bg { width: 100%; height: 100%; object-fit: cover; }
+        .store-modal-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%); }
+        .store-modal-avatar { position: absolute; bottom: -40px; right: 50%; transform: translateX(50%); width: 80px; height: 80px; border-radius: 24px; border: 4px solid white; box-shadow: 0 8px 24px rgba(0,0,0,0.2); object-fit: cover; background: white; }
+
+        /* FAB */
+        .fab-container { position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%); z-index: 50; pointer-events: none; }
+        .fab-btn { pointer-events: auto; background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 8px 32px rgba(79, 70, 229, 0.4), 0 2px 8px rgba(0,0,0,0.15); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .fab-btn:hover { transform: scale(1.05); box-shadow: 0 12px 40px rgba(79, 70, 229, 0.5); }
+        .fab-btn:active { transform: scale(0.95); }
+
+        /* شريط سفلي */
+        .bottom-nav { position: fixed; bottom: 0; right: 0; left: 0; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(226,232,240,0.6); box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        .bottom-item { position: relative; transition: all 0.2s ease; }
+        .bottom-item.active { color: #4f46e5; }
+        .bottom-item.active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 32px; height: 3px; background: linear-gradient(90deg, #4f46e5, #7c3aed); border-radius: 0 0 8px 8px; }
+        .bottom-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; background: #ef4444; color: white; font-size: 10px; font-weight: 700; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 5px; border: 2px solid white; }
+
+        .stores-scroll { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .stores-scroll::-webkit-scrollbar { display: none; }
+
+        .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%); background-size: 200% 100%; animation: skeleton 1.5s infinite; }
+        @keyframes skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .main-content { padding-bottom: 160px; }
+        html { scroll-behavior: smooth; }
+
+        .feature-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: #f8fafc; border-radius: 16px; margin-bottom: 8px; border: 1px solid #f1f5f9; }
+        .feature-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+
+        .similar-card { min-width: 160px; flex-shrink: 0; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.2s ease; cursor: pointer; }
+        .similar-card:active { transform: scale(0.95); }
+
+        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
+    </style>
+<base target="_blank">
+</head>
+<body class="min-h-screen">
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [1] شريط دعائي - مستطيلات متقلبة يمين ويسار -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="promo-banner text-white py-8 px-4 relative">
+        <div class="promo-shape promo-shape-1" style="--rot: 12deg;"></div>
+        <div class="promo-shape promo-shape-2" style="--rot: -8deg;"></div>
+        <div class="promo-shape promo-shape-3" style="--rot: 20deg;"></div>
+        <div class="promo-shape promo-shape-4" style="--rot: -3deg;"></div>
+        <div class="promo-shape promo-shape-5" style="--rot: 18deg;"></div>
+        <div class="promo-shape promo-shape-6" style="--rot: 30deg;"></div>
+
+        <div class="max-w-lg mx-auto flex items-center justify-between relative z-10">
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur border border-white/30">
+                        <i class="fas fa-mobile-alt text-white text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-black text-slate-900 leading-tight tracking-tight">سوق فون</h1>
-                        <p class="text-[10px] text-slate-500 font-medium">Phone Souq Sudan</p>
-                    </div>
-                </a>
-                <div class="search-box flex-1 max-w-lg relative">
-                    <div class="relative">
-                        <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="searchInput" placeholder="ابحث عن هاتف، بائع، أو مدينة..."
-                            class="w-full pr-12 pl-4 py-2.5 bg-slate-100 border-2 border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
-                            oninput="filterPhones()">
+                        <h1 class="text-2xl font-black leading-none tracking-tight">سوق فون</h1>
+                        <p class="text-xs text-white/80 font-semibold mt-1">Phone Souq Sudan</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <a href="publish.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2 shadow-md shadow-indigo-500/20">
-                        <i class="fas fa-plus"></i><span class="hidden sm:inline">أضف إعلان</span>
-                    </a>
-                    <button onclick="showLogin()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-semibold text-sm transition-colors">دخول</button>
+                <p class="text-sm text-white/90 mb-4 leading-relaxed font-medium">
+                    منصتك الأولى لبيع وشراء الهواتف في السودان بأفضل الأسعار
+                </p>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="bg-white/20 backdrop-blur px-3 py-1.5 rounded-xl text-xs font-bold border border-white/20">
+                        <i class="fas fa-shield-alt ml-1"></i> آمن
+                    </span>
+                    <span class="bg-white/20 backdrop-blur px-3 py-1.5 rounded-xl text-xs font-bold border border-white/20">
+                        <i class="fas fa-bolt ml-1"></i> سريع
+                    </span>
+                    <span class="bg-white/20 backdrop-blur px-3 py-1.5 rounded-xl text-xs font-bold border border-white/20">
+                        <i class="fas fa-check-circle ml-1"></i> موثوق
+                    </span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [2] Navbar التطبيقي                           -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <nav class="app-nav sticky top-0 z-40">
+        <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
+            <div class="flex-1 relative">
+                <i class="fas fa-search absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="ابحث عن هاتف، بائع، أو مدينة..."
+                    class="w-full pr-10 pl-4 py-2 bg-slate-100 border-2 border-transparent rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
+                    oninput="filterPhones()">
+            </div>
+            <div class="flex items-center gap-1">
+                <button onclick="showNotifications()" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all relative">
+                    <i class="fas fa-bell text-lg"></i>
+                    <span class="absolute top-1 left-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+                </button>
+                <button onclick="showProfile()" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all">
+                    <div class="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-xs"></i>
+                    </div>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Brand Filters -->
-    <section class="pt-20 pb-2 bg-white border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex gap-2 overflow-x-auto pb-3 snap-x" id="brandFilters">
-                <button onclick="setBrandFilter('')" class="brand-btn active flex items-center gap-2 px-4 py-2 bg-indigo-50 border-2 border-indigo-500 rounded-xl font-semibold text-indigo-700 flex-shrink-0 transition-all" data-brand="">
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [3] فلتر الحالة                                -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <section class="bg-white border-b border-slate-200 py-3">
+        <div class="max-w-lg mx-auto px-4">
+            <div class="flex gap-2 overflow-x-auto pb-1" id="statusFilters">
+                <button onclick="setStatusFilter('')" class="filter-chip active flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-status="">
                     <i class="fas fa-th-large"></i> الكل
                 </button>
-                <button onclick="setBrandFilter('apple')" class="brand-btn flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 rounded-xl font-semibold text-slate-600 flex-shrink-0 hover:border-indigo-300 transition-all" data-brand="apple">
-                    <i class="fab fa-apple text-lg"></i> Apple
+                <button onclick="setStatusFilter('new')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-status="new">
+                    <i class="fas fa-box-open text-green-500"></i> جديد
                 </button>
-                <button onclick="setBrandFilter('samsung')" class="brand-btn flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 rounded-xl font-semibold text-slate-600 flex-shrink-0 hover:border-indigo-300 transition-all" data-brand="samsung">
-                    <i class="fab fa-android text-lg text-blue-600"></i> Samsung
+                <button onclick="setStatusFilter('like-new')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-status="like-new">
+                    <i class="fas fa-star text-blue-500"></i> شبه جديد
                 </button>
-                <button onclick="setBrandFilter('xiaomi')" class="brand-btn flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 rounded-xl font-semibold text-slate-600 flex-shrink-0 hover:border-indigo-300 transition-all" data-brand="xiaomi">
-                    <span class="font-black text-orange-600 text-sm">Mi</span> Xiaomi
-                </button>
-                <button onclick="setBrandFilter('oppo')" class="brand-btn flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 rounded-xl font-semibold text-slate-600 flex-shrink-0 hover:border-indigo-300 transition-all" data-brand="oppo">
-                    <span class="font-black text-green-600 text-sm">OP</span> OPPO
-                </button>
-                <button onclick="setBrandFilter('huawei')" class="brand-btn flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 rounded-xl font-semibold text-slate-600 flex-shrink-0 hover:border-indigo-300 transition-all" data-brand="huawei">
-                    <i class="fas fa-wifi text-lg text-red-600"></i> Huawei
-                </button>
-                <button onclick="setBrandFilter('google')" class="brand-btn flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 rounded-xl font-semibold text-slate-600 flex-shrink-0 hover:border-indigo-300 transition-all" data-brand="google">
-                    <i class="fab fa-google text-lg text-blue-500"></i> Google
-                </button>
-                <button onclick="setBrandFilter('oneplus')" class="brand-btn flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 rounded-xl font-semibold text-slate-600 flex-shrink-0 hover:border-indigo-300 transition-all" data-brand="oneplus">
-                    <span class="font-black text-red-600 text-sm">1+</span> OnePlus
-                </button>
-                <button onclick="setBrandFilter('realme')" class="brand-btn flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 rounded-xl font-semibold text-slate-600 flex-shrink-0 hover:border-indigo-300 transition-all" data-brand="realme">
-                    <span class="font-black text-yellow-600 text-sm">rl</span> Realme
+                <button onclick="setStatusFilter('used')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-status="used">
+                    <i class="fas fa-mobile-screen text-orange-500"></i> مستعمل
                 </button>
             </div>
         </div>
     </section>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h2 class="text-xl font-bold text-slate-900">أحدث الهواتف</h2>
-                <p class="text-sm text-slate-500 mt-1">اكتشف أفضل العروض في السودان</p>
-            </div>
-            <span id="phonesCount" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg font-bold text-sm">جاري التحميل...</span>
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [4] المحتوى الرئيسي                           -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <main class="main-content max-w-lg mx-auto px-4 py-4">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-slate-900">أحدث الهواتف</h2>
+            <span id="phonesCount" class="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg font-bold text-xs">جاري التحميل...</span>
         </div>
 
-        <div id="loadingState" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-                <div class="aspect-square loading-skeleton"></div>
+        <div id="loadingState" class="space-y-4">
+            <div class="phone-card">
+                <div class="card-corner"></div>
+                <div class="aspect-[4/3] skeleton"></div>
                 <div class="p-4 space-y-3">
-                    <div class="h-4 loading-skeleton rounded w-3/4"></div>
-                    <div class="h-3 loading-skeleton rounded w-1/2"></div>
-                    <div class="h-10 loading-skeleton rounded-xl"></div>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-                <div class="aspect-square loading-skeleton"></div>
-                <div class="p-4 space-y-3">
-                    <div class="h-4 loading-skeleton rounded w-3/4"></div>
-                    <div class="h-3 loading-skeleton rounded w-1/2"></div>
-                    <div class="h-10 loading-skeleton rounded-xl"></div>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-                <div class="aspect-square loading-skeleton"></div>
-                <div class="p-4 space-y-3">
-                    <div class="h-4 loading-skeleton rounded w-3/4"></div>
-                    <div class="h-3 loading-skeleton rounded w-1/2"></div>
-                    <div class="h-10 loading-skeleton rounded-xl"></div>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-                <div class="aspect-square loading-skeleton"></div>
-                <div class="p-4 space-y-3">
-                    <div class="h-4 loading-skeleton rounded w-3/4"></div>
-                    <div class="h-3 loading-skeleton rounded w-1/2"></div>
-                    <div class="h-10 loading-skeleton rounded-xl"></div>
+                    <div class="h-4 skeleton rounded w-3/4"></div>
+                    <div class="h-3 skeleton rounded w-1/2"></div>
+                    <div class="flex justify-between">
+                        <div class="h-8 skeleton rounded-xl w-20"></div>
+                        <div class="h-8 skeleton rounded-full w-8"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div id="phonesGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+        <div id="phonesGrid" class="hidden space-y-4"></div>
 
         <div id="noResults" class="hidden text-center py-16">
             <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-search text-3xl text-slate-400"></i>
             </div>
             <h3 class="text-lg font-bold text-slate-700">لا توجد نتائج</h3>
-            <p class="text-slate-500">جرب بحث مختلف أو فلتر آخر</p>
+            <p class="text-slate-500 text-sm">جرب بحث مختلف أو فلتر آخر</p>
         </div>
     </main>
 
-    <!-- Stores Section -->
-    <section class="bg-white border-t border-slate-200 py-8 mt-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-store text-indigo-600"></i>
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [5] قسم المتاجر - تصميم فاخر                   -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <section class="bg-white border-t border-slate-200 py-6">
+        <div class="max-w-lg mx-auto px-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-store text-white text-sm"></i>
                     </div>
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-900">البائعون الموثوقون</h2>
-                        <p class="text-xs text-slate-500">تصفح متاجر الهواتف في السودان</p>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="scrollStores('left')" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
-                        <i class="fas fa-chevron-right text-slate-600"></i>
-                    </button>
-                    <button onclick="scrollStores('right')" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
-                        <i class="fas fa-chevron-left text-slate-600"></i>
-                    </button>
+                    <h2 class="font-bold text-slate-900">المتاجر</h2>
                 </div>
             </div>
-            <div id="storesContainer" class="stores-scroll flex gap-4 overflow-x-auto pb-4"></div>
+            <div id="storesContainer" class="stores-scroll flex gap-4 overflow-x-auto pb-2"></div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-white py-10">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <div class="flex items-center justify-center gap-2 mb-4">
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [6] Footer                                     -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <footer class="bg-slate-900 text-white py-8 mb-20">
+        <div class="max-w-lg mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-2 mb-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center">
                     <i class="fas fa-mobile-alt text-white"></i>
                 </div>
                 <span class="text-xl font-black">سوق فون</span>
             </div>
-            <p class="text-slate-400 text-sm">منصتك الأولى لبيع وشراء الهواتف في السودان</p>
-            <div class="flex justify-center gap-4 mt-6">
-                <a href="#" class="w-10 h-10 bg-slate-800 hover:bg-green-600 rounded-xl flex items-center justify-center transition-colors"><i class="fab fa-whatsapp"></i></a>
-                <a href="#" class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-xl flex items-center justify-center transition-colors"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="w-10 h-10 bg-slate-800 hover:bg-pink-600 rounded-xl flex items-center justify-center transition-colors"><i class="fab fa-instagram"></i></a>
+            <p class="text-slate-400 text-xs">منصتك الأولى لبيع وشراء الهواتف في السودان</p>
+            <div class="flex justify-center gap-3 mt-4">
+                <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors text-sm"><i class="fab fa-whatsapp"></i></a>
+                <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-colors text-sm"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-pink-600 rounded-lg flex items-center justify-center transition-colors text-sm"><i class="fab fa-instagram"></i></a>
             </div>
-            <p class="text-slate-600 text-xs mt-8">© 2026 سوق فون - جميع الحقوق محفوظة</p>
+            <p class="text-slate-600 text-[10px] mt-6">© 2026 سوق فون - جميع الحقوق محفوظة</p>
         </div>
     </footer>
 
-    <!-- Phone Modal -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [7] زر الإضافة العائم                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="fab-container">
+        <a href="publish.html" class="fab-btn flex items-center gap-2 px-6 py-3.5 rounded-full text-white font-bold text-sm">
+            <i class="fas fa-plus text-lg"></i>
+            <span>أضف إعلان</span>
+        </a>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [8] الشريط السفلي                             -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <nav class="bottom-nav h-16">
+        <div class="max-w-lg mx-auto h-full flex items-center justify-around px-4">
+            <a href="index.html" class="bottom-item active flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
+                <div class="relative"><i class="fas fa-home text-xl"></i></div>
+                <span class="text-[10px] font-bold">الرئيسية</span>
+            </a>
+            <a href="my-ads.html" class="bottom-item flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
+                <div class="relative">
+                    <i class="fas fa-list-alt text-xl"></i>
+                    <span class="bottom-badge">2</span>
+                </div>
+                <span class="text-[10px] font-bold">إعلاناتي</span>
+            </a>
+            <a href="messages.html" class="bottom-item flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
+                <div class="relative">
+                    <i class="fas fa-comment-dots text-xl"></i>
+                    <span class="bottom-badge">5</span>
+                </div>
+                <span class="text-[10px] font-bold">المراسلة</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [9] Modal تفاصيل الهاتف                        -->
+    <!-- ═══════════════════════════════════════════════ -->
     <div id="phoneModal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div class="absolute inset-4 md:inset-10 bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
-            <button onclick="closeModal()" class="absolute top-4 left-4 z-10 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-slate-100">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
+        <div class="absolute inset-0 md:inset-4 md:max-w-2xl md:mx-auto bg-white md:rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <button onclick="closeModal()" class="absolute top-4 left-4 z-20 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
                 <i class="fas fa-times text-slate-600"></i>
+            </button>
+            <button onclick="toggleFavorite()" id="modalFavBtn" class="absolute top-4 right-4 z-20 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                <i class="far fa-heart text-slate-600 text-lg"></i>
             </button>
             <div id="modalContent" class="flex-1 overflow-y-auto"></div>
         </div>
     </div>
 
-    <!-- Firebase + JavaScript -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [10] Modal صفحة المتجر                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div id="storeModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeStoreModal()"></div>
+        <div class="absolute inset-0 md:inset-4 md:max-w-2xl md:mx-auto bg-slate-50 md:rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <button onclick="closeStoreModal()" class="absolute top-4 left-4 z-20 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                <i class="fas fa-times text-slate-600"></i>
+            </button>
+            <div id="storeModalContent" class="flex-1 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [11] Firebase + JavaScript                     -->
+    <!-- ═══════════════════════════════════════════════ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
-        import { 
-            getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs
-        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // ════════════════════════════════════════════
-        // [Firebase Config] - مطابق تماماً لكود النشر
-        // ════════════════════════════════════════════
         const firebaseConfig = {
             apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
             authDomain: "phone-soug.firebaseapp.com",
@@ -234,118 +412,68 @@
             measurementId: "G-S87955B526"
         };
 
-        console.log("🔥 Firebase Config:", firebaseConfig);
-
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        console.log("✅ Firebase Initialized");
-
         let allPhones = [];
-        let currentBrand = '';
+        let allStores = [];
+        let currentStatus = '';
+        let currentPhoneId = null;
+        let galleryInterval = null;
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
         let unsubscribePhones = null;
 
-        // ════════════════════════════════════════════
-        // [1] جلب الإعلانات - استعلام بسيط بدون where
-        // ════════════════════════════════════════════
         async function loadPhones() {
             try {
-                console.log("📡 Loading ads from Firestore...");
-                
-                // استعلام بسيط: فقط ترتيب حسب التاريخ + حد 50
-                // لا نستخدم where هنا لتجنب الحاجة لفهرس مركب
-                const phonesQuery = query(
-                    collection(db, 'ads'), 
-                    orderBy('createdAt', 'desc'),
-                    limit(50)
-                );
-
-                console.log("📡 Query created:", phonesQuery);
-
+                const phonesQuery = query(collection(db, 'ads'), orderBy('createdAt', 'desc'), limit(50));
                 unsubscribePhones = onSnapshot(phonesQuery, (snapshot) => {
-                    console.log("📨 Snapshot received, docs count:", snapshot.docs.length);
-                    
                     allPhones = [];
-                    snapshot.forEach((doc) => {
-                        const data = doc.data();
-                        console.log("📄 Doc:", doc.id, data);
-                        allPhones.push({ id: doc.id, ...data });
-                    });
-                    
-                    console.log("📊 Total ads loaded:", allPhones.length);
-                    
+                    snapshot.forEach((doc) => { allPhones.push({ id: doc.id, ...doc.data() }); });
                     hideLoading();
                     renderPhones(allPhones);
                     extractStoresFromAds(allPhones);
-                    
-                }, (error) => {
-                    console.error("❌ Firestore Error:", error);
-                    console.error("❌ Error Code:", error.code);
-                    console.error("❌ Error Message:", error.message);
-                    
-                    // إذا فشل الاستعلام، جرب getDocs كبديل
-                    console.log("🔄 Trying getDocs instead...");
-                    fallbackLoad();
-                });
-
-            } catch (error) {
-                console.error("❌ Critical Error in loadPhones:", error);
-                hideLoading();
-                renderPhones([]);
-            }
+                }, (error) => { console.error('Error:', error); fallbackLoad(); });
+            } catch (error) { console.error('Critical Error:', error); hideLoading(); }
         }
 
-        // ════════════════════════════════════════════
-        // [Fallback] إذا فشل onSnapshot
-        // ════════════════════════════════════════════
         async function fallbackLoad() {
             try {
                 const q = query(collection(db, 'ads'), limit(50));
                 const snapshot = await getDocs(q);
-                console.log("📨 Fallback loaded:", snapshot.docs.length, "docs");
-                
                 allPhones = [];
-                snapshot.forEach((doc) => {
-                    allPhones.push({ id: doc.id, ...doc.data() });
-                });
-                
+                snapshot.forEach((doc) => { allPhones.push({ id: doc.id, ...doc.data() }); });
                 hideLoading();
                 renderPhones(allPhones);
                 extractStoresFromAds(allPhones);
-            } catch (err) {
-                console.error("❌ Fallback also failed:", err);
-                hideLoading();
-                document.getElementById('phonesCount').textContent = 'خطأ في الاتصال';
-            }
+            } catch (err) { console.error('Fallback failed:', err); hideLoading(); document.getElementById('phonesCount').textContent = 'خطأ في الاتصال'; }
         }
 
-        // ════════════════════════════════════════════
-        // [2] استخراج البائعين من الإعلانات
-        // ════════════════════════════════════════════
         function extractStoresFromAds(ads) {
             const sellersMap = new Map();
-            
             ads.forEach(ad => {
                 const key = ad.userId || ad.userEmail || ad.userName;
                 if (!key) return;
-                
                 if (!sellersMap.has(key)) {
                     sellersMap.set(key, {
+                        id: key,
                         name: ad.userName || 'بائع',
                         city: ad.city || 'السودان',
                         phoneCount: 1,
                         whatsapp: ad.whatsApp || ad.contactPhone,
-                        phone: ad.contactPhone
+                        phone: ad.contactPhone,
+                        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(ad.userName || 'B')}&background=6366f1&color=fff&size=256&bold=true`,
+                        bgImage: `https://images.unsplash.com/photo-1556656793-02715d8dd660?w=600&h=200&fit=crop`,
+                        phones: [ad]
                     });
                 } else {
-                    sellersMap.get(key).phoneCount += 1;
+                    const store = sellersMap.get(key);
+                    store.phoneCount += 1;
+                    store.phones.push(ad);
                 }
             });
-            
-            const stores = Array.from(sellersMap.values());
-            console.log("🏪 Stores extracted:", stores.length);
-            renderStores(stores);
+            allStores = Array.from(sellersMap.values());
+            renderStores(allStores);
         }
 
         function hideLoading() {
@@ -353,80 +481,62 @@
             document.getElementById('phonesGrid').classList.remove('hidden');
         }
 
-        // ════════════════════════════════════════════
-        // [3] عرض الهواتف - متوافق مع حقول 'ads'
-        // ════════════════════════════════════════════
         window.renderPhones = function(phones) {
             const grid = document.getElementById('phonesGrid');
             const noResults = document.getElementById('noResults');
             const countEl = document.getElementById('phonesCount');
-            
-            // فلترة العميل: إظهار فقط النشط وغير المباع
             const activePhones = phones.filter(p => p.isActive !== false && p.isSold !== true);
-            
             countEl.textContent = activePhones.length + ' هاتف';
-            
-            if (activePhones.length === 0) {
-                grid.innerHTML = '';
-                noResults.classList.remove('hidden');
-                return;
-            }
-            
+            if (activePhones.length === 0) { grid.innerHTML = ''; noResults.classList.remove('hidden'); return; }
             noResults.classList.add('hidden');
-            
             grid.innerHTML = activePhones.map((phone) => {
                 const statusConfig = {
                     'new': { label: 'جديد', class: 'status-new' },
                     'like-new': { label: 'شبه جديد', class: 'status-like-new' },
                     'used': { label: 'مستعمل', class: 'status-used' }
                 }[phone.status] || { label: 'مستعمل', class: 'status-used' };
-
                 const price = phone.price ? parseInt(phone.price).toLocaleString() : '???';
                 const image = phone.mainImage || (phone.images && phone.images[0]) || 'https://via.placeholder.com/400?text=No+Image';
-
+                const isFav = favorites.includes(phone.id);
                 return `
-                    <div class="phone-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 cursor-pointer" onclick="openPhoneModal('${phone.id}')">
-                        <div class="relative aspect-square bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden">
-                            <img src="${image}" alt="${phone.phoneModel || 'هاتف'}" 
-                                 class="w-full h-full object-contain p-4 hover:scale-105 transition-transform duration-500"
-                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/400?text=No+Image';">
-                            <div class="absolute top-3 right-3">
-                                <span class="${statusConfig.class} text-white px-3 py-1 rounded-lg text-xs font-bold shadow-lg">${statusConfig.label}</span>
+                    <div class="phone-card" onclick="openPhoneModal('${phone.id}')">
+                        <div class="card-corner"></div>
+                        <div class="relative aspect-[4/3] bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden">
+                            <img src="${image}" alt="${phone.phoneModel || 'هاتف'}" class="w-full h-full object-contain p-6 hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='https://via.placeholder.com/400?text=No+Image';">
+                            <div class="absolute top-4 right-4">
+                                <span class="${statusConfig.class} text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-lg">${statusConfig.label}</span>
                             </div>
-                            <div class="absolute bottom-3 left-3">
-                                <span class="bg-white/95 backdrop-blur px-3 py-1.5 rounded-lg shadow-md">
-                                    <span class="text-lg font-bold text-indigo-600">${price}</span>
-                                    <span class="text-xs text-slate-500">ج.س</span>
+                            <button onclick="event.stopPropagation(); toggleFavCard('${phone.id}')" class="fav-btn absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center shadow-md ${isFav ? 'liked' : 'text-slate-400'}">
+                                <i class="${isFav ? 'fas' : 'far'} fa-heart text-lg"></i>
+                            </button>
+                            <div class="absolute bottom-4 left-4">
+                                <span class="bg-white/95 backdrop-blur px-4 py-2 rounded-2xl shadow-lg">
+                                    <span class="text-xl font-black text-indigo-600">${price}</span>
+                                    <span class="text-xs text-slate-500 font-bold">ج.س</span>
                                 </span>
                             </div>
                         </div>
-                        <div class="p-4">
-                            <h3 class="font-bold text-slate-900 mb-1 truncate">${phone.phoneModel || 'هاتف'}</h3>
-                            <div class="flex items-center gap-3 text-xs text-slate-500 mb-3">
-                                ${phone.ram ? `<span class="flex items-center gap-1"><i class="fas fa-memory text-indigo-400"></i> ${phone.ram} GB</span>` : ''}
-                                ${phone.storage ? `<span class="flex items-center gap-1"><i class="fas fa-hdd text-indigo-400"></i> ${phone.storage} GB</span>` : ''}
-                                ${phone.batteryHealth ? `<span class="flex items-center gap-1"><i class="fas fa-battery-full text-green-400"></i> ${phone.batteryHealth}%</span>` : ''}
+                        <div class="p-5">
+                            <h3 class="font-bold text-slate-900 mb-2 text-lg truncate">${phone.phoneModel || 'هاتف'}</h3>
+                            <div class="flex items-center gap-2 text-xs text-slate-500 mb-3 flex-wrap">
+                                ${phone.ram ? `<span class="flex items-center gap-1 bg-slate-100 px-2.5 py-1.5 rounded-lg font-semibold"><i class="fas fa-memory text-indigo-400"></i> ${phone.ram}GB</span>` : ''}
+                                ${phone.storage ? `<span class="flex items-center gap-1 bg-slate-100 px-2.5 py-1.5 rounded-lg font-semibold"><i class="fas fa-hdd text-indigo-400"></i> ${phone.storage}GB</span>` : ''}
+                                ${phone.batteryHealth ? `<span class="flex items-center gap-1 bg-slate-100 px-2.5 py-1.5 rounded-lg font-semibold"><i class="fas fa-battery-full text-green-400"></i> ${phone.batteryHealth}%</span>` : ''}
                             </div>
                             <div class="flex items-center justify-between pt-3 border-t border-slate-100">
                                 <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-user text-indigo-600 text-xs"></i>
+                                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-indigo-600 text-[10px]"></i>
                                     </div>
                                     <div>
-                                        <p class="text-xs font-semibold text-slate-700 truncate max-w-[100px]">${phone.userName || 'بائع'}</p>
+                                        <p class="text-xs font-bold text-slate-700">${phone.userName || 'بائع'}</p>
                                         <p class="text-[10px] text-slate-400">${phone.city || 'السودان'}</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-1">
                                     ${(phone.contactMethods?.includes('whatsapp') || phone.whatsApp) ? `
-                                    <a href="https://wa.me/${formatWaForLink(phone.whatsApp || phone.contactPhone)}" onclick="event.stopPropagation()" 
-                                       class="w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center justify-center transition-colors">
+                                    <a href="https://wa.me/${formatWaForLink(phone.whatsApp || phone.contactPhone)}" onclick="event.stopPropagation()" class="w-9 h-9 bg-green-500 hover:bg-green-600 text-white rounded-xl flex items-center justify-center transition-colors shadow-md shadow-green-500/20">
                                         <i class="fab fa-whatsapp text-sm"></i>
-                                    </a>` : ''}
-                                    ${(phone.contactMethods?.includes('call') || phone.contactPhone) ? `
-                                    <a href="tel:${phone.contactPhone}" onclick="event.stopPropagation()" 
-                                       class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition-colors">
-                                        <i class="fas fa-phone text-xs"></i>
                                     </a>` : ''}
                                 </div>
                             </div>
@@ -436,66 +546,121 @@
             }).join('');
         };
 
-        // ════════════════════════════════════════════
-        // [4] عرض المتاجر
-        // ════════════════════════════════════════════
         window.renderStores = function(stores) {
             const container = document.getElementById('storesContainer');
-            if (stores.length === 0) {
-                container.innerHTML = '<p class="text-slate-500 text-sm">لا يوجد متاجر حالياً</p>';
-                return;
-            }
-            
+            if (stores.length === 0) { container.innerHTML = '<p class="text-slate-500 text-sm">لا يوجد متاجر حالياً</p>'; return; }
             container.innerHTML = stores.map(store => {
-                const logoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(store.name)}&background=6366f1&color=fff&size=128&bold=true`;
                 return `
-                    <div class="store-card w-72 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-lg transition-all cursor-pointer">
-                        <div class="flex items-center gap-3 mb-4">
-                            <img src="${logoUrl}" alt="${store.name}" class="w-14 h-14 rounded-xl object-cover border-2 border-slate-100 shadow-sm">
-                            <div>
-                                <h3 class="font-bold text-slate-900">${store.name}</h3>
-                                <p class="text-xs text-slate-500">${store.city || 'السودان'}</p>
+                    <div class="store-card" onclick="openStoreModal('${store.id}')">
+                        <div class="store-header">
+                            <img src="${store.bgImage}" class="store-header-bg" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #4f46e5, #7c3aed)';">
+                            <div class="store-header-overlay"></div>
+                            <img src="${store.avatar}" class="store-avatar" onerror="this.src='https://ui-avatars.com/api/?name=S&background=6366f1&color=fff'">
+                        </div>
+                        <div class="store-body">
+                            <h3 class="font-bold text-slate-900 text-lg">${store.name}</h3>
+                            <p class="text-xs text-slate-500 mb-3">${store.city || 'السودان'}</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-mobile-alt text-indigo-500 text-xs"></i>
+                                    <span class="text-sm font-bold text-slate-700">${store.phoneCount || 0} هاتف</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                    <span class="text-sm font-bold text-slate-700">4.5</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between text-sm mb-4">
-                            <span class="text-slate-500">${store.phoneCount || 0} هاتف</span>
-                            <div class="flex items-center gap-1">
-                                <i class="fas fa-star text-yellow-400 text-xs"></i>
-                                <span class="font-semibold">4.5</span>
-                            </div>
-                        </div>
-                        <a href="https://wa.me/${formatWaForLink(store.whatsapp || store.phone)}" 
-                           class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-center py-2.5 rounded-xl font-semibold text-sm transition-colors">
-                            تواصل مع البائع
-                        </a>
                     </div>
                 `;
             }).join('');
         };
 
-        // ════════════════════════════════════════════
-        // [5] فلترة الشركات
-        // ════════════════════════════════════════════
-        window.setBrandFilter = function(brand) {
-            currentBrand = brand;
-            document.querySelectorAll('.brand-btn').forEach(btn => {
-                if (btn.dataset.brand === brand) {
-                    btn.classList.add('active', 'bg-indigo-50', 'border-indigo-500', 'text-indigo-700');
+        window.openStoreModal = function(storeId) {
+            const store = allStores.find(s => s.id === storeId);
+            if (!store) return;
+            const modal = document.getElementById('storeModal');
+            const content = document.getElementById('storeModalContent');
+            const storePhones = store.phones || [];
+            content.innerHTML = `
+                <div class="store-modal-header">
+                    <img src="${store.bgImage}" class="store-modal-bg" onerror="this.parentElement.style.background='linear-gradient(135deg, #4f46e5, #7c3aed)'">
+                    <div class="store-modal-overlay"></div>
+                    <img src="${store.avatar}" class="store-modal-avatar" onerror="this.src='https://ui-avatars.com/api/?name=S&background=6366f1&color=fff'">
+                </div>
+                <div class="bg-white rounded-t-3xl -mt-6 relative z-10 p-6">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-black text-slate-900">${store.name}</h2>
+                        <p class="text-sm text-slate-500 mt-1">${store.city || 'السودان'}</p>
+                        <div class="flex items-center justify-center gap-4 mt-3">
+                            <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-sm font-bold"><i class="fas fa-mobile-alt ml-1"></i> ${store.phoneCount || 0} هاتف</span>
+                            <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-lg text-sm font-bold"><i class="fas fa-star ml-1"></i> 4.5</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mb-6">
+                        ${store.whatsapp ? `<a href="https://wa.me/${formatWaForLink(store.whatsapp)}" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"><i class="fab fa-whatsapp text-xl"></i> واتساب</a>` : ''}
+                        ${store.phone ? `<a href="tel:${store.phone}" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"><i class="fas fa-phone"></i> اتصال</a>` : ''}
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2"><i class="fas fa-mobile-alt text-indigo-500"></i> الهواتف المعروضة</h3>
+                    <div class="space-y-4">
+                        ${storePhones.map(phone => {
+                            const price = phone.price ? parseInt(phone.price).toLocaleString() : '???';
+                            const image = phone.mainImage || (phone.images && phone.images[0]) || 'https://via.placeholder.com/400?text=No+Image';
+                            const statusConfig = {
+                                'new': { label: 'جديد', class: 'status-new' },
+                                'like-new': { label: 'شبه جديد', class: 'status-like-new' },
+                                'used': { label: 'مستعمل', class: 'status-used' }
+                            }[phone.status] || { label: 'مستعمل', class: 'status-used' };
+                            return `
+                                <div class="phone-card" onclick="closeStoreModal(); setTimeout(()=>openPhoneModal('${phone.id}'), 300)">
+                                    <div class="card-corner"></div>
+                                    <div class="flex gap-4 p-4">
+                                        <div class="w-24 h-24 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex-shrink-0 overflow-hidden">
+                                            <img src="${image}" class="w-full h-full object-contain p-2" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="${statusConfig.class} text-white px-2 py-0.5 rounded-lg text-[10px] font-bold">${statusConfig.label}</span>
+                                            </div>
+                                            <h4 class="font-bold text-slate-900 text-sm mb-1">${phone.phoneModel || 'هاتف'}</h4>
+                                            <div class="flex items-center gap-2 text-[10px] text-slate-500 mb-2">
+                                                ${phone.ram ? `<span>${phone.ram}GB رام</span>` : ''}
+                                                ${phone.storage ? `<span>${phone.storage}GB</span>` : ''}
+                                            </div>
+                                            <p class="text-lg font-black text-indigo-600">${price} <span class="text-xs text-slate-500 font-normal">ج.س</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeStoreModal = function() {
+            document.getElementById('storeModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        window.setStatusFilter = function(status) {
+            currentStatus = status;
+            document.querySelectorAll('.filter-chip').forEach(btn => {
+                if (btn.dataset.status === status) {
+                    btn.classList.add('active');
                     btn.classList.remove('bg-white', 'border-slate-200', 'text-slate-600');
                 } else {
-                    btn.classList.remove('active', 'bg-indigo-50', 'border-indigo-500', 'text-indigo-700');
+                    btn.classList.remove('active');
                     btn.classList.add('bg-white', 'border-slate-200', 'text-slate-600');
                 }
             });
             filterPhones();
         };
 
-        // ════════════════════════════════════════════
-        // [6] البحث والفلترة
-        // ════════════════════════════════════════════
         window.filterPhones = function() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
             const filtered = allPhones.filter(phone => {
                 const isActive = phone.isActive !== false && phone.isSold !== true;
                 const matchesSearch = !searchTerm || 
@@ -504,11 +669,9 @@
                     phone.city?.toLowerCase().includes(searchTerm) ||
                     phone.neighborhood?.toLowerCase().includes(searchTerm) ||
                     phone.description?.toLowerCase().includes(searchTerm);
-                const matchesBrand = !currentBrand || phone.brand === currentBrand;
-                
-                return isActive && matchesSearch && matchesBrand;
+                const matchesStatus = !currentStatus || phone.status === currentStatus;
+                return isActive && matchesSearch && matchesStatus;
             });
-            
             renderPhones(filtered);
         };
 
@@ -517,143 +680,169 @@
             container.scrollBy({ left: direction === 'right' ? -300 : 300, behavior: 'smooth' });
         };
 
-        // ════════════════════════════════════════════
-        // [7] Modal - تفاصيل الهاتف
-        // ════════════════════════════════════════════
         window.openPhoneModal = function(phoneId) {
             const phone = allPhones.find(p => p.id === phoneId);
             if (!phone) return;
-            
+            currentPhoneId = phoneId;
             const statusConfig = {
                 'new': { label: 'جديد', class: 'status-new' },
                 'like-new': { label: 'شبه جديد', class: 'status-like-new' },
                 'used': { label: 'مستعمل', class: 'status-used' }
             }[phone.status] || { label: 'مستعمل', class: 'status-used' };
-
             const price = phone.price ? parseInt(phone.price).toLocaleString() : '???';
             const images = phone.images || [];
-            const mainImg = phone.mainImage || images[0] || 'https://via.placeholder.com/400?text=No+Image';
-            
-            const thumbnailsHtml = images.length > 1 ? `
-                <div class="flex gap-2 mt-4 justify-center flex-wrap">
-                    ${images.map((img, idx) => `
-                        <img src="${img}" onclick="changeModalImage('${img}')"
-                             class="thumb-img w-16 h-16 rounded-lg object-cover ${idx === 0 ? 'active' : ''}"
-                             onerror="this.style.display='none'">
-                    `).join('')}
-                </div>
-            ` : '';
-
+            const hasImages = images.length > 0;
+            const isFav = favorites.includes(phoneId);
+            const favBtn = document.getElementById('modalFavBtn');
+            favBtn.innerHTML = `<i class="${isFav ? 'fas liked text-red-500' : 'far text-slate-600'} fa-heart text-lg"></i>`;
             const modal = document.getElementById('phoneModal');
             const content = document.getElementById('modalContent');
-            
-            content.innerHTML = `
-                <div class="md:flex h-full">
-                    <div class="md:w-1/2 bg-gradient-to-br from-slate-50 to-indigo-50 p-6 flex flex-col items-center justify-center">
-                        <img id="modalMainImage" src="${mainImg}" class="max-h-80 object-contain drop-shadow-xl"
-                             onerror="this.onerror=null; this.src='https://via.placeholder.com/400?text=No+Image';">
-                        ${thumbnailsHtml}
-                    </div>
-                    <div class="md:w-1/2 p-6 overflow-y-auto">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="${statusConfig.class} text-white px-3 py-1 rounded-lg text-sm font-bold">${statusConfig.label}</span>
-                            <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-sm font-semibold">${phone.brand?.toUpperCase() || 'UNKNOWN'}</span>
-                        </div>
-                        <h2 class="text-2xl font-bold text-slate-900 mb-2">${phone.phoneModel || 'هاتف'}</h2>
-                        ${phone.description ? `<p class="text-slate-500 text-sm mb-4">${phone.description}</p>` : ''}
-                        <div class="flex items-baseline gap-2 mb-5">
-                            <span class="text-3xl font-bold text-indigo-600">${price}</span>
-                            <span class="text-lg text-slate-500">جنيه سوداني</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 mb-5">
-                            ${phone.ram ? `<div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500">الرام</p><p class="font-bold text-slate-900">${phone.ram} GB</p></div>` : ''}
-                            ${phone.storage ? `<div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500">التخزين</p><p class="font-bold text-slate-900">${phone.storage} GB</p></div>` : ''}
-                            ${phone.batteryHealth ? `<div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500">صحة البطارية</p><p class="font-bold text-slate-900">${phone.batteryHealth}%</p></div>` : ''}
-                            ${phone.camera ? `<div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500">الكاميرا</p><p class="font-bold text-slate-900">${phone.camera}</p></div>` : ''}
-                            ${phone.waterResistant !== undefined && phone.waterResistant !== null ? `<div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500">مقاومة الماء</p><p class="font-bold text-slate-900">${phone.waterResistant === true || phone.waterResistant === 'true' ? 'نعم' : 'لا'}</p></div>` : ''}
-                            ${phone.color ? `<div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500">اللون</p><p class="font-bold text-slate-900">${phone.color}</p></div>` : ''}
-                        </div>
-                        <div class="bg-slate-50 rounded-xl p-4 mb-5">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-user text-indigo-600 text-lg"></i>
+            let galleryHtml = '';
+            if (hasImages) {
+                galleryHtml = `
+                    <div class="gallery-container relative aspect-[4/3] bg-gradient-to-br from-slate-50 to-indigo-50">
+                        <div class="gallery-track" id="galleryTrack">
+                            ${images.map(img => `
+                                <div class="gallery-slide flex items-center justify-center p-8">
+                                    <img src="${img}" class="max-h-72 object-contain drop-shadow-xl" onerror="this.style.display='none'">
                                 </div>
-                                <div>
-                                    <h4 class="font-bold text-slate-900">${phone.userName || 'بائع'}</h4>
-                                    <p class="text-sm text-slate-500">${phone.city || 'السودان'} ${phone.neighborhood ? '- ' + phone.neighborhood : ''}</p>
-                                </div>
+                            `).join('')}
+                        </div>
+                        ${images.length > 1 ? `
+                            <button class="gallery-nav prev" onclick="moveGallery(-1)"><i class="fas fa-chevron-right text-slate-600"></i></button>
+                            <button class="gallery-nav next" onclick="moveGallery(1)"><i class="fas fa-chevron-left text-slate-600"></i></button>
+                            <div class="gallery-dots" id="galleryDots">
+                                ${images.map((_, i) => `<div class="gallery-dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></div>`).join('')}
                             </div>
-                        </div>
-                        <div class="space-y-3">
-                            ${(phone.contactMethods?.includes('whatsapp') || phone.whatsApp) ? `
-                            <a href="https://wa.me/${formatWaForLink(phone.whatsApp || phone.contactPhone)}" 
-                               class="block w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold text-center transition-colors flex items-center justify-center gap-2">
-                                <i class="fab fa-whatsapp text-xl"></i> تواصل عبر واتساب
-                            </a>` : ''}
-                            ${(phone.contactMethods?.includes('call') || phone.contactPhone) ? `
-                            <a href="tel:${phone.contactPhone}" 
-                               class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-bold text-center transition-colors flex items-center justify-center gap-2">
-                                <i class="fas fa-phone"></i> اتصل الآن
-                            </a>` : ''}
-                            ${phone.contactMethods?.includes('message') ? `
-                            <button onclick="showLogin()" 
-                                    class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-center transition-colors flex items-center justify-center gap-2">
-                                <i class="fas fa-comment-dots"></i> رسالة داخلية
-                            </button>` : ''}
-                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                galleryHtml = `<div class="aspect-[4/3] bg-gradient-to-br from-slate-50 to-indigo-50 flex items-center justify-center p-8"><img src="${phone.mainImage || 'https://via.placeholder.com/400?text=No+Image'}" class="max-h-72 object-contain"></div>`;
+            }
+            const similar = allPhones.filter(p => 
+                p.id !== phoneId && p.isActive !== false && p.isSold !== true &&
+                (p.brand === phone.brand || p.phoneModel?.includes(phone.phoneModel?.split(' ')[0]))
+            ).slice(0, 5);
+            const similarHtml = similar.length > 0 ? `
+                <div class="mt-6 pt-6 border-t border-slate-200">
+                    <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2"><i class="fas fa-clone text-indigo-500"></i> إعلانات مشابهة</h3>
+                    <div class="flex gap-3 overflow-x-auto pb-2" style="scrollbar-width: none;">
+                        ${similar.map(p => {
+                            const simPrice = p.price ? parseInt(p.price).toLocaleString() : '???';
+                            const simImg = p.mainImage || (p.images && p.images[0]) || 'https://via.placeholder.com/150?text=No+Image';
+                            return `
+                                <div class="similar-card" onclick="switchToPhone('${p.id}')">
+                                    <div class="aspect-square bg-slate-50"><img src="${simImg}" class="w-full h-full object-contain p-3" onerror="this.src='https://via.placeholder.com/150?text=No+Image'"></div>
+                                    <div class="p-2"><p class="text-xs font-bold text-slate-900 truncate">${p.phoneModel || 'هاتف'}</p><p class="text-xs text-indigo-600 font-bold">${simPrice} ج.س</p></div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
+            ` : '';
+            content.innerHTML = `
+                ${galleryHtml}
+                <div class="p-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="${statusConfig.class} text-white px-3 py-1 rounded-lg text-xs font-bold">${statusConfig.label}</span>
+                        <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-bold">${phone.brand?.toUpperCase() || 'UNKNOWN'}</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">${phone.phoneModel || 'هاتف'}</h2>
+                    ${phone.description ? `<p class="text-slate-500 text-sm mb-4 leading-relaxed">${phone.description}</p>` : ''}
+                    <div class="flex items-baseline gap-2 mb-5">
+                        <span class="text-3xl font-black text-indigo-600">${price}</span>
+                        <span class="text-sm text-slate-500">جنيه سوداني</span>
+                    </div>
+                    <div class="space-y-2 mb-5">
+                        ${phone.ram ? `<div class="feature-item"><div class="feature-icon bg-indigo-100 text-indigo-600"><i class="fas fa-memory"></i></div><div><p class="text-xs text-slate-500">الرام</p><p class="font-bold text-slate-900">${phone.ram} GB</p></div></div>` : ''}
+                        ${phone.storage ? `<div class="feature-item"><div class="feature-icon bg-blue-100 text-blue-600"><i class="fas fa-hdd"></i></div><div><p class="text-xs text-slate-500">التخزين</p><p class="font-bold text-slate-900">${phone.storage} GB</p></div></div>` : ''}
+                        ${phone.batteryHealth ? `<div class="feature-item"><div class="feature-icon bg-green-100 text-green-600"><i class="fas fa-battery-full"></i></div><div><p class="text-xs text-slate-500">صحة البطارية</p><p class="font-bold text-slate-900">${phone.batteryHealth}%</p></div></div>` : ''}
+                        ${phone.camera ? `<div class="feature-item"><div class="feature-icon bg-purple-100 text-purple-600"><i class="fas fa-camera"></i></div><div><p class="text-xs text-slate-500">الكاميرا</p><p class="font-bold text-slate-900">${phone.camera} MP</p></div></div>` : ''}
+                        ${phone.waterResistant !== undefined && phone.waterResistant !== null ? `<div class="feature-item"><div class="feature-icon bg-cyan-100 text-cyan-600"><i class="fas fa-tint-slash"></i></div><div><p class="text-xs text-slate-500">مقاومة الماء</p><p class="font-bold text-slate-900">${phone.waterResistant === true || phone.waterResistant === 'true' ? 'نعم ✓' : 'لا ✗'}</p></div></div>` : ''}
+                        ${phone.color ? `<div class="feature-item"><div class="feature-icon bg-pink-100 text-pink-600"><i class="fas fa-palette"></i></div><div><p class="text-xs text-slate-500">اللون</p><p class="font-bold text-slate-900">${phone.color}</p></div></div>` : ''}
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-4 mb-5">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center"><i class="fas fa-user text-white"></i></div>
+                            <div><h4 class="font-bold text-slate-900">${phone.userName || 'بائع'}</h4><p class="text-xs text-slate-500">${phone.city || 'السودان'} ${phone.neighborhood ? '• ' + phone.neighborhood : ''}</p></div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        ${(phone.contactMethods?.includes('whatsapp') || phone.whatsApp) ? `
+                        <a href="https://wa.me/${formatWaForLink(phone.whatsApp || phone.contactPhone)}" class="block w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3.5 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20">
+                            <i class="fab fa-whatsapp text-xl"></i> تواصل عبر واتساب
+                        </a>` : ''}
+                        ${(phone.contactMethods?.includes('call') || phone.contactPhone) ? `
+                        <a href="tel:${phone.contactPhone}" class="block w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3.5 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20">
+                            <i class="fas fa-phone"></i> اتصل الآن
+                        </a>` : ''}
+                    </div>
+                    ${similarHtml}
+                </div>
             `;
-            
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            if (hasImages && images.length > 1) { startAutoGallery(images.length); }
         };
 
-        window.changeModalImage = function(src) {
-            const mainImg = document.getElementById('modalMainImage');
-            if (mainImg) mainImg.src = src;
-            document.querySelectorAll('.thumb-img').forEach(img => {
-                img.classList.remove('active');
-                if (img.src === src) img.classList.add('active');
-            });
+        let currentSlide = 0;
+        function startAutoGallery(total) {
+            if (galleryInterval) clearInterval(galleryInterval);
+            currentSlide = 0;
+            galleryInterval = setInterval(() => { currentSlide = (currentSlide + 1) % total; updateGallery(); }, 3000);
+        }
+        window.moveGallery = function(dir) {
+            const phone = allPhones.find(p => p.id === currentPhoneId);
+            if (!phone || !phone.images) return;
+            currentSlide = (currentSlide + dir + phone.images.length) % phone.images.length;
+            updateGallery();
+        };
+        window.goToSlide = function(index) { currentSlide = index; updateGallery(); };
+        function updateGallery() {
+            const track = document.getElementById('galleryTrack');
+            const dots = document.querySelectorAll('.gallery-dot');
+            if (track) { track.style.transform = `translateX(${currentSlide * 100}%)`; }
+            dots.forEach((dot, i) => { dot.classList.toggle('active', i === currentSlide); });
+        }
+        window.switchToPhone = function(phoneId) { closeModal(); setTimeout(() => openPhoneModal(phoneId), 300); };
+
+        window.toggleFavorite = function() {
+            if (!currentPhoneId) return;
+            const index = favorites.indexOf(currentPhoneId);
+            if (index > -1) favorites.splice(index, 1); else favorites.push(currentPhoneId);
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            const favBtn = document.getElementById('modalFavBtn');
+            const isFav = favorites.includes(currentPhoneId);
+            favBtn.innerHTML = `<i class="${isFav ? 'fas liked text-red-500' : 'far text-slate-600'} fa-heart text-lg"></i>`;
+            renderPhones(allPhones);
+        };
+
+        window.toggleFavCard = function(phoneId) {
+            const index = favorites.indexOf(phoneId);
+            if (index > -1) favorites.splice(index, 1); else favorites.push(phoneId);
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            renderPhones(allPhones);
         };
 
         window.closeModal = function() {
+            if (galleryInterval) { clearInterval(galleryInterval); galleryInterval = null; }
             document.getElementById('phoneModal').classList.add('hidden');
             document.body.style.overflow = '';
+            currentPhoneId = null;
         };
 
-        // ════════════════════════════════════════════
-        // [8] مساعد: تنسيق رقم الواتساب للرابط
-        // ════════════════════════════════════════════
         function formatWaForLink(num) {
             if (!num) return '';
-            // إزالة + ومسافات وشرطات
-            let clean = num.toString().replace(/[\s\-]/g, '');
-            // إذا بدأ بـ + نزيله فقط (نترك 249)
-            clean = clean.replace(/^\+/, '');
-            return clean;
+            return num.toString().replace(/[\s\-]/g, '').replace(/^\+/, '');
         }
 
-        window.showLogin = function() {
-            alert('يجب تسجيل الدخول أولاً!');
-        };
+        window.showProfile = function() { alert('سيتم فتح صفحة البروفايل قريباً!'); };
+        window.showNotifications = function() { alert('لديك 3 إشعارات جديدة!'); };
 
-        // ════════════════════════════════════════════
-        // [9] تهيئة
-        // ════════════════════════════════════════════
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("🚀 DOM Ready - Starting app...");
-            loadPhones();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        window.addEventListener('beforeunload', () => {
-            if (unsubscribePhones) unsubscribePhones();
-        });
+        document.addEventListener('DOMContentLoaded', () => { loadPhones(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); closeStoreModal(); } });
+        window.addEventListener('beforeunload', () => { if (unsubscribePhones) unsubscribePhones(); if (galleryInterval) clearInterval(galleryInterval); });
     </script>
 </body>
 </html>
