@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض الملفات الشخصية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        * { font-family: 'Cairo', sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .card { box-shadow: 0 20px 60px rgba(0,0,0,0.3); transition: transform 0.3s, box-shadow 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 30px 80px rgba(0,0,0,0.4); }
+        .profile-card { border-radius: 16px; overflow: hidden; background: white; }
+        .profile-image { width: 100%; height: 250px; object-fit: cover; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state-icon { font-size: 80px; color: rgba(255,255,255,0.3); margin-bottom: 20px; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="min-h-screen py-12 px-4">
+    
+    <!-- Header -->
+    <div class="max-w-6xl mx-auto mb-12">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-4xl font-bold text-white mb-2">الملفات الشخصية</h1>
+                <p class="text-purple-100">عرض جميع الملفات المضافة</p>
+            </div>
+            <a href="upload.html" class="bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 px-6 rounded-lg transition flex items-center gap-2">
+                <i class="fas fa-plus"></i> إضافة ملف جديد
+            </a>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="max-w-6xl mx-auto text-center">
+        <div class="spinner mx-auto mb-4"></div>
+        <p class="text-white font-semibold">جاري تحميل البيانات...</p>
+    </div>
+
+    <!-- Profiles Grid -->
+    <div id="profilesContainer" class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+        <!-- Filled dynamically -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">لا توجد ملفات شخصية</h2>
+            <p class="text-purple-100 mb-8">ابدأ بإضافة ملفك الشخصي الآن</p>
+            <a href="upload.html" class="bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 px-8 rounded-lg transition inline-flex items-center gap-2">
+                <i class="fas fa-plus"></i> إضافة ملف شخصي
+            </a>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="hidden">
+        <div class="max-w-md mx-auto bg-red-500 text-white rounded-lg p-6 text-center">
+            <i class="fas fa-exclamation-circle text-4xl mb-4 block"></i>
+            <h2 class="text-xl font-bold mb-2">حدث خطأ</h2>
+            <p id="errorMessage" class="mb-4"></p>
+            <button onclick="location.reload()" class="bg-white text-red-500 font-bold py-2 px-6 rounded-lg hover:bg-gray-100 transition">
+                <i class="fas fa-redo"></i> حاول مجدداً
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
+        authDomain: "phone-soug.firebaseapp.com",
+        projectId: "phone-soug",
+        storageBucket: "phone-soug.firebasestorage.app",
+        messagingSenderId: "224588578227",
+        appId: "1:224588578227:web:46b4cb96ff2535a1521fc6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Load Profiles
+    async function loadProfiles() {
+        try {
+            console.log('جاري تحميل البيانات من Firebase...');
+            
+            const q = query(collection(db, 'profiles'), orderBy('createdAt', 'desc'));
+            const querySnapshot = await getDocs(q);
+
+            console.log(`✅ تم تحميل ${querySnapshot.size} ملف شخصي`);
+
+            const profiles = [];
+            querySnapshot.forEach((doc) => {
+                profiles.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+
+            displayProfiles(profiles);
+
+        } catch (error) {
+            console.error('❌ خطأ:', error);
+            showError('فشل تحميل البيانات: ' + error.message);
+        }
+    }
+
+    // Display Profiles
+    function displayProfiles(profiles) {
+        const container = document.getElementById('profilesContainer');
+        const loadingState = document.getElementById('loadingState');
+        const emptyState = document.getElementById('emptyState');
+
+        loadingState.classList.add('hidden');
+
+        if (profiles.length === 0) {
+            emptyState.classList.remove('hidden');
+            return;
+        }
+
+        container.innerHTML = profiles.map((profile, index) => `
+            <div class="card profile-card fade-in" style="animation-delay: ${index * 0.1}s">
+                <img src="${profile.imageUrl}" alt="${profile.username}" class="profile-image" onerror="this.src='https://via.placeholder.com/300x250?text=صورة غير متاحة'">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-user-circle text-purple-600 ml-2"></i>${profile.username}
+                    </h3>
+                    <p class="text-sm text-gray-500">
+                        <i class="fas fa-calendar-alt ml-1"></i>
+                        ${formatDate(profile.createdAt)}
+                    </p>
+                </div>
+            </div>
+        `).join('');
+
+        container.classList.remove('hidden');
+    }
+
+    // Format Date
+    function formatDate(timestamp) {
+        if (!timestamp) return 'تاريخ غير معروف';
+        
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        return new Intl.DateTimeFormat('ar-SA', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(date);
+    }
+
+    // Show Error
+    function showError(message) {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('errorState').classList.remove('hidden');
+    }
+
+    // Load profiles on page load
+    window.addEventListener('load', loadProfiles);
+
+    console.log('✅ صفحة العرض جاهزة');
+</script>
+
+</body>
+</html>
