@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إرسال رقم الهاتف - Cloud Firestore</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 {
+            color: #0288d1;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+            text-align: left;
+            direction: ltr;
+        }
+        input[type="tel"]:focus {
+            border-color: #0288d1;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0288d1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #01579b;
+        }
+        .link-btn {
+            display: inline-block;
+            margin-top: 20px;
+            color: #0288d1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .link-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>فحص كود Cloud Firestore</h2>
+    <p>أدخل رقم هاتف للتجربة وافحص وصوله إلى المجلد الرئيسي</p>
+    
+    <form id="phoneForm">
+        <div class="form-group">
+            <label for="phoneNumber">رقم الهاتف:</label>
+            <input type="tel" id="phoneNumber" placeholder="+249 000 000 000" required>
+        </div>
+        <button type="submit" id="submitBtn">إرسال الرقم الآن</button>
+    </form>
+
+    <a href="receive.html" class="link-btn">الانتقال لصفحة عرض الأرقام ←</a>
+</div>
+
+<script type="module">
+    // لاحظ هنا استيراد مكتبة firestore الحصرية وليس database
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // مفاتيحك التي أرسلتها (تعمل مع Firestore بشكل ممتاز)
+    const firebaseConfig = {
+      apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
+      authDomain: "phone-soug.firebaseapp.com",
+      databaseURL: "https://phone-soug-default-rtdb.firebaseio.com", // وجوده هنا لن يضر لأنه مستدعى لـ Firestore بالأسفل
+      projectId: "phone-soug",
+      storageBucket: "phone-soug.firebasestorage.app",
+      messagingSenderId: "224588578227",
+      appId: "1:224588578227:web:46b4cb96ff2535a1521fc6",
+      measurementId: "G-T3DSBNJ5MQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app); // ربط بـ Cloud Firestore حصرّاً
+
+    document.getElementById("phoneForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const btn = document.getElementById("submitBtn");
+        const phoneNumber = document.getElementById("phoneNumber").value;
+
+        btn.innerText = "جاري الإرسال...";
+        btn.disabled = true;
+
+        try {
+            // إضافة البيانات في كولكشن مستقل للتجربة باسم test_numbers
+            const docRef = await addDoc(collection(db, "test_numbers"), {
+                phone: phoneNumber,
+                createdAt: new Date()
+            });
+            
+            alert("✅ رائع جداً! تم حفظ الرقم بنجاح داخل كولكشن في Cloud Firestore.");
+            document.getElementById("phoneForm").reset();
+        } catch (error) {
+            console.error("خطأ أثناء الإرسال: ", error);
+            alert("❌ فشل الإرسال! تحقق من صفحة الـ Rules لـ Cloud Firestore التي عدلناها سابقاً.");
+        } finally {
+            btn.innerText = "إرسال الرقم الآن";
+            btn.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
