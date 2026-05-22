@@ -47,18 +47,19 @@
     };
 
     // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
- db = getFirestore(app);
+    const firebaseApp = initializeApp(firebaseConfig);
+const analytics = getAnalytics(firebaseApp);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+
 
         // Cloudinary Configuration
         const CLOUDINARY_CLOUD_NAME = "dxbfupupw";
         const CLOUDINARY_UPLOAD_PRESET = "Ob7uqufu";
 
         // Export for global use
-        window.firebaseApp = app;
+       window.firebaseApp = firebaseApp;
+
         window.firebaseAuth = auth;
         window.firebaseDb = db;
         window.firebaseAuthFns = { 
