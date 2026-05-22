@@ -14,48 +14,52 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Firebase SDK (Modular v10) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            onAuthStateChanged,
-            updateProfile
-        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            serverTimestamp,
-            setDoc,
-            doc
-        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+ <!-- Firebase SDK (Modular v10) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
+    import { 
+        getAuth, 
+        createUserWithEmailAndPassword, 
+        signInWithEmailAndPassword, 
+        onAuthStateChanged,
+        updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { 
+        getFirestore, 
+        collection, 
+        addDoc, 
+        serverTimestamp,
+        setDoc,
+        doc
+    } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
-            authDomain: "phone-soug.firebaseapp.com",
-            databaseURL: "https://phone-soug-default-rtdb.firebaseio.com",
-            projectId: "phone-soug",
-            storageBucket: "phone-soug.firebasestorage.app",
-            messagingSenderId: "224588578227",
-            appId: "1:224588578227:web:46b4cb96ff2535a1521fc6",
-            measurementId: "G-T3DSBNJ5MQ"
-        };
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
+        authDomain: "phone-soug.firebaseapp.com",
+        databaseURL: "https://phone-soug-default-rtdb.firebaseio.com",
+        projectId: "phone-soug",
+        storageBucket: "phone-soug.firebasestorage.app",
+        messagingSenderId: "224588578227",
+        appId: "1:224588578227:web:f3127dfbea31a77d521fc6",
+        measurementId: "G-S87955B526"
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    // Initialize Firebase
+    const firebaseApp = initializeApp(firebaseConfig);
+const analytics = getAnalytics(firebaseApp);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+
 
         // Cloudinary Configuration
         const CLOUDINARY_CLOUD_NAME = "dxbfupupw";
         const CLOUDINARY_UPLOAD_PRESET = "Ob7uqufu";
 
         // Export for global use
-        window.firebaseApp = app;
+       window.firebaseApp = firebaseApp;
+
         window.firebaseAuth = auth;
         window.firebaseDb = db;
         window.firebaseAuthFns = { 
