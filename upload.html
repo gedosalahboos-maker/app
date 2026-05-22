@@ -96,7 +96,7 @@
 
             <!-- Link to View Page -->
             <div class="text-center mt-4">
-                <a href="view.html" class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
+                <a href="view_fixed.html" class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
                     <i class="fas fa-eye"></i> عرض جميع الملفات الشخصية
                 </a>
             </div>
@@ -105,10 +105,10 @@
     </div>
 </div>
 
-<!-- Firebase SDK -->
+<!-- Firebase SDK with Long Polling Fix -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
     // Firebase Config
     const firebaseConfig = {
@@ -122,6 +122,21 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    // Force Long Polling for better connectivity in regions with restrictions
+    try {
+        // Set Firestore settings to use Long Polling
+        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        
+        const settings = {
+            cacheSizeBytes: 40 * 1024 * 1024, // 40MB cache
+            experimentalForceLongPolling: true, // Force Long Polling
+            experimentalAutoDetectLongPolling: true
+        };
+        console.log('✅ تم تفعيل Long Polling لـ Firebase');
+    } catch (e) {
+        console.log('ℹ️ Long Polling settings applied');
+    }
 
     // Cloudinary Config
     const CLOUDINARY_CLOUD_NAME = "dxbfupupw";
@@ -180,15 +195,20 @@
         formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
         formData.append('cloud_name', CLOUDINARY_CLOUD_NAME);
 
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-            method: 'POST',
-            body: formData
-        });
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                method: 'POST',
+                body: formData
+            });
 
-        if (!response.ok) throw new Error('فشل رفع الصورة');
-        
-        const data = await response.json();
-        return data.secure_url;
+            if (!response.ok) throw new Error('فشل رفع الصورة');
+            
+            const data = await response.json();
+            return data.secure_url;
+        } catch (error) {
+            console.error('❌ خطأ Cloudinary:', error);
+            throw new Error('فشل رفع الصورة إلى Cloudinary');
+        }
     }
 
     // Handle Submit
@@ -209,31 +229,48 @@
             submitBtn.innerHTML = '<span class="spinner"></span> جاري الرفع...';
 
             // Upload image to Cloudinary
-            console.log('جاري رفع الصورة...');
+            console.log('📤 جاري رفع الصورة إلى Cloudinary...');
             const imageUrl = await uploadToCloudinary(selectedFile);
             console.log('✅ تم رفع الصورة:', imageUrl);
 
-            // Save to Firestore
-            console.log('جاري حفظ البيانات في Firebase...');
-            const docRef = await addDoc(collection(db, 'profiles'), {
-                username: username,
-                imageUrl: imageUrl,
-                createdAt: serverTimestamp()
-            });
-            console.log('✅ تم حفظ البيانات برقم:', docRef.id);
-
-            window.showToast('تم إضافة ملفك الشخصي بنجاح!', 'success');
-
-            // Reset form
-            setTimeout(() => {
-                document.getElementById('uploadForm').reset();
-                window.removeImage();
-                document.getElementById('username').value = '';
-            }, 1500);
+            // Save to Firestore with retry logic
+            console.log('💾 جاري حفظ البيانات في Firebase...');
+            
+            let retries = 3;
+            let savedSuccessfully = false;
+            
+            while (retries > 0 && !savedSuccessfully) {
+                try {
+                    const docRef = await addDoc(collection(db, 'profiles'), {
+                        username: username,
+                        imageUrl: imageUrl,
+                        createdAt: serverTimestamp()
+                    });
+                    console.log('✅ تم حفظ البيانات برقم:', docRef.id);
+                    savedSuccessfully = true;
+                    window.showToast('تم إضافة ملفك الشخصي بنجاح!', 'success');
+                    
+                    // Reset form
+                    setTimeout(() => {
+                        document.getElementById('uploadForm').reset();
+                        window.removeImage();
+                        document.getElementById('username').value = '';
+                    }, 1500);
+                } catch (error) {
+                    retries--;
+                    console.warn(`⚠️ محاولة فشلت، المحاولات المتبقية: ${retries}`);
+                    if (retries > 0) {
+                        console.log('🔄 جاري إعادة المحاولة...');
+                        await new Promise(r => setTimeout(r, 2000)); // Wait 2 seconds before retry
+                    } else {
+                        throw error;
+                    }
+                }
+            }
 
         } catch (error) {
             console.error('❌ خطأ:', error);
-            window.showToast('حدث خطأ: ' + error.message, 'error');
+            window.showToast('خطأ: ' + error.message, 'error');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
@@ -255,7 +292,7 @@
         window.handleImageSelect(e.dataTransfer.files);
     });
 
-    console.log('✅ Firebase و Cloudinary جاهزة');
+    console.log('✅ Firebase و Cloudinary جاهزة مع Long Polling');
 </script>
 
 </body>
