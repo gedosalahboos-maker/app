@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سوق الهواتف - نشر إعلان</title>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+        
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
+            authDomain: "phone-soug.firebaseapp.com",
+            databaseURL: "https://phone-soug-default-rtdb.firebaseio.com",
+            projectId: "phone-soug",
+            storageBucket: "phone-soug.firebasestorage.app",
+            messagingSenderId: "224588578227",
+            appId: "1:224588578227:web:46b4cb96ff2535a1521fc6",
+            measurementId: "G-T3DSBNJ5MQ"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+        
+        // Make Firebase services globally available
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDB = database;
+        window.firebaseStorage = storage;
+        window.firebaseRefs = { ref, set, push, onValue, get };
+        window.firebaseStorageRefs = { storageRef, uploadBytes, getDownloadURL };
+        window.firebaseAuthFuncs = { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut };
+    </script>
+    
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/latest/global/all.js" type="text/javascript"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .progress-step .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        
+        .progress-step.active .step-number {
+            background: #667eea;
+            color: white;
+        }
+        
+        .progress-step.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+        
+        .progress-step .step-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .form-container {
+            padding: 30px 40px;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group .required::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-control:disabled {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+        
+        .radio-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        
+        .radio-card {
+            position: relative;
+        }
+        
+        .radio-card input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .radio-card label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .radio-card input:checked + label {
+            border-color: #667eea;
+            background: #f0f4ff;
+            color: #667eea;
+        }
+        
+        .radio-card label:hover {
+            border-color: #667eea;
+        }
+        
+        .drop-zone {
+            border: 3px dashed #dee2e6;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .drop-zone:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .drop-zone.dragover {
+            border-color: #667eea;
+            background: #e8eeff;
+        }
+        
+        .drop-zone i {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .drop-zone p {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .preview-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #dee2e6;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        /* Auth Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .auth-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+        
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .loading-spinner.show {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #f0f4ff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info.show {
+            display: flex;
+        }
+        
+        .user-info button {
+            margin-right: auto;
+            padding: 5px 15px;
+            border: none;
+            background: #dc3545;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .phone-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .country-code {
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 سوق الهواتف</h1>
+            <p>أضف إعلان هاتفك المستعمل بسهولة</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">الهاتف</div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">المواصفات</div>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">الصور</div>
+            </div>
+            <div class="progress-step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-label">السعر</div>
+            </div>
+            <div class="progress-step" data-step="5">
+                <div class="step-number">5</div>
+                <div class="step-label">الموقع</div>
+            </div>
+        </div>
+        
+        <div class="form-container">
+            <!-- User Info -->
+            <div class="user-info" id="userInfo">
+                <span>👤</span>
+                <span id="userEmail"></span>
+                <button onclick="logoutUser()">تسجيل الخروج</button>
+            </div>
+            
+            <!-- Step 1: Phone Selection -->
+            <div class="step-content active" id="step-1">
+                <h2 style="margin-bottom: 25px; color: #333;">اختر هاتفك</h2>
+                
+                <div class="form-group">
+                    <label class="required">الشركة المصنعة</label>
+                    <div class="radio-cards" id="brandSelection">
+                        <div class="radio-card">
+                            <input type="radio" name="brand" id="brand-apple" value="apple" required>
+                            <label for="brand-apple">🍎 Apple</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="brand" id="brand-samsung" value="samsung">
+                            <label for="brand-samsung">📱 Samsung</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="brand" id="brand-xiaomi" value="xiaomi">
+                            <label for="brand-xiaomi">🤖 Xiaomi</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="brand" id="brand-oppo" value="oppo">
+                            <label for="brand-oppo">📲 OPPO</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="brand" id="brand-huawei" value="huawei">
+                            <label for="brand-huawei">🔵 Huawei</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="brand" id="brand-google" value="google">
+                            <label for="brand-google">🔍 Google</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="brand" id="brand-oneplus" value="oneplus">
+                            <label for="brand-oneplus">➕ OnePlus</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="brand" id="brand-realme" value="realme">
+                            <label for="brand-realme">⚡ Realme</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">نوع الهاتف</label>
+                    <select class="form-control" id="phoneModel" disabled required>
+                        <option value="">اختر الشركة أولاً</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>اللون</label>
+                    <input type="text" class="form-control" id="color" placeholder="مثال: أسود، أبيض، أزرق">
+                </div>
+            </div>
+            
+            <!-- Step 2: Technical Specifications -->
+            <div class="step-content" id="step-2">
+                <h2 style="margin-bottom: 25px; color: #333;">المواصفات التقنية</h2>
+                
+                <div class="form-group">
+                    <label class="required">الذاكرة العشوائية (RAM)</label>
+                    <div class="radio-cards">
+                        <div class="radio-card">
+                            <input type="radio" name="ram" id="ram-2" value="2">
+                            <label for="ram-2">2 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="ram" id="ram-4" value="4">
+                            <label for="ram-4">4 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="ram" id="ram-6" value="6">
+                            <label for="ram-6">6 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="ram" id="ram-8" value="8">
+                            <label for="ram-8">8 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="ram" id="ram-12" value="12">
+                            <label for="ram-12">12 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="ram" id="ram-16" value="16">
+                            <label for="ram-16">16 GB</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">سعة التخزين</label>
+                    <div class="radio-cards">
+                        <div class="radio-card">
+                            <input type="radio" name="storage" id="storage-32" value="32">
+                            <label for="storage-32">32 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="storage" id="storage-64" value="64">
+                            <label for="storage-64">64 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="storage" id="storage-128" value="128">
+                            <label for="storage-128">128 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="storage" id="storage-256" value="256">
+                            <label for="storage-256">256 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="storage" id="storage-512" value="512">
+                            <label for="storage-512">512 GB</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="storage" id="storage-1024" value="1024">
+                            <label for="storage-1024">1 TB</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group hidden" id="batteryHealthGroup">
+                    <label class="required">صحة البطارية (%)</label>
+                    <input type="number" class="form-control" id="batteryHealth" min="0" max="100" placeholder="مثال: 85">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">مقاومة الماء</label>
+                    <div class="radio-cards">
+                        <div class="radio-card">
+                            <input type="radio" name="waterResistant" id="water-yes" value="true">
+                            <label for="water-yes">✅ نعم</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="waterResistant" id="water-no" value="false">
+                            <label for="water-no">❌ لا</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>الكاميرا الرئيسية</label>
+                    <input type="text" class="form-control" id="camera" placeholder="مثال: 48MP">
+                </div>
+                
+                <div class="form-group">
+                    <label>وصف إضافي</label>
+                    <textarea class="form-control" id="description" placeholder="اكتب أي ملاحظات إضافية عن حالة الجهاز..."></textarea>
+                </div>
+            </div>
+            
+            <!-- Step 3: Images -->
+            <div class="step-content" id="step-3">
+                <h2 style="margin-bottom: 25px; color: #333;">صور الهاتف</h2>
+                
+                <div class="form-group">
+                    <label class="required">أضف صور الهاتف (3 صور كحد أقصى)</label>
+                    <div class="drop-zone" id="dropZone">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📸</div>
+                        <p>اسحب الصور هنا أو اضغط لاختيارها</p>
+                        <p style="font-size: 14px; color: #adb5bd;">الحد الأقصى: 3 صور، 5 ميجابايت للصورة</p>
+                        <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+                    </div>
+                    <div class="image-preview" id="imagePreview"></div>
+                    <p class="error-message" id="imageError"></p>
+                </div>
+                
+                <div class="form-group">
+                    <label>أو استخدم Cloudinary Widget</label>
+                    <button type="button" class="btn btn-secondary" id="cloudinaryBtn" onclick="openCloudinaryWidget()">
+                        ☁️ رفع عبر Cloudinary
+                    </button>
+                    <div class="image-preview" id="cloudinaryPreview"></div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Price & Status -->
+            <div class="step-content" id="step-4">
+                <h2 style="margin-bottom: 25px; color: #333;">السعر والحالة</h2>
+                
+                <div class="form-group">
+                    <label class="required">السعر (جنيه سوداني)</label>
+                    <input type="text" class="form-control" id="price" placeholder="مثال: 300,000" required>
+                    <p class="error-message" id="priceError">السعر يجب أن يكون 1,000 على الأقل</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">حالة الهاتف</label>
+                    <div class="radio-cards">
+                        <div class="radio-card">
+                            <input type="radio" name="status" id="status-new" value="new">
+                            <label for="status-new">✨ جديد</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="status" id="status-like-new" value="like-new">
+                            <label for="status-like-new">🔄 شبه جديد</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="status" id="status-used" value="used">
+                            <label for="status-used">📱 مستعمل</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 5: Location & Contact -->
+            <div class="step-content" id="step-5">
+                <h2 style="margin-bottom: 25px; color: #333;">الموقع وطرق التواصل</h2>
+                
+                <div class="form-group">
+                    <label class="required">الولاية</label>
+                    <select class="form-control" id="state" required>
+                        <option value="">اختر الولاية</option>
+                        <option value="khartoum">الخرطوم</option>
+                        <option value="omdurman">أم درمان</option>
+                        <option value="bahri">بحري</option>
+                        <option value="jazeera">الجزيرة</option>
+                        <option value="white-nile">النيل الأبيض</option>
+                        <option value="blue-nile">النيل الأزرق</option>
+                        <option value="kassala">كسلا</option>
+                        <option value="gadarif">القضارف</option>
+                        <option value="red-sea">البحر الأحمر</option>
+                        <option value="north">الشمالية</option>
+                        <option value="nahr-nile">نهر النيل</option>
+                        <option value="sennar">سنار</option>
+                        <option value="white-nile">النيل الأبيض</option>
+                        <option value="north-kordofan">شمال كردفان</option>
+                        <option value="south-kordofan">جنوب كردفان</option>
+                        <option value="west-kordofan">غرب كردفان</option>
+                        <option value="north-darfur">شمال دارفور</option>
+                        <option value="south-darfur">جنوب دارفور</option>
+                        <option value="east-darfur">شرق دارفور</option>
+                        <option value="west-darfur">غرب دارفور</option>
+                        <option value="central-darfur">وسط دارفور</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">المدينة / المحلية</label>
+                    <select class="form-control" id="city" disabled required>
+                        <option value="">اختر الولاية أولاً</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">الحي / المنطقة</label>
+                    <input type="text" class="form-control" id="neighborhood" placeholder="مثال: الرياض، العمارات" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">رقم الهاتف للتواصل</label>
+                    <div class="phone-input-wrapper">
+                        <span class="country-code">+249</span>
+                        <input type="tel" class="form-control" id="contactPhone" maxlength="9" placeholder="123456789" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="sameWhatsApp" checked>
+                        <label for="sameWhatsApp">نفس الرقم للواتساب</label>
+                    </div>
+                </div>
+                
+                <div class="form-group hidden" id="whatsappGroup">
+                    <label class="required">رقم الواتساب</label>
+                    <div class="phone-input-wrapper">
+                        <span class="country-code">+249</span>
+                        <input type="tel" class="form-control" id="whatsAppNumber" maxlength="9" placeholder="123456789">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">طرق التواصل المتاحة</label>
+                    <div class="checkbox-group" style="gap: 20px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" name="contactMethods" value="whatsapp" checked>
+                            <span>💬 واتساب</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" name="contactMethods" value="call">
+                            <span>📞 اتصال</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" name="contactMethods" value="message">
+                            <span>✉️ رسائل</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage">
+                <div class="success-icon">🎉</div>
+                <h2 style="color: #28a745; margin-bottom: 15px;">تم نشر الإعلان بنجاح!</h2>
+                <p style="color: #6c757d; margin-bottom: 25px;">سيتم مراجعة إعلانك ونشره قريباً</p>
+                <button class="btn btn-primary" onclick="location.reload()">نشر إعلان جديد</button>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="btn-group" id="navButtons">
+                <button class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)" style="display: none;">السابق</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">التالي</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <h2>🔐 التحقق من الحساب</h2>
+            <p style="text-align: center; color: #6c757d; margin-bottom: 20px;">يجب تسجيل الدخول لنشر الإعلان</p>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">تسجيل الدخول</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">إنشاء حساب</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="required">البريد الإلكتروني</label>
+                    <input type="email" class="form-control" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="required">كلمة المرور</label>
+                    <input type="password" class="form-control" id="loginPassword" minlength="6" required>
+                </div>
+                <p class="error-message" id="loginError"></p>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">تسجيل الدخول</button>
+            </form>
+            
+            <!-- Register Form -->
+            <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label class="required">الاسم الكامل</label>
+                    <input type="text" class="form-control" id="regName" required>
+                </div>
+                <div class="form-group">
+                    <label class="required">البريد الإلكتروني</label>
+                    <input type="email" class="form-control" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="required">كلمة المرور</label>
+                    <input type="password" class="form-control" id="regPassword" minlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label class="required">تأكيد كلمة المرور</label>
+                    <input type="password" class="form-control" id="regPasswordConfirm" minlength="6" required>
+                </div>
+                <p class="error-message" id="registerError"></p>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">إنشاء حساب</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p style="margin-top: 20px; color: #667eea; font-weight: 600;">جاري المعالجة...</p>
+    </div>
+
+    <script>
+        // ==================== PHONE DATABASE ====================
+        const phoneDatabase = {
+            apple: [
+                "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
+                "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14",
+                "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13", "iPhone 13 mini",
+                "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 12 mini",
+                "iPhone 11 Pro Max", "iPhone 11 Pro", "iPhone 11",
+                "iPhone SE (2022)", "iPhone SE (2020)", "iPhone XR", "iPhone XS Max", "iPhone XS"
+            ],
+            samsung: [
+                "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24",
+                "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S23",
+                "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S22",
+                "Galaxy Z Fold 5", "Galaxy Z Flip 5",
+                "Galaxy A54", "Galaxy A34", "Galaxy A24", "Galaxy A14",
+                "Galaxy M54", "Galaxy M34", "Galaxy M14",
+                "Galaxy Note 20 Ultra", "Galaxy Note 20"
+            ],
+            xiaomi: [
+                "Xiaomi 14 Ultra", "Xiaomi 14 Pro", "Xiaomi 14",
+                "Xiaomi 13 Ultra", "Xiaomi 13 Pro", "Xiaomi 13",
+                "Xiaomi 12 Pro", "Xiaomi 12",
+                "Redmi Note 13 Pro+", "Redmi Note 13 Pro", "Redmi Note 13",
+                "Redmi Note 12 Pro", "Redmi Note 12",
+                "Poco F6 Pro", "Poco F6", "Poco X6 Pro", "Poco X6",
+                "Redmi 13C", "Redmi 12C"
+            ],
+            oppo: [
+                "Find X7 Ultra", "Find X7", "Find X6 Pro",
+                "Reno 11 Pro", "Reno 11", "Reno 10 Pro", "Reno 10",
+                "A98", "A78", "A58", "A38", "A18",
+                "F25 Pro", "F23", "F21s"
+            ],
+            huawei: [
+                "Mate 60 Pro", "Mate 60", "Mate 50 Pro", "Mate 50",
+                "P60 Pro", "P60", "P50 Pro", "P50",
+                "nova 12 Pro", "nova 12", "nova 11 Pro", "nova 11",
+                "Enjoy 60 Pro", "Enjoy 60",
+                "Mate X5", "Mate X3"
+            ],
+            google: [
+                "Pixel 8 Pro", "Pixel 8", "Pixel 8a",
+                "Pixel 7 Pro", "Pixel 7", "Pixel 7a",
+                "Pixel 6 Pro", "Pixel 6", "Pixel 6a",
+                "Pixel 5", "Pixel 5a", "Pixel 4 XL", "Pixel 4"
+            ],
+            oneplus: [
+                "OnePlus 12", "OnePlus 12R",
+                "OnePlus 11", "OnePlus 11R",
+                "OnePlus 10 Pro", "OnePlus 10T", "OnePlus 10R",
+                "OnePlus Nord 3", "OnePlus Nord CE 3", "OnePlus Nord CE 3 Lite",
+                "OnePlus Open"
+            ],
+            realme: [
+                "GT 6", "GT 5 Pro", "GT 5",
+                "GT Neo 6", "GT Neo 5", "GT Neo 3",
+                "12 Pro+", "12 Pro", "12",
+                "11 Pro+", "11 Pro", "11",
+                "C67", "C55", "C53", "C51"
+            ]
+        };
+        
+        // ==================== CITIES DATA ====================
+        const citiesData = {
+            khartoum: ["الخرطوم", "جبل أولياء", "شرق النيل", "كرري"],
+            omdurman: ["أم درمان", "الثورة", "بري", "الحاج يوسف"],
+            bahri: ["بحري", "الدروشاب", "الكدرو", "الحلفايا"],
+            jazeera: ["ود مدني", "الحصاحيصا", "المناقل", "الكاملين"],
+            "white-nile": ["ربك", "كوستي", "الدويم", "الجبلين"],
+            "blue-nile": ["الدمازين", "الروصيرص", "قيسان"],
+            kassala: ["كسلا", "باسندة", "خشم القربة", "تلكوك"],
+            gadarif: ["القضارف", "البطانة", "الفاو", "الرهد"],
+            "red-sea": ["بورتسودان", "سواكن", "طوكر", "هلايب"],
+            north: ["دنقلا", "كريمة", "الدبة", "مروي"],
+            "nahr-nile": ["عطبرة", "بربر", "أبو حمد", "المتمة"],
+            sennar: ["سنار", "الدندر", "السوكي", "شرق سنار"],
+            "north-kordofan": ["الأبيض", "سودري", "بركة", "أم روابة"],
+            "south-kordofan": ["كادوقلي", "الفولة", "الليري", "القولد"],
+            "west-kordofan": ["الفاشر", "كبكابية", "الكومة", "تولس"],
+            "north-darfur": ["الفاشر", "كبكابية", "الكومة", "تولس"],
+            "south-darfur": ["نيالا", "كاس", "الردوم", "عد الفرسان"],
+            "east-darfur": ["الضعين", "بحر العرب", "الفردوس", "أبو كارنكا"],
+            "west-darfur": ["الجنينة", "بيضة", "كرينك", "هبيلا"],
+            "central-darfur": ["زالنجي", "أزوم", "مكجر", "نيرتتي"]
+        };
+        
+        // ==================== STATE MANAGEMENT ====================
+        let currentStep = 1;
+        const totalSteps = 5;
+        let uploadedImages = [];
+        let cloudinaryImages = [];
+        let currentUser = null;
+        
+        // ==================== FIREBASE AUTH ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for Firebase to be ready
+            setTimeout(() => {
+                if (window.firebaseAuth && window.firebaseAuthFuncs) {
+                    const { onAuthStateChanged } = window.firebaseAuthFuncs;
+                    onAuthStateChanged(window.firebaseAuth, (user) => {
+                        currentUser = user;
+                        if (user) {
+                            document.getElementById('userInfo').classList.add('show');
+                            document.getElementById('userEmail').textContent = user.email;
+                        } else {
+                            document.getElementById('userInfo').classList.remove('show');
+                        }
+                    });
+                }
+            }, 1000);
+            
+            initEventListeners();
+        });
+        
+        function initEventListeners() {
+            // Brand selection
+            document.querySelectorAll('input[name="brand"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updatePhoneModels(this.value);
+                    toggleBatteryHealth(this.value);
+                });
+            });
+            
+            // State selection
+            document.getElementById('state').addEventListener('change', function() {
+                updateCities(this.value);
+            });
+            
+            // WhatsApp toggle
+            document.getElementById('sameWhatsApp').addEventListener('change', function() {
+                const whatsappGroup = document.getElementById('whatsappGroup');
+                if (this.checked) {
+                    whatsappGroup.classList.add('hidden');
+                    document.getElementById('whatsAppNumber').required = false;
+                } else {
+                    whatsappGroup.classList.remove('hidden');
+                    document.getElementById('whatsAppNumber').required = true;
+                }
+            });
+            
+            // Price formatting
+            document.getElementById('price').addEventListener('input', formatPrice);
+            
+            // Image upload
+            const dropZone = document.getElementById('dropZone');
+            const imageInput = document.getElementById('imageInput');
+            
+            dropZone.addEventListener('click', () => imageInput.click());
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+            imageInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+        
+        // ==================== STEP NAVIGATION ====================
+        function changeStep(direction) {
+            if (direction === 1 && !validateCurrentStep()) return;
+            
+            currentStep += direction;
+            
+            if (currentStep > totalSteps) {
+                submitForm();
+                return;
+            }
+            
+            if (currentStep < 1) currentStep = 1;
+            
+            updateUI();
+        }
+        
+        function updateUI() {
+            // Update steps
+            document.querySelectorAll('.step-content').forEach((step, index) => {
+                step.classList.toggle('active', index + 1 === currentStep);
+            });
+            
+            // Update progress
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // Update buttons
+            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
+            document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'نشر الإعلان 🚀' : 'التالي';
+        }
+        
+        function validateCurrentStep() {
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            const requiredFields = currentStepEl.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value || (field.type === 'radio' && !field.checked)) {
+                    // Check if radio group has selection
+                    if (field.type === 'radio') {
+                        const radioGroup = currentStepEl.querySelectorAll(`input[name="${field.name}"]`);
+                        const hasSelection = Array.from(radioGroup).some(r => r.checked);
+                        if (!hasSelection) isValid = false;
+                    } else {
+                        isValid = false;
+                    }
+                    field.style.borderColor = '#dc3545';
+                } else {
+                    field.style.borderColor = '#e9ecef';
+                }
+            });
+            
+            // Step-specific validations
+            if (currentStep === 3) {
+                const allImages = [...uploadedImages, ...cloudinaryImages];
+                if (allImages.length === 0) {
+                    document.getElementById('imageError').textContent = 'يجب إضافة صورة واحدة على الأقل';
+                    document.getElementById('imageError').classList.add('show');
+                    isValid = false;
+                } else {
+                    document.getElementById('imageError').classList.remove('show');
+                }
+            }
+            
+            if (currentStep === 4) {
+                const price = document.getElementById('price').value.replace(/,/g, '');
+                if (price && parseInt(price) < 1000) {
+                    document.getElementById('priceError').classList.add('show');
+                    isValid = false;
+                } else {
+                    document.getElementById('priceError').classList.remove('show');
+                }
+            }
+            
+            return isValid;
+        }
+        
+        // ==================== PHONE MODELS ====================
+        function updatePhoneModels(brand) {
+            const select = document.getElementById('phoneModel');
+            select.innerHTML = '<option value="">اختر نوع الهاتف</option>';
+            select.disabled = false;
+            
+            if (phoneDatabase[brand]) {
+                phoneDatabase[brand].forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    select.appendChild(option);
+                });
+            }
+        }
+        
+        function toggleBatteryHealth(brand) {
+            const batteryGroup = document.getElementById('batteryHealthGroup');
+            if (brand === 'apple') {
+                batteryGroup.classList.remove('hidden');
+                document.getElementById('batteryHealth').required = true;
+            } else {
+                batteryGroup.classList.add('hidden');
+                document.getElementById('batteryHealth').required = false;
+            }
+        }
+        
+        // ==================== CITIES ====================
+        function updateCities(state) {
+            const select = document.getElementById('city');
+            select.innerHTML = '<option value="">اختر المدينة</option>';
+            select.disabled = false;
+            
+            if (citiesData[state]) {
+                citiesData[state].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    select.appendChild(option);
+                });
+            }
+        }
+        
+        // ==================== PRICE FORMATTING ====================
+        function formatPrice(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value) {
+                value = parseInt(value).toLocaleString('en-US');
+            }
+            e.target.value = value;
+        }
+        
+        // ==================== IMAGE HANDLING ====================
+        function handleFiles(files) {
+            const errorEl = document.getElementById('imageError');
+            
+            if (uploadedImages.length + files.length > 3) {
+                errorEl.textContent = 'الحد الأقصى 3 صور فقط';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            Array.from(files).forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    errorEl.textContent = 'حجم الصورة يجب أن لا يتجاوز 5 ميجابايت';
+                    errorEl.classList.add('show');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedImages.push({
+                        file: file,
+                        preview: e.target.result
+                    });
+                    updateImagePreview();
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            errorEl.classList.remove('show');
+        }
+        
+        function updateImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            uploadedImages.forEach((img, index) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <img src="${img.preview}" alt="Preview">
+                    <button class="remove-btn" onclick="removeImage(${index})">×</button>
+                `;
+                preview.appendChild(div);
+            });
+        }
+        
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            updateImagePreview();
+        }
+        
+        // ==================== CLOUDINARY WIDGET ====================
+        function openCloudinaryWidget() {
+            const widget = cloudinary.createUploadWidget({
+                cloudName: 'dxbfupupw',
+                uploadPreset: 'Ob7uqufu',
+                sources: ['local', 'camera'],
+                multiple: true,
+                maxFiles: 3,
+                maxFileSize: 5000000,
+                folder: 'phone_soug',
+                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+                language: 'ar',
+                text: {
+                    ar: {
+                        or: 'أو',
+                        menu: {
+                            files: 'ملفاتي',
+                            camera: 'الكاميرا'
+                        },
+                        local: {
+                            browse: 'اختر ملف',
+                            dd_title_single: 'اسحب الصورة هنا',
+                            dd_title_multi: 'اسحب الصور هنا'
+                        },
+                        queue: {
+                            title: 'قائمة الرفع',
+                            title_uploading_with_counter: 'جاري رفع {{num}} صور',
+                            done: 'تم',
+                            failed: 'فشل'
+                        }
+                    }
+                }
+            }, (error, result) => {
+                if (!error && result && result.event === "success") {
+                    cloudinaryImages.push(result.info.secure_url);
+                    updateCloudinaryPreview();
+                    console.log('Cloudinary URL:', result.info.secure_url);
+                }
+                if (error) {
+                    console.error('Cloudinary Error:', error);
+                    alert('حدث خطأ أثناء رفع الصورة: ' + error.message);
+                }
+            });
+            
+            widget.open();
+        }
+        
+        function updateCloudinaryPreview() {
+            const preview = document.getElementById('cloudinaryPreview');
+            preview.innerHTML = '';
+            
+            cloudinaryImages.forEach((url, index) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <img src="${url}" alt="Cloudinary Image">
+                    <button class="remove-btn" onclick="removeCloudinaryImage(${index})">×</button>
+                `;
+                preview.appendChild(div);
+            });
+        }
+        
+        function removeCloudinaryImage(index) {
+            cloudinaryImages.splice(index, 1);
+            updateCloudinaryPreview();
+        }
+        
+        // ==================== AUTH FUNCTIONS ====================
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Form').classList.add('active');
+        }
+        
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            
+            try {
+                const { signInWithEmailAndPassword } = window.firebaseAuthFuncs;
+                await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+                document.getElementById('authModal').classList.remove('show');
+                submitForm();
+            } catch (error) {
+                errorEl.textContent = getAuthErrorMessage(error.code);
+                errorEl.classList.add('show');
+            }
+        }
+        
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regPasswordConfirm').value;
+            const errorEl = document.getElementById('registerError');
+            
+            if (password !== confirm) {
+                errorEl.textContent = 'كلمتا المرور غير متطابقتين';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            try {
+                const { createUserWithEmailAndPassword } = window.firebaseAuthFuncs;
+                const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+                
+                // Save user name to database
+                const { ref, set } = window.firebaseRefs;
+                await set(ref(window.firebaseDB, 'users/' + userCredential.user.uid), {
+                    name: name,
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+                
+                document.getElementById('authModal').classList.remove('show');
+                submitForm();
+            } catch (error) {
+                errorEl.textContent = getAuthErrorMessage(error.code);
+                errorEl.classList.add('show');
+            }
+        }
+        
+        function getAuthErrorMessage(code) {
+            const messages = {
+                'auth/invalid-email': 'البريد الإلكتروني غير صالح',
+                'auth/user-disabled': 'هذا الحساب معطل',
+                'auth/user-not-found': 'لم يتم العثور على هذا الحساب',
+                'auth/wrong-password': 'كلمة المرور غير صحيحة',
+                'auth/email-already-in-use': 'هذا البريد مستخدم بالفعل',
+                'auth/weak-password': 'كلمة المرور ضعيفة جداً',
+                'auth/invalid-credential': 'بيانات الدخول غير صحيحة'
+            };
+            return messages[code] || 'حدث خطأ، يرجى المحاولة مرة أخرى';
+        }
+        
+        async function logoutUser() {
+            try {
+                const { signOut } = window.firebaseAuthFuncs;
+                await signOut(window.firebaseAuth);
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        
+        // ==================== FORM SUBMISSION ====================
+        async function submitForm() {
+            // Check if user is logged in
+            if (!currentUser) {
+                document.getElementById('authModal').classList.add('show');
+                return;
+            }
+            
+            document.getElementById('loadingSpinner').classList.add('show');
+            
+            try {
+                // Collect form data
+                const formData = collectFormData();
+                
+                // Upload local images to Firebase Storage
+                const imageUrls = [];
+                for (const img of uploadedImages) {
+                    const url = await uploadToFirebaseStorage(img.file);
+                    imageUrls.push(url);
+                }
+                
+                // Add Cloudinary images
+                imageUrls.push(...cloudinaryImages);
+                
+                // Save to Firebase Realtime Database
+                const { ref, push, set } = window.firebaseRefs;
+                const listingsRef = ref(window.firebaseDB, 'listings');
+                const newListingRef = push(listingsRef);
+                
+                const listingData = {
+                    ...formData,
+                    images: imageUrls,
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                await set(newListingRef, listingData);
+                
+                // Show success
+                document.getElementById('loadingSpinner').classList.remove('show');
+                document.getElementById('navButtons').style.display = 'none';
+                document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
+                document.getElementById('successMessage').classList.add('show');
+                
+                console.log('Listing saved with ID:', newListingRef.key);
+                
+            } catch (error) {
+                console.error('Submission error:', error);
+                document.getElementById('loadingSpinner').classList.remove('show');
+                alert('حدث خطأ أثناء نشر الإعلان: ' + error.message);
+            }
+        }
+        
+        function collectFormData() {
+            const brand = document.querySelector('input[name="brand"]:checked')?.value || '';
+            const ram = document.querySelector('input[name="ram"]:checked')?.value || '';
+            const storage = document.querySelector('input[name="storage"]:checked')?.value || '';
+            const waterResistant = document.querySelector('input[name="waterResistant"]:checked')?.value || '';
+            const status = document.querySelector('input[name="status"]:checked')?.value || '';
+            
+            const contactMethods = Array.from(document.querySelectorAll('input[name="contactMethods"]:checked'))
+                .map(cb => cb.value);
+            
+            return {
+                brand: brand,
+                phoneModel: document.getElementById('phoneModel').value,
+                color: document.getElementById('color').value,
+                ram: ram,
+                storage: storage,
+                batteryHealth: document.getElementById('batteryHealth').value || null,
+                waterResistant: waterResistant === 'true',
+                camera: document.getElementById('camera').value,
+                description: document.getElementById('description').value,
+                price: document.getElementById('price').value.replace(/,/g, ''),
+                status: status,
+                state: document.getElementById('state').value,
+                city: document.getElementById('city').value,
+                neighborhood: document.getElementById('neighborhood').value,
+                contactPhone: '+249' + document.getElementById('contactPhone').value,
+                whatsAppNumber: document.getElementById('sameWhatsApp').checked 
+                    ? '+249' + document.getElementById('contactPhone').value 
+                    : '+249' + document.getElementById('whatsAppNumber').value,
+                contactMethods: contactMethods
+            };
+        }
+        
+        async function uploadToFirebaseStorage(file) {
+            const { storageRef, uploadBytes, getDownloadURL } = window.firebaseStorageRefs;
+            const timestamp = Date.now();
+            const filename = `listings/${currentUser.uid}/${timestamp}_${file.name}`;
+            const fileRef = storageRef(window.firebaseStorage, filename);
+            
+            await uploadBytes(fileRef, file);
+            const url = await getDownloadURL(fileRef);
+            return url;
+        }
+    </script>
+</body>
+</html>
