@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>البروفايل - سوق فون</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        body { background: #f1f5f9; overflow-x: hidden; }
+
+        /* Navbar */
+        .app-nav {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226,232,240,0.6);
+        }
+
+        /* غلاف البروفايل */
+        .profile-cover {
+            position: relative;
+            height: 180px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+            overflow: hidden;
+        }
+        .profile-cover::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
+        }
+
+        /* صورة البروفايل */
+        .profile-avatar {
+            position: absolute;
+            bottom: -50px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 30px;
+            border: 5px solid white;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            object-fit: cover;
+            background: white;
+        }
+        .avatar-edit {
+            position: absolute;
+            bottom: -40px;
+            right: calc(50% + 30px);
+            transform: translateX(50%);
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: 3px solid white;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+        }
+
+        /* إحصائيات */
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 20px;
+        }
+
+        /* بطاقات الإعلانات */
+        .ad-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .ad-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+        }
+        .ad-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .ad-card:hover::before { opacity: 1; }
+
+        .status-new { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .status-like-new { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+        .status-used { background: linear-gradient(135deg, #f59e0b, #ea580c); }
+
+        /* أزرار التعديل والحذف */
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .action-btn:hover { transform: scale(1.1); }
+        .action-btn:active { transform: scale(0.9); }
+
+        /* نموذج التعديل */
+        .edit-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .edit-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.1);
+        }
+
+        /* التبويبات */
+        .tab-btn {
+            position: relative;
+            padding: 12px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+        }
+
+        /* FAB */
+        .fab-container {
+            position: fixed;
+            bottom: 88px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            pointer-events: none;
+        }
+        .fab-btn {
+            pointer-events: auto;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            box-shadow: 0 8px 32px rgba(79, 70, 229, 0.4);
+            transition: all 0.3s ease;
+        }
+        .fab-btn:hover { transform: scale(1.05); }
+        .fab-btn:active { transform: scale(0.95); }
+
+        /* الشريط السفلي */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            right: 0; left: 0;
+            z-index: 50;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(226,232,240,0.6);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+        }
+        .bottom-item {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .bottom-item.active { color: #4f46e5; }
+        .bottom-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 32px; height: 3px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            border-radius: 0 0 8px 8px;
+        }
+        .bottom-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            min-width: 18px; height: 18px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid white;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+        }
+
+        .main-content { padding-bottom: 160px; }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toggle-switch.active::after {
+            right: 26px;
+        }
+
+        /* Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton 1.5s infinite;
+        }
+        @keyframes skeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="app-nav sticky top-0 z-40">
+        <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+            <button onclick="history.back()" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 transition-all">
+                <i class="fas fa-arrow-right text-lg"></i>
+            </button>
+            <h1 class="font-bold text-slate-900">البروفايل</h1>
+            <button onclick="showSettings()" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 transition-all">
+                <i class="fas fa-cog text-lg"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [1] غلاف البروفايل + الصورة                   -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="profile-cover">
+        <div class="max-w-lg mx-auto px-4 h-full flex items-end pb-4 relative">
+            <div class="absolute bottom-0 right-0 left-0 h-20 bg-gradient-to-t from-black/30 to-transparent"></div>
+        </div>
+    </div>
+
+    <!-- صورة البروفايل -->
+    <div class="relative max-w-lg mx-auto">
+        <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff&size=256&bold=true" 
+             class="profile-avatar" alt="Profile">
+        <label class="avatar-edit" title="تغيير الصورة">
+            <i class="fas fa-camera text-sm"></i>
+            <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="updateAvatar(this)">
+        </label>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [2] معلومات المستخدم                           -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="max-w-lg mx-auto px-4 pt-16 pb-4 text-center">
+        <h2 id="profileName" class="text-2xl font-black text-slate-900">اسم المستخدم</h2>
+        <p id="profileEmail" class="text-sm text-slate-500 mt-1">user@email.com</p>
+        <p id="profilePhone" class="text-sm text-slate-400 mt-0.5">+249 912345678</p>
+
+        <!-- زر تعديل الملف الشخصي -->
+        <button onclick="showEditProfile()" 
+                class="mt-4 bg-white border-2 border-indigo-500 text-indigo-600 px-6 py-2.5 rounded-2xl font-bold text-sm hover:bg-indigo-50 transition-all flex items-center gap-2 mx-auto">
+            <i class="fas fa-pen"></i>
+            تعديل الملف الشخصي
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [3] الإحصائيات                                 -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="max-w-lg mx-auto px-4 py-4">
+        <div class="grid grid-cols-3 gap-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-indigo-100 text-indigo-600">
+                    <i class="fas fa-list-alt"></i>
+                </div>
+                <p id="statAds" class="text-2xl font-black text-slate-900">0</p>
+                <p class="text-xs text-slate-500 font-semibold">إعلاناتي</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-pink-100 text-pink-600">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <p id="statFav" class="text-2xl font-black text-slate-900">0</p>
+                <p class="text-xs text-slate-500 font-semibold">المفضلة</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-yellow-100 text-yellow-600">
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="text-2xl font-black text-slate-900">4.5</p>
+                <p class="text-xs text-slate-500 font-semibold">التقييم</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [4] التبويبات                                  -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="max-w-lg mx-auto px-4">
+        <div class="bg-white rounded-2xl p-1 flex gap-1 mb-4">
+            <button onclick="switchTab('ads')" id="tabAds" class="tab-btn active flex-1 rounded-xl">
+                <i class="fas fa-list-alt ml-1"></i> إعلاناتي
+            </button>
+            <button onclick="switchTab('favorites')" id="tabFav" class="tab-btn flex-1 rounded-xl">
+                <i class="fas fa-heart ml-1"></i> المفضلة
+            </button>
+            <button onclick="switchTab('settings')" id="tabSettings" class="tab-btn flex-1 rounded-xl">
+                <i class="fas fa-cog ml-1"></i> الإعدادات
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [5] محتوى التبويبات                            -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="main-content max-w-lg mx-auto px-4 pb-4">
+
+        <!-- إعلاناتي -->
+        <div id="contentAds" class="tab-content">
+            <div id="myAdsList" class="space-y-4">
+                <!-- يُملأ ديناميكياً -->
+            </div>
+            <div id="noAdsMsg" class="hidden text-center py-12">
+                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-list-alt text-3xl text-slate-400"></i>
+                </div>
+                <h3 class="font-bold text-slate-700">لا توجد إعلانات</h3>
+                <p class="text-sm text-slate-500 mt-1">ابدأ بإضافة إعلانك الأول!</p>
+            </div>
+        </div>
+
+        <!-- المفضلة -->
+        <div id="contentFav" class="tab-content hidden">
+            <div id="favList" class="space-y-4">
+                <!-- يُملأ ديناميكياً -->
+            </div>
+            <div id="noFavMsg" class="hidden text-center py-12">
+                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-heart text-3xl text-slate-400"></i>
+                </div>
+                <h3 class="font-bold text-slate-700">لا توجد مفضلات</h3>
+                <p class="text-sm text-slate-500 mt-1">أضف إعلانات إلى المفضلة</p>
+            </div>
+        </div>
+
+        <!-- الإعدادات -->
+        <div id="contentSettings" class="tab-content hidden">
+            <div class="bg-white rounded-2xl p-5 space-y-4">
+                <h3 class="font-bold text-slate-900 mb-4">إعدادات الحساب</h3>
+
+                <!-- الإشعارات -->
+                <div class="flex items-center justify-between py-3 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-bell text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">الإشعارات</p>
+                            <p class="text-xs text-slate-500">تفعيل إشعارات التطبيق</p>
+                        </div>
+                    </div>
+                    <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <!-- الوضع الليلي -->
+                <div class="flex items-center justify-between py-3 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-moon text-purple-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">الوضع الليلي</p>
+                            <p class="text-xs text-slate-500">تفعيل المظهر الداكن</p>
+                        </div>
+                    </div>
+                    <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+                </div>
+
+                <!-- تغيير كلمة المرور -->
+                <button onclick="showChangePassword()" class="w-full flex items-center justify-between py-3 border-b border-slate-100 hover:bg-slate-50 rounded-xl px-2 transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-lock text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">تغيير كلمة المرور</p>
+                            <p class="text-xs text-slate-500">تحديث كلمة المرور الخاصة بك</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-left text-slate-400"></i>
+                </button>
+
+                <!-- تسجيل الخروج -->
+                <button onclick="logout()" class="w-full flex items-center gap-3 py-3 text-red-500 hover:bg-red-50 rounded-xl px-2 transition-all">
+                    <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt text-red-500"></i>
+                    </div>
+                    <p class="font-bold text-sm">تسجيل الخروج</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [6] زر الإضافة العائم                           -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="fab-container">
+        <a href="publish.html" class="fab-btn flex items-center gap-2 px-6 py-3.5 rounded-full text-white font-bold text-sm">
+            <i class="fas fa-plus text-lg"></i>
+            <span>أضف إعلان</span>
+        </a>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [7] الشريط السفلي                               -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <nav class="bottom-nav h-16">
+        <div class="max-w-lg mx-auto h-full flex items-center justify-around px-4">
+            <a href="index.html" class="bottom-item flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
+                <div class="relative"><i class="fas fa-home text-xl"></i></div>
+                <span class="text-[10px] font-bold">الرئيسية</span>
+            </a>
+            <a href="my-ads.html" class="bottom-item flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
+                <div class="relative">
+                    <i class="fas fa-list-alt text-xl"></i>
+                    <span class="bottom-badge">2</span>
+                </div>
+                <span class="text-[10px] font-bold">إعلاناتي</span>
+            </a>
+            <a href="messages.html" class="bottom-item flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
+                <div class="relative">
+                    <i class="fas fa-comment-dots text-xl"></i>
+                    <span class="bottom-badge">5</span>
+                </div>
+                <span class="text-[10px] font-bold">المراسلة</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [8] Modal تعديل الملف الشخصي                   -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div id="editProfileModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeEditModal()"></div>
+        <div class="absolute bottom-0 right-0 left-0 md:top-1/2 md:right-1/2 md:left-auto md:bottom-auto md:transform md:translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white z-10 px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-bold text-lg text-slate-900">تعديل الملف الشخصي</h3>
+                <button onclick="closeEditModal()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-all">
+                    <i class="fas fa-times text-slate-500"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label>
+                    <input type="text" id="editName" class="edit-input" placeholder="أدخل اسمك">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
+                    <input type="email" id="editEmail" class="edit-input text-left" placeholder="example@email.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">رقم الهاتف</label>
+                    <div class="relative">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">+249</span>
+                        <input type="tel" id="editPhone" class="edit-input pr-16 text-left" placeholder="912345678" maxlength="9">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">المدينة</label>
+                    <select id="editCity" class="edit-input">
+                        <option value="">اختر المدينة</option>
+                        <option value="khartoum">الخرطوم</option>
+                        <option value="omdurman">أم درمان</option>
+                        <option value="bahri">بحري</option>
+                        <option value="jazeera">الجزيرة</option>
+                        <option value="white-nile">النيل الأبيض</option>
+                        <option value="blue-nile">النيل الأزرق</option>
+                        <option value="kassala">كسلا</option>
+                        <option value="gedaref">القضارف</option>
+                        <option value="sennar">سنار</option>
+                        <option value="northern">شمالية</option>
+                        <option value="river-nile">نهر النيل</option>
+                        <option value="red-sea">البحر الأحمر</option>
+                        <option value="kordofan">كردفان</option>
+                        <option value="darfur">دارفور</option>
+                    </select>
+                </div>
+                <button onclick="saveProfile()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3.5 rounded-2xl font-bold text-center transition-all shadow-lg shadow-indigo-500/20 mt-2">
+                    حفظ التغييرات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [9] Modal تعديل إعلان                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div id="editAdModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeEditAdModal()"></div>
+        <div class="absolute bottom-0 right-0 left-0 md:top-1/2 md:right-1/2 md:left-auto md:bottom-auto md:transform md:translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white md:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white z-10 px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-bold text-lg text-slate-900">تعديل الإعلان</h3>
+                <button onclick="closeEditAdModal()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-all">
+                    <i class="fas fa-times text-slate-500"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">السعر</label>
+                    <div class="relative">
+                        <input type="text" id="editAdPrice" class="edit-input text-left" placeholder="300,000">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">ج.س</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">الحالة</label>
+                    <select id="editAdStatus" class="edit-input">
+                        <option value="new">جديد</option>
+                        <option value="like-new">شبه جديد</option>
+                        <option value="used">مستعمل</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">الوصف</label>
+                    <textarea id="editAdDesc" rows="3" class="edit-input resize-none" placeholder="أضف وصفاً للهاتف..."></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="closeEditAdModal()" class="flex-1 bg-slate-100 text-slate-700 py-3 rounded-2xl font-bold transition-all">
+                        إلغاء
+                    </button>
+                    <button onclick="saveAdChanges()" class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/20">
+                        حفظ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- [10] Firebase + JavaScript                      -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
+        import { 
+            getFirestore, collection, query, where, orderBy, limit, onSnapshot, getDocs, doc, updateDoc, deleteDoc
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { 
+            getAuth, onAuthStateChanged, updateProfile, updateEmail, updatePassword, signOut
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
+            authDomain: "phone-soug.firebaseapp.com",
+            databaseURL: "https://phone-soug-default-rtdb.firebaseio.com",
+            projectId: "phone-soug",
+            storageBucket: "phone-soug.firebasestorage.app",
+            messagingSenderId: "224588578227",
+            appId: "1:224588578227:web:f3127dfbea31a77d521fc6",
+            measurementId: "G-S87955B526"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let currentUser = null;
+        let myAds = [];
+        let favoriteAds = [];
+        let currentEditAdId = null;
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+        // ════════════════════════════════════════════
+        // [مراقبة حالة تسجيل الدخول]
+        // ════════════════════════════════════════════
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loadUserData(user);
+                loadMyAds(user.uid);
+            } else {
+                // إعادة توجيه لصفحة تسجيل الدخول
+                window.location.href = 'index.html';
+            }
+        });
+
+        // ════════════════════════════════════════════
+        // [تحميل بيانات المستخدم]
+        // ════════════════════════════════════════════
+        function loadUserData(user) {
+            document.getElementById('profileName').textContent = user.displayName || 'مستخدم';
+            document.getElementById('profileEmail').textContent = user.email || '';
+
+            if (user.photoURL) {
+                document.getElementById('profileAvatar').src = user.photoURL;
+            }
+
+            // تحميل رقم الهاتف من Firestore
+            const userRef = doc(db, 'users', user.uid);
+            getDocs(query(collection(db, 'users'), where('__name__', '==', user.uid))).then((snapshot) => {
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.phone) {
+                        document.getElementById('profilePhone').textContent = data.phone;
+                    }
+                });
+            });
+        }
+
+        // ════════════════════════════════════════════
+        // [تحميل إعلاناتي]
+        // ════════════════════════════════════════════
+        async function loadMyAds(userId) {
+            try {
+                const adsQuery = query(
+                    collection(db, 'ads'),
+                    where('userId', '==', userId),
+                    orderBy('createdAt', 'desc')
+                );
+
+                onSnapshot(adsQuery, (snapshot) => {
+                    myAds = [];
+                    snapshot.forEach((doc) => {
+                        myAds.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    document.getElementById('statAds').textContent = myAds.length;
+                    renderMyAds(myAds);
+                    loadFavorites();
+                });
+            } catch (error) {
+                console.error('Error loading ads:', error);
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // [تحميل المفضلة]
+        // ════════════════════════════════════════════
+        async function loadFavorites() {
+            if (favorites.length === 0) {
+                document.getElementById('statFav').textContent = '0';
+                document.getElementById('favList').innerHTML = '';
+                document.getElementById('noFavMsg').classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const favList = [];
+                for (const favId of favorites) {
+                    const ad = allPhones.find(p => p.id === favId) || myAds.find(p => p.id === favId);
+                    if (ad) favList.push(ad);
+                }
+
+                favoriteAds = favList;
+                document.getElementById('statFav').textContent = favList.length;
+                renderFavorites(favList);
+            } catch (error) {
+                console.error('Error loading favorites:', error);
+            }
+        }
+
+        // ════════════════════════════════════════════
+        // [عرض إعلاناتي]
+        // ════════════════════════════════════════════
+        window.renderMyAds = function(ads) {
+            const container = document.getElementById('myAdsList');
+            const noMsg = document.getElementById('noAdsMsg');
+
+            if (ads.length === 0) {
+                container.innerHTML = '';
+                noMsg.classList.remove('hidden');
+                return;
+            }
+
+            noMsg.classList.add('hidden');
+
+            container.innerHTML = ads.map(ad => {
+                const statusConfig = {
+                    'new': { label: 'جديد', class: 'status-new' },
+                    'like-new': { label: 'شبه جديد', class: 'status-like-new' },
+                    'used': { label: 'مستعمل', class: 'status-used' }
+                }[ad.status] || { label: 'مستعمل', class: 'status-used' };
+
+                const price = ad.price ? parseInt(ad.price).toLocaleString() : '???';
+                const image = ad.mainImage || (ad.images && ad.images[0]) || 'https://via.placeholder.com/400?text=No+Image';
+                const date = ad.createdAt ? new Date(ad.createdAt).toLocaleDateString('ar-SD') : '';
+
+                return `
+                    <div class="ad-card">
+                        <div class="flex gap-4 p-4">
+                            <div class="w-24 h-24 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex-shrink-0 overflow-hidden">
+                                <img src="${image}" class="w-full h-full object-contain p-2" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="${statusConfig.class} text-white px-2 py-0.5 rounded-lg text-[10px] font-bold">${statusConfig.label}</span>
+                                    ${ad.isSold ? '<span class="bg-red-500 text-white px-2 py-0.5 rounded-lg text-[10px] font-bold">تم البيع</span>' : ''}
+                                </div>
+                                <h4 class="font-bold text-slate-900 text-sm mb-1">${ad.phoneModel || 'هاتف'}</h4>
+                                <p class="text-lg font-black text-indigo-600">${price} <span class="text-xs text-slate-500 font-normal">ج.س</span></p>
+                                <p class="text-[10px] text-slate-400 mt-1">${date}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 px-4 pb-4">
+                            <button onclick="event.stopPropagation(); editAd('${ad.id}')" class="action-btn flex-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold text-xs">
+                                <i class="fas fa-pen ml-1"></i> تعديل
+                            </button>
+                            <button onclick="event.stopPropagation(); markAsSold('${ad.id}')" class="action-btn flex-1 bg-green-50 text-green-600 hover:bg-green-100 font-bold text-xs">
+                                <i class="fas fa-check ml-1"></i> تم البيع
+                            </button>
+                            <button onclick="event.stopPropagation(); deleteAd('${ad.id}')" class="action-btn bg-red-50 text-red-500 hover:bg-red-100 font-bold text-xs">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        // ════════════════════════════════════════════
+        // [عرض المفضلة]
+        // ════════════════════════════════════════════
+        window.renderFavorites = function(favs) {
+            const container = document.getElementById('favList');
+            const noMsg = document.getElementById('noFavMsg');
+
+            if (favs.length === 0) {
+                container.innerHTML = '';
+                noMsg.classList.remove('hidden');
+                return;
+            }
+
+            noMsg.classList.add('hidden');
+
+            container.innerHTML = favs.map(ad => {
+                const statusConfig = {
+                    'new': { label: 'جديد', class: 'status-new' },
+                    'like-new': { label: 'شبه جديد', class: 'status-like-new' },
+                    'used': { label: 'مستعمل', class: 'status-used' }
+                }[ad.status] || { label: 'مستعمل', class: 'status-used' };
+
+                const price = ad.price ? parseInt(ad.price).toLocaleString() : '???';
+                const image = ad.mainImage || (ad.images && ad.images[0]) || 'https://via.placeholder.com/400?text=No+Image';
+
+                return `
+                    <div class="ad-card" onclick="window.location.href='index.html#${ad.id}'">
+                        <div class="flex gap-4 p-4">
+                            <div class="w-24 h-24 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex-shrink-0 overflow-hidden">
+                                <img src="${image}" class="w-full h-full object-contain p-2" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="${statusConfig.class} text-white px-2 py-0.5 rounded-lg text-[10px] font-bold">${statusConfig.label}</span>
+                                    <button onclick="event.stopPropagation(); removeFromFav('${ad.id}')" class="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                                <h4 class="font-bold text-slate-900 text-sm mb-1">${ad.phoneModel || 'هاتف'}</h4>
+                                <p class="text-lg font-black text-indigo-600">${price} <span class="text-xs text-slate-500 font-normal">ج.س</span></p>
+                                <p class="text-xs text-slate-500 mt-1">${ad.userName || 'بائع'} • ${ad.city || 'السودان'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        // ════════════════════════════════════════════
+        // [التبويبات]
+        // ════════════════════════════════════════════
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            document.getElementById('content' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+        };
+
+        // ════════════════════════════════════════════
+        // [تعديل الملف الشخصي]
+        // ════════════════════════════════════════════
+        window.showEditProfile = function() {
+            if (!currentUser) return;
+            document.getElementById('editName').value = currentUser.displayName || '';
+            document.getElementById('editEmail').value = currentUser.email || '';
+            document.getElementById('editProfileModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeEditModal = function() {
+            document.getElementById('editProfileModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        window.saveProfile = async function() {
+            if (!currentUser) return;
+
+            const name = document.getElementById('editName').value;
+            const email = document.getElementById('editEmail').value;
+            const phone = document.getElementById('editPhone').value;
+            const city = document.getElementById('editCity').value;
+
+            try {
+                // تحديث الاسم
+                if (name) {
+                    await updateProfile(currentUser, { displayName: name });
+                }
+
+                // تحديث البريد
+                if (email && email !== currentUser.email) {
+                    await updateEmail(currentUser, email);
+                }
+
+                // حفظ في Firestore
+                await updateDoc(doc(db, 'users', currentUser.uid), {
+                    name: name,
+                    email: email,
+                    phone: phone ? '+249' + phone : '',
+                    city: city,
+                    updatedAt: new Date().toISOString()
+                });
+
+                // تحديث الواجهة
+                document.getElementById('profileName').textContent = name;
+                document.getElementById('profileEmail').textContent = email;
+                if (phone) {
+                    document.getElementById('profilePhone').textContent = '+249' + phone;
+                }
+
+                closeEditModal();
+                alert('تم حفظ التغييرات بنجاح!');
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                alert('حدث خطأ: ' + error.message);
+            }
+        };
+
+        window.updateAvatar = async function(input) {
+            if (!input.files || !input.files[0] || !currentUser) return;
+
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const base64 = e.target.result;
+                document.getElementById('profileAvatar').src = base64;
+
+                // TODO: رفع إلى Cloudinary ثم تحديث photoURL
+                // حالياً نستخدم base64 مؤقتاً
+                try {
+                    await updateProfile(currentUser, { photoURL: base64 });
+                } catch (error) {
+                    console.error('Error updating avatar:', error);
+                }
+            };
+
+            reader.readAsDataURL(file);
+        };
+
+        // ════════════════════════════════════════════
+        // [تعديل وحذف الإعلان]
+        // ════════════════════════════════════════════
+        window.editAd = function(adId) {
+            const ad = myAds.find(a => a.id === adId);
+            if (!ad) return;
+
+            currentEditAdId = adId;
+            document.getElementById('editAdPrice').value = ad.price || '';
+            document.getElementById('editAdStatus').value = ad.status || 'used';
+            document.getElementById('editAdDesc').value = ad.description || '';
+            document.getElementById('editAdModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeEditAdModal = function() {
+            document.getElementById('editAdModal').classList.add('hidden');
+            document.body.style.overflow = '';
+            currentEditAdId = null;
+        };
+
+        window.saveAdChanges = async function() {
+            if (!currentEditAdId) return;
+
+            const price = document.getElementById('editAdPrice').value.replace(/,/g, '');
+            const status = document.getElementById('editAdStatus').value;
+            const description = document.getElementById('editAdDesc').value;
+
+            try {
+                await updateDoc(doc(db, 'ads', currentEditAdId), {
+                    price: parseInt(price) || 0,
+                    status: status,
+                    description: description,
+                    updatedAt: new Date().toISOString()
+                });
+
+                closeEditAdModal();
+                alert('تم تحديث الإعلان بنجاح!');
+            } catch (error) {
+                console.error('Error updating ad:', error);
+                alert('حدث خطأ: ' + error.message);
+            }
+        };
+
+        window.markAsSold = async function(adId) {
+            if (!confirm('هل أنت متأكد من تحديد هذا الإعلان كـ "تم البيع"؟')) return;
+
+            try {
+                await updateDoc(doc(db, 'ads', adId), {
+                    isSold: true,
+                    soldAt: new Date().toISOString()
+                });
+                alert('تم تحديث الحالة!');
+            } catch (error) {
+                console.error('Error marking as sold:', error);
+                alert('حدث خطأ: ' + error.message);
+            }
+        };
+
+        window.deleteAd = async function(adId) {
+            if (!confirm('هل أنت متأكد من حذف هذا الإعلان؟ لا يمكن التراجع!')) return;
+
+            try {
+                await deleteDoc(doc(db, 'ads', adId));
+
+                // إزالة من المفضلة إن وجد
+                const favIndex = favorites.indexOf(adId);
+                if (favIndex > -1) {
+                    favorites.splice(favIndex, 1);
+                    localStorage.setItem('favorites', JSON.stringify(favorites));
+                }
+
+                alert('تم حذف الإعلان!');
+            } catch (error) {
+                console.error('Error deleting ad:', error);
+                alert('حدث خطأ: ' + error.message);
+            }
+        };
+
+        window.removeFromFav = function(adId) {
+            const index = favorites.indexOf(adId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+                loadFavorites();
+            }
+        };
+
+        // ════════════════════════════════════════════
+        // [الإعدادات]
+        // ════════════════════════════════════════════
+        window.showSettings = function() {
+            switchTab('settings');
+        };
+
+        window.showChangePassword = function() {
+            const newPass = prompt('أدخل كلمة المرور الجديدة (6 أحرف على الأقل):');
+            if (!newPass || newPass.length < 6) {
+                alert('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+                return;
+            }
+
+            updatePassword(currentUser, newPass)
+                .then(() => alert('تم تغيير كلمة المرور بنجاح!'))
+                .catch(err => alert('خطأ: ' + err.message));
+        };
+
+        window.logout = function() {
+            if (!confirm('هل أنت متأكد من تسجيل الخروج؟')) return;
+
+            signOut(auth)
+                .then(() => {
+                    window.location.href = 'index.html';
+                })
+                .catch(err => {
+                    console.error('Logout error:', err);
+                    alert('حدث خطأ أثناء تسجيل الخروج');
+                });
+        };
+
+        // ════════════════════════════════════════════
+        // [إغلاق Modals بالنقر خارجها]
+        // ════════════════════════════════════════════
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeEditModal();
+                closeEditAdModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeEditModal();
+                closeEditAdModal();
+            }
+        });
+    </script>
+</body>
+</html>
