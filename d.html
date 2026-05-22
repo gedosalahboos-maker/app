@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأرقام المستلمة فوريّاً</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h2 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 24px;
+            text-align: center;
+        }
+        .sub-title {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .list-container {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-left: 0;
+        }
+        .number-item {
+            background-color: #f9f9f9;
+            padding: 12px 15px;
+            border-right: 4px solid #2e7d32;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            direction: ltr;
+        }
+        .number-item span {
+            color: #333;
+            font-weight: bold;
+        }
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+        }
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #2e7d32;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>شاشة المراقبة الفورية</h2>
+    <div class="sub-title">الأرقام المجلوبة مباشرة من Realtime Database</div>
+    
+    <ul id="numbersList" class="list-container">
+        <div class="no-data">جاري الاستماع لقاعدة البيانات...</div>
+    </ul>
+
+    <a href="send.html" class="back-btn">← العودة لصفحة الإرسال</a>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
+        authDomain: "phone-soug.firebaseapp.com",
+        databaseURL: "https://phone-soug-default-rtdb.firebaseio.com",
+        projectId: "phone-soug",
+        storageBucket: "phone-soug.firebasestorage.app",
+        messagingSenderId: "224588578227",
+        appId: "1:224588578227:web:46b4cb96ff2535a1521fc6",
+        measurementId: "G-T3DSBNJ5MQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const listElement = document.getElementById("numbersList");
+
+    // ميزة التحديث التلقائي الفوري بمجرد إضافة أي رقم جديد دون الحاجة لتحديث الصفحة!
+    onValue(ref(db, 'test_numbers'), (snapshot) => {
+        listElement.innerHTML = "";
+        
+        if (!snapshot.exists()) {
+            listElement.innerHTML = '<div class="no-data">قائمة البيانات فارغة حالياً.</div>';
+            return;
+        }
+
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            const li = document.createElement("li");
+            li.className = "number-item";
+            li.innerHTML = `<span>📱</span> ${data.phone}`;
+            // إضافته في البداية ليظهر الأحدث أولاً
+            listElement.insertBefore(li, listElement.firstChild);
+        });
+    }, (error) => {
+        console.error("خطأ جلب البيانات: ", error);
+        listElement.innerHTML = '<div class="no-data" style="color: red;">فشل الاتصال. تأكد من إعدادات القواعد الـ Rules للـ Realtime DB.</div>';
+    });
+</script>
+
+</body>
+</html>
