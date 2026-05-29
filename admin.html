@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - إدارة الهواتف</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { font-family: 'Cairo', sans-serif; }
+        .input-field:focus { box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .spec-row { transition: all 0.2s; }
+        .spec-row:hover { background: #f8fafc; }
+        .color-option { transition: all 0.2s; cursor: pointer; }
+        .color-option.selected { ring: 2px; ring-offset: 2px; ring-color: #4f46e5; transform: scale(1.1); }
+        .toast {
+            position: fixed; bottom: 20px; left: 20px; padding: 16px 20px;
+            background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: flex; align-items: center; gap: 12px; max-width: 400px; z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { border-left: 4px solid #10b981; }
+        .toast.error { border-left: 4px solid #ef4444; }
+        @keyframes slideIn { from { transform: translateX(-400px); } to { transform: translateX(0); } }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Header -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-cog text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900">لوحة التحكم</h1>
+                    <p class="text-xs text-slate-500">إدارة هواتف السوق</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="adminStatus" class="text-sm text-slate-500 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                    جاري الاتصال...
+                </span>
+                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-semibold text-sm transition-colors">
+                    <i class="fas fa-arrow-right ml-1"></i> رجوع للموقع
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-3 gap-4 mb-8">
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-mobile-alt text-indigo-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-500">إجمالي الهواتف</p>
+                        <p id="totalPhones" class="text-2xl font-bold text-slate-900">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-plus text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-500">هواتف جديدة</p>
+                        <p id="newPhones" class="text-2xl font-bold text-slate-900">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-clock text-amber-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-500">آخر إضافة</p>
+                        <p id="lastAdded" class="text-lg font-bold text-slate-900">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Add Phone Form -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                        <h2 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                            <i class="fas fa-plus-circle text-indigo-600"></i>
+                            إضافة هاتف جديد
+                        </h2>
+                        <span class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-semibold">للهواتف الجديدة فقط</span>
+                    </div>
+                    
+                    <form id="addPhoneForm" class="p-6 space-y-5">
+                        
+                        <!-- Basic Info -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">الشركة <span class="text-red-500">*</span></label>
+                                <select id="adminBrand" class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" required>
+                                    <option value="">اختر الشركة</option>
+                                    <option value="apple">Apple</option>
+                                    <option value="samsung">Samsung</option>
+                                    <option value="xiaomi">Xiaomi</option>
+                                    <option value="oppo">OPPO</option>
+                                    <option value="huawei">Huawei</option>
+                                    <option value="google">Google</option>
+                                    <option value="oneplus">OnePlus</option>
+                                    <option value="realme">Realme</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">اسم الهاتف <span class="text-red-500">*</span></label>
+                                <input type="text" id="adminModel" class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" placeholder="مثال: iPhone 15 Pro Max" required>
+                            </div>
+                        </div>
+
+                        <!-- Colors -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">الألوان المتوفرة <span class="text-red-500">*</span></label>
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                <button type="button" onclick="toggleColor('black', this)" class="color-option px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50" data-color="black">
+                                    <span class="w-3 h-3 rounded-full bg-black inline-block ml-1"></span>أسود
+                                </button>
+                                <button type="button" onclick="toggleColor('white', this)" class="color-option px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50" data-color="white">
+                                    <span class="w-3 h-3 rounded-full bg-white border border-slate-300 inline-block ml-1"></span>أبيض
+                                </button>
+                                <button type="button" onclick="toggleColor('silver', this)" class="color-option px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50" data-color="silver">
+                                    <span class="w-3 h-3 rounded-full bg-gray-400 inline-block ml-1"></span>فضي
+                                </button>
+                                <button type="button" onclick="toggleColor('gold', this)" class="color-option px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50" data-color="gold">
+                                    <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block ml-1"></span>ذهبي
+                                </button>
+                                <button type="button" onclick="toggleColor('blue', this)" class="color-option px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50" data-color="blue">
+                                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block ml-1"></span>أزرق
+                                </button>
+                                <button type="button" onclick="toggleColor('red', this)" class="color-option px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50" data-color="red">
+                                    <span class="w-3 h-3 rounded-full bg-red-500 inline-block ml-1"></span>أحمر
+                                </button>
+                                <button type="button" onclick="toggleColor('green', this)" class="color-option px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50" data-color="green">
+                                    <span class="w-3 h-3 rounded-full bg-green-500 inline-block ml-1"></span>أخضر
+                                </button>
+                                <button type="button" onclick="toggleColor('purple', this)" class="color-option px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50" data-color="purple">
+                                    <span class="w-3 h-3 rounded-full bg-purple-500 inline-block ml-1"></span>بنفسجي
+                                </button>
+                                <button type="button" onclick="toggleColor('pink', this)" class="color-option px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50" data-color="pink">
+                                    <span class="w-3 h-3 rounded-full bg-pink-400 inline-block ml-1"></span>وردي
+                                </button>
+                            </div>
+                            <input type="hidden" id="selectedColors" required>
+                            <p id="colorError" class="text-sm text-red-500 hidden">اختر لوناً واحداً على الأقل</p>
+                        </div>
+
+                        <!-- RAM & Storage -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">الذاكرة (RAM) <span class="text-red-500">*</span></label>
+                                <div class="flex flex-wrap gap-2">
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="ramOptions" value="4" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">4GB</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="ramOptions" value="6" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">6GB</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="ramOptions" value="8" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">8GB</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="ramOptions" value="12" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">12GB</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="ramOptions" value="16" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">16GB</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">التخزين <span class="text-red-500">*</span></label>
+                                <div class="flex flex-wrap gap-2">
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="storageOptions" value="64" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">64GB</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="storageOptions" value="128" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">128GB</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="storageOptions" value="256" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">256GB</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="storageOptions" value="512" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">512GB</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                        <input type="checkbox" name="storageOptions" value="1024" class="w-4 h-4 text-indigo-600 rounded">
+                                        <span class="text-sm font-semibold">1TB</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Camera & Battery -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">الكاميرا الخلفية (MP)</label>
+                                <input type="text" id="adminCamera" class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" placeholder="مثال: 48+12+12">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">سعة البطارية (mAh)</label>
+                                <input type="number" id="adminBattery" class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500" placeholder="مثال: 4500">
+                            </div>
+                        </div>
+
+                        <!-- Features -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50">
+                                <input type="checkbox" id="adminWaterResistant" class="w-5 h-5 text-indigo-600 rounded">
+                                <div>
+                                    <p class="font-semibold text-sm text-slate-700">مقاوم للماء</p>
+                                    <p class="text-xs text-slate-500">IP68</p>
+                                </div>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50">
+                                <input type="checkbox" id="admin5G" class="w-5 h-5 text-indigo-600 rounded" checked>
+                                <div>
+                                    <p class="font-semibold text-sm text-slate-700">5G</p>
+                                    <p class="text-xs text-slate-500">شبكة الجيل الخامس</p>
+                                </div>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50">
+                                <input type="checkbox" id="adminWireless" class="w-5 h-5 text-indigo-600 rounded">
+                                <div>
+                                    <p class="font-semibold text-sm text-slate-700">شحن لاسلكي</p>
+                                    <p class="text-xs text-slate-500">Wireless Charging</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">وصف مختصر</label>
+                            <textarea id="adminDescription" rows="3" class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 resize-none" placeholder="مميزات الهاتف الرئيسية..."></textarea>
+                        </div>
+
+                        <!-- Default Price -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">السعر الافتراضي (ج.س)</label>
+                            <input type="number" id="adminPrice" class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left" placeholder="300000">
+                            <p class="text-xs text-slate-500 mt-1">السعر التقريبي للهاتف الجديد (يمكن تعديله لاحقاً)</p>
+                        </div>
+
+                        <!-- Image URL -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">رابط صورة الهاتف</label>
+                            <input type="url" id="adminImage" class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-left" placeholder="https://example.com/phone.jpg">
+                            <p class="text-xs text-slate-500 mt-1">رابط صورة رسمية للهاتف (اختياري)</p>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-lg">
+                            <i class="fas fa-save"></i>
+                            <span>حفظ الهاتف في القاعدة</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Phone List -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden sticky top-24">
+                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                        <h2 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                            <i class="fas fa-list text-indigo-600"></i>
+                            الهواتف المخزنة
+                        </h2>
+                    </div>
+                    <div id="phoneList" class="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
+                        <div class="p-8 text-center text-slate-400">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>جاري التحميل...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
+            authDomain: "phone-soug.firebaseapp.com",
+            projectId: "phone-soug",
+            storageBucket: "phone-soug.firebasestorage.app",
+            messagingSenderId: "224588578227",
+            appId: "1:224588578227:web:f3127dfbea31a77d521fc6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firestoreFns = { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp };
+        
+        document.getElementById('adminStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500"></span>متصل';
+        loadPhones();
+    </script>
+
+    <script>
+        let selectedColorsList = [];
+
+        function toggleColor(color, btn) {
+            const index = selectedColorsList.indexOf(color);
+            if (index > -1) {
+                selectedColorsList.splice(index, 1);
+                btn.classList.remove('selected', 'ring-2', 'ring-offset-2', 'ring-indigo-500');
+            } else {
+                selectedColorsList.push(color);
+                btn.classList.add('selected', 'ring-2', 'ring-offset-2', 'ring-indigo-500');
+            }
+            document.getElementById('selectedColors').value = selectedColorsList.join(',');
+            document.getElementById('colorError').classList.add('hidden');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} text-lg ${type === 'success' ? 'text-green-500' : 'text-red-500'}"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        document.getElementById('addPhoneForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (selectedColorsList.length === 0) {
+                document.getElementById('colorError').classList.remove('hidden');
+                return;
+            }
+
+            const ram = Array.from(document.querySelectorAll('input[name="ramOptions"]:checked')).map(cb => parseInt(cb.value));
+            const storage = Array.from(document.querySelectorAll('input[name="storageOptions"]:checked')).map(cb => parseInt(cb.value));
+            
+            if (ram.length === 0 || storage.length === 0) {
+                showToast('اختر خياراً واحداً على الأقل للذاكرة والتخزين', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<span class="spinner"></span> جاري الحفظ...';
+            btn.disabled = true;
+
+            try {
+                const { collection, addDoc, serverTimestamp } = window.firestoreFns;
+                
+                const phoneData = {
+                    brand: document.getElementById('adminBrand').value,
+                    model: document.getElementById('adminModel').value.trim(),
+                    colors: selectedColorsList,
+                    ramOptions: ram,
+                    storageOptions: storage,
+                    camera: document.getElementById('adminCamera').value || null,
+                    battery: document.getElementById('adminBattery').value ? parseInt(document.getElementById('adminBattery').value) : null,
+                    waterResistant: document.getElementById('adminWaterResistant').checked,
+                    has5G: document.getElementById('admin5G').checked,
+                    wirelessCharging: document.getElementById('adminWireless').checked,
+                    description: document.getElementById('adminDescription').value || null,
+                    defaultPrice: document.getElementById('adminPrice').value ? parseInt(document.getElementById('adminPrice').value) : null,
+                    imageUrl: document.getElementById('adminImage').value || null,
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                };
+
+                await addDoc(collection(window.db, 'phone_models'), phoneData);
+                showToast('تم حفظ الهاتف بنجاح!', 'success');
+                
+                // Reset form
+                document.getElementById('addPhoneForm').reset();
+                selectedColorsList = [];
+                document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('selected', 'ring-2', 'ring-offset-2', 'ring-indigo-500'));
+                
+                loadPhones();
+            } catch (error) {
+                console.error(error);
+                showToast('خطأ في الحفظ: ' + error.message, 'error');
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save"></i><span>حفظ الهاتف في القاعدة</span>';
+                btn.disabled = false;
+            }
+        });
+
+        async function loadPhones() {
+            try {
+                const { collection, getDocs, query, orderBy, deleteDoc, doc } = window.firestoreFns;
+                const q = query(collection(window.db, 'phone_models'), orderBy('createdAt', 'desc'));
+                const snapshot = await getDocs(q);
+                
+                const list = document.getElementById('phoneList');
+                const totalEl = document.getElementById('totalPhones');
+                const newEl = document.getElementById('newPhones');
+                const lastEl = document.getElementById('lastAdded');
+                
+                if (snapshot.empty) {
+                    list.innerHTML = '<div class="p-8 text-center text-slate-400"><i class="fas fa-mobile-alt text-4xl mb-2 opacity-30"></i><p>لا توجد هواتف مخزنة</p></div>';
+                    totalEl.textContent = '0';
+                    newEl.textContent = '0';
+                    lastEl.textContent = '-';
+                    return;
+                }
+
+                let html = '';
+                let count = 0;
+                let lastDate = null;
+
+                snapshot.forEach((d) => {
+                    const phone = d.data();
+                    count++;
+                    if (!lastDate) lastDate = phone.createdAt;
+                    
+                    const colorMap = {
+                        'black': 'bg-black', 'white': 'bg-white border border-slate-300',
+                        'silver': 'bg-gray-400', 'gold': 'bg-yellow-500',
+                        'blue': 'bg-blue-500', 'red': 'bg-red-500',
+                        'green': 'bg-green-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-400'
+                    };
+                    
+                    const colorDots = phone.colors ? phone.colors.map(c => 
+                        `<span class="w-3 h-3 rounded-full ${colorMap[c] || 'bg-slate-400'} inline-block" title="${c}"></span>`
+                    ).join('') : '';
+
+                    html += `
+                        <div class="p-4 hover:bg-slate-50 transition-colors group">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-bold text-slate-900">${phone.model}</span>
+                                        <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">${phone.brand}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        ${colorDots}
+                                    </div>
+                                    <div class="flex flex-wrap gap-1 text-xs">
+                                        ${phone.ramOptions ? phone.ramOptions.map(r => `<span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-semibold">${r}GB RAM</span>`).join('') : ''}
+                                        ${phone.storageOptions ? phone.storageOptions.map(s => `<span class="bg-green-50 text-green-700 px-2 py-0.5 rounded font-semibold">${s >= 1024 ? (s/1024) + 'TB' : s + 'GB'}</span>`).join('') : ''}
+                                    </div>
+                                    ${phone.defaultPrice ? `<p class="text-sm font-bold text-indigo-600 mt-1">${phone.defaultPrice.toLocaleString()} ج.س</p>` : ''}
+                                </div>
+                                <button onclick="deletePhone('${d.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="fas fa-trash text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                list.innerHTML = html;
+                totalEl.textContent = count;
+                newEl.textContent = count;
+                lastEl.textContent = lastDate ? new Date(lastDate).toLocaleDateString('ar-SD') : '-';
+            } catch (error) {
+                console.error(error);
+                document.getElementById('phoneList').innerHTML = '<div class="p-8 text-center text-red-500"><i class="fas fa-exclamation-circle text-2xl mb-2"></i><p>خطأ في التحميل</p></div>';
+            }
+        }
+
+        window.deletePhone = async function(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا الهاتف؟')) return;
+            try {
+                const { deleteDoc, doc } = window.firestoreFns;
+                await deleteDoc(doc(window.db, 'phone_models', id));
+                showToast('تم الحذف بنجاح', 'success');
+                loadPhones();
+            } catch (error) {
+                showToast('خطأ في الحذف', 'error');
+            }
+        };
+    </script>
+</body>
+</html>
