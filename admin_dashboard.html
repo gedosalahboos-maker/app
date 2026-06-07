@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - AppBuilder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #F7F9FC;
+            color: #2D3436;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, #2D3436 0%, #1E1E1E 100%);
+            color: white;
+            padding: 30px 0;
+            position: fixed;
+            width: 250px;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-nav {
+            margin-top: 30px;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #6C63FF;
+        }
+
+        .nav-item.active {
+            background: rgba(108, 99, 255, 0.2);
+            border-left-color: #6C63FF;
+            color: #6C63FF;
+        }
+
+        .nav-item-icon {
+            font-size: 1.3rem;
+            min-width: 30px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-right: 250px;
+            padding: 40px;
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            color: #2D3436;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #2D3436;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7F8C8D;
+        }
+
+        /* Section */
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section h2 {
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            color: #2D3436;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #F7F9FC;
+            padding: 15px;
+            text-align: right;
+            font-weight: 700;
+            border-bottom: 2px solid #E8EBED;
+            color: #2D3436;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #E8EBED;
+        }
+
+        table tr:hover {
+            background: #F7F9FC;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #6C63FF;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5A52CC;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #E8EBED;
+            color: #2D3436;
+        }
+
+        .btn-secondary:hover {
+            background: #D4D7DB;
+        }
+
+        .btn-danger {
+            background: #FFE5E5;
+            color: #C92A2A;
+        }
+
+        .btn-danger:hover {
+            background: #FFC9C9;
+        }
+
+        .btn-success {
+            background: #E8F8F5;
+            color: #0E6251;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2D3436;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E8EBED;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="file"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #6C63FF;
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #E8F8F5;
+            color: #0E6251;
+        }
+
+        .badge-warning {
+            background: #FEF3E2;
+            color: #D97706;
+        }
+
+        .badge-danger {
+            background: #FFE5E5;
+            color: #C92A2A;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #2D3436;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7F8C8D;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                width: 100%;
+                height: auto;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 100;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-right: 0;
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>📱 AppBuilder</h2>
+                <p>لوحة التحكم الرئيسية</p>
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-item active" onclick="showSection('overview')">
+                    <span class="nav-item-icon">📊</span>
+                    <span>نظرة عامة</span>
+                </div>
+                <div class="nav-item" onclick="showSection('apps')">
+                    <span class="nav-item-icon">📱</span>
+                    <span>التطبيقات</span>
+                </div>
+                <div class="nav-item" onclick="showSection('create')">
+                    <span class="nav-item-icon">➕</span>
+                    <span>إنشاء تطبيق جديد</span>
+                </div>
+                <div class="nav-item" onclick="showSection('analytics')">
+                    <span class="nav-item-icon">📈</span>
+                    <span>الإحصائيات</span>
+                </div>
+                <div class="nav-item" onclick="showSection('settings')">
+                    <span class="nav-item-icon">⚙️</span>
+                    <span>الإعدادات</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Overview Section -->
+            <div id="overview" class="section active">
+                <div class="dashboard-header">
+                    <h1>نظرة عامة</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="showSection('create')">
+                            ➕ تطبيق جديد
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📱</div>
+                        <div class="stat-value" id="totalAppsCount">0</div>
+                        <div class="stat-label">إجمالي التطبيقات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⬇️</div>
+                        <div class="stat-value" id="totalDownloadsCount">0</div>
+                        <div class="stat-label">إجمالي التحميلات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-value" id="todayAppsCount">0</div>
+                        <div class="stat-label">تطبيقات اليوم</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-value">4.8</div>
+                        <div class="stat-label">تقييم المستخدمين</div>
+                    </div>
+                </div>
+
+                <!-- Recent Apps -->
+                <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                    <h2 style="margin-bottom: 20px;">آخر التطبيقات</h2>
+                    <div id="recentAppsContainer">
+                        <p style="text-align: center; color: #7F8C8D; padding: 30px;">
+                            لا توجد تطبيقات بعد
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apps Section -->
+            <div id="apps" class="section">
+                <div class="dashboard-header">
+                    <h1>إدارة التطبيقات</h1>
+                    <div class="header-actions">
+                        <input type="text" id="searchApps" placeholder="ابحث عن تطبيق..." style="width: 250px;">
+                        <button class="btn btn-success" onclick="exportAppsData()">
+                            📥 تصدير
+                        </button>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم التطبيق</th>
+                            <th>الوصف</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appsTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px;">
+                                لا توجد تطبيقات
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Create Section -->
+            <div id="create" class="section">
+                <h1 style="margin-bottom: 30px;">إنشاء تطبيق جديد</h1>
+
+                <div style="max-width: 500px;">
+                    <div class="form-group">
+                        <label for="newAppName">اسم التطبيق</label>
+                        <input type="text" id="newAppName" placeholder="مثال: تطبيقي الرائع">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newAppUrl">رابط الموقع</label>
+                        <input type="text" id="newAppUrl" placeholder="https://example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newAppEmail">البريد الإلكتروني</label>
+                        <input type="email" id="newAppEmail" placeholder="your@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newAppDesc">الوصف</label>
+                        <textarea id="newAppDesc" placeholder="وصف التطبيق..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newAppColor">اللون الأساسي</label>
+                        <input type="text" id="newAppColor" value="#6C63FF" placeholder="#6C63FF">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="createNewApp()" style="width: 100%; padding: 15px;">
+                        ✨ إنشاء التطبيق
+                    </button>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics" class="section">
+                <h1 style="margin-bottom: 30px;">الإحصائيات</h1>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div>
+                        <h3 style="margin-bottom: 15px;">توزيع التطبيقات</h3>
+                        <div style="background: #F7F9FC; padding: 30px; border-radius: 10px; text-align: center;">
+                            <p style="color: #7F8C8D;">📊 سيتم عرض الرسوم البيانية هنا</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 15px;">التحميلات اليومية</h3>
+                        <div style="background: #F7F9FC; padding: 30px; border-radius: 10px; text-align: center;">
+                            <p style="color: #7F8C8D;">📈 سيتم عرض الرسوم البيانية هنا</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="section">
+                <h1 style="margin-bottom: 30px;">الإعدادات</h1>
+
+                <div style="max-width: 500px;">
+                    <h3 style="margin-bottom: 20px;">إدارة البيانات</h3>
+
+                    <div class="form-group">
+                        <button class="btn btn-success" onclick="exportAppsData()" style="width: 100%; padding: 15px;">
+                            📥 تصدير جميع البيانات
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>استيراد البيانات</label>
+                        <input type="file" id="importFile" accept=".json">
+                        <button class="btn btn-primary" onclick="importAppsData()" style="width: 100%; padding: 15px; margin-top: 10px;">
+                            📤 استيراد البيانات
+                        </button>
+                    </div>
+
+                    <h3 style="margin: 30px 0 20px;">الخطر</h3>
+
+                    <div class="form-group">
+                        <button class="btn btn-danger" onclick="clearAllData()" style="width: 100%; padding: 15px;">
+                            🗑️ حذف جميع البيانات
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="appModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">تفاصيل التطبيق</h2>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load apps from localStorage
+        let apps = JSON.parse(localStorage.getItem('apps')) || [];
+
+        // Show Section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+
+            // Update data when showing certain sections
+            if (sectionId === 'overview') {
+                updateOverview();
+            } else if (sectionId === 'apps') {
+                displayApps();
+            }
+        }
+
+        // Update Overview
+        function updateOverview() {
+            document.getElementById('totalAppsCount').textContent = apps.length;
+            
+            const today = new Date().toLocaleDateString('ar-SA');
+            const todayApps = apps.filter(app => app.createdAt === today).length;
+            document.getElementById('todayAppsCount').textContent = todayApps;
+
+            const totalDownloads = apps.reduce((sum, app) => sum + (app.downloads || 0), 0);
+            document.getElementById('totalDownloadsCount').textContent = totalDownloads;
+
+            // Display recent apps
+            const recentApps = apps.slice(-3).reverse();
+            const container = document.getElementById('recentAppsContainer');
+            
+            if (recentApps.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7F8C8D; padding: 30px;">لا توجد تطبيقات</p>';
+                return;
+            }
+
+            container.innerHTML = recentApps.map(app => `
+                <div style="padding: 15px; border-bottom: 1px solid #E8EBED; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin-bottom: 5px;">${app.name}</h3>
+                        <p style="color: #7F8C8D; font-size: 0.9rem;">${app.description}</p>
+                    </div>
+                    <span class="badge badge-success">${app.createdAt}</span>
+                </div>
+            `).join('');
+        }
+
+        // Display Apps
+        function displayApps() {
+            const tbody = document.getElementById('appsTableBody');
+            
+            if (apps.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;">لا توجد تطبيقات</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = apps.map(app => `
+                <tr>
+                    <td><strong>${app.name}</strong></td>
+                    <td>${app.description}</td>
+                    <td>${app.createdAt}</td>
+                    <td><span class="badge badge-success">مكتمل</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="viewApp(${app.id})">عرض</button>
+                            <button class="btn btn-danger" onclick="deleteApp(${app.id})">حذف</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // View App
+        function viewApp(id) {
+            const app = apps.find(a => a.id === id);
+            if (app) {
+                document.getElementById('modalTitle').textContent = app.name;
+                document.getElementById('modalBody').innerHTML = `
+                    <div style="display: grid; gap: 15px;">
+                        <div>
+                            <strong>الاسم:</strong>
+                            <p>${app.name}</p>
+                        </div>
+                        <div>
+                            <strong>الرابط:</strong>
+                            <p><a href="${app.url}" target="_blank">${app.url}</a></p>
+                        </div>
+                        <div>
+                            <strong>الوصف:</strong>
+                            <p>${app.description}</p>
+                        </div>
+                        <div>
+                            <strong>البريد الإلكتروني:</strong>
+                            <p>${app.email}</p>
+                        </div>
+                        <div>
+                            <strong>تاريخ الإنشاء:</strong>
+                            <p>${app.createdAt}</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('appModal').classList.add('active');
+            }
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('appModal').classList.remove('active');
+        }
+
+        // Create New App
+        function createNewApp() {
+            const name = document.getElementById('newAppName').value;
+            const url = document.getElementById('newAppUrl').value;
+            const email = document.getElementById('newAppEmail').value;
+            const desc = document.getElementById('newAppDesc').value;
+            const color = document.getElementById('newAppColor').value;
+
+            if (!name || !url || !email || !desc) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            const app = {
+                id: Date.now(),
+                name,
+                url,
+                email,
+                description: desc,
+                primaryColor: color,
+                createdAt: new Date().toLocaleDateString('ar-SA'),
+                downloads: 0
+            };
+
+            apps.push(app);
+            localStorage.setItem('apps', JSON.stringify(apps));
+
+            alert('✅ تم إنشاء التطبيق بنجاح!');
+
+            // Clear form
+            document.getElementById('newAppName').value = '';
+            document.getElementById('newAppUrl').value = '';
+            document.getElementById('newAppEmail').value = '';
+            document.getElementById('newAppDesc').value = '';
+
+            updateOverview();
+        }
+
+        // Delete App
+        function deleteApp(id) {
+            if (confirm('هل أنت متأكد من حذف هذا التطبيق؟')) {
+                apps = apps.filter(a => a.id !== id);
+                localStorage.setItem('apps', JSON.stringify(apps));
+                displayApps();
+            }
+        }
+
+        // Export Data
+        function exportAppsData() {
+            const dataStr = JSON.stringify(apps, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `apps-backup-${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Import Data
+        function importAppsData() {
+            const file = document.getElementById('importFile').files[0];
+            if (!file) {
+                alert('يرجى اختيار ملف');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data)) {
+                        apps = [...apps, ...data];
+                        localStorage.setItem('apps', JSON.stringify(apps));
+                        alert('✅ تم استيراد البيانات بنجاح!');
+                        updateOverview();
+                    }
+                } catch (error) {
+                    alert('❌ خطأ في قراءة الملف');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Clear All Data
+        function clearAllData() {
+            if (confirm('⚠️ هذا الإجراء لا يمكن التراجع عنه! هل أنت متأكد؟')) {
+                apps = [];
+                localStorage.setItem('apps', JSON.stringify(apps));
+                alert('✅ تم حذف جميع البيانات');
+                updateOverview();
+            }
+        }
+
+        // Initialize
+        updateOverview();
+    </script>
+</body>
+</html>
