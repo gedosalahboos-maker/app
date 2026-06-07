@@ -295,5 +295,5 @@ function estimateAPKSize(appData) {
     const iconSize = 0.2; // 200 KB
     const webContainerSize = 3; // 3 MB
     
-    return (baseSize + iconSize + webContainerSize).toFixed(1);
+    return (baseSize + iconSize + webContainerSize).toFixed(1); 
 }
