@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppBuilder - تحويل المواقع إلى تطبيقات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6C63FF;
+            --secondary: #FF6B6B;
+            --accent: #4ECDC4;
+            --dark: #2D3436;
+            --light: #F7F9FC;
+            --border: #E8EBED;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: slideDown 0.6s ease;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            animation: fadeIn 0.8s ease;
+        }
+
+        .card.preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 35px;
+        }
+
+        .form-section h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-section h3::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        input[type="email"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        input[type="email"]:focus,
+        input[type="file"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+
+        /* Color Picker */
+        .color-picker-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        input[type="color"]:hover {
+            transform: scale(1.05);
+        }
+
+        .color-value {
+            flex: 1;
+            padding: 10px 12px;
+            background: var(--light);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        /* Preview Phone */
+        .phone-preview {
+            width: 280px;
+            height: 560px;
+            background: white;
+            border-radius: 40px;
+            border: 8px solid #2D3436;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: phoneFloat 3s ease-in-out infinite;
+        }
+
+        .phone-notch {
+            width: 100%;
+            height: 30px;
+            background: #2D3436;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-notch-inner {
+            width: 120px;
+            height: 20px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .phone-screen {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .app-preview {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .app-header {
+            padding: 15px;
+            color: white;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .app-content {
+            flex: 1;
+            overflow: auto;
+            padding: 10px;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* Status Messages */
+        .status {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #E8F8F5;
+            color: #0E6251;
+            border-left: 4px solid #27AE60;
+        }
+
+        .status.error {
+            background: #FDEDEC;
+            color: #78281F;
+            border-left: 4px solid #E74C3C;
+        }
+
+        .status.loading {
+            background: #EBF5FB;
+            color: #154360;
+            border-left: 4px solid #3498DB;
+        }
+
+        /* Apps List */
+        .apps-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease;
+        }
+
+        .apps-container h2 {
+            color: var(--dark);
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .app-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .app-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(108, 99, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .app-card-header {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .app-info h3 {
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .app-info p {
+            color: #7F8C8D;
+            font-size: 0.85rem;
+        }
+
+        .app-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .app-actions button {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-download {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-delete {
+            background: #FFE5E5;
+            color: #C92A2A;
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes phoneFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Icon Preview */
+        .icon-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            margin: 20px auto;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            border: 2px dashed var(--border);
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 20px;
+            border: 2px dashed var(--primary);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            background: rgba(108, 99, 255, 0.05);
+        }
+
+        .file-upload-label input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🚀 AppBuilder</h1>
+            <p>حول موقعك إلى تطبيق أندرويد احترافي</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Form Section -->
+            <div class="card">
+                <div id="statusMessage" class="status"></div>
+
+                <!-- App Details -->
+                <div class="form-section">
+                    <h3>معلومات التطبيق</h3>
+                    
+                    <div class="form-group">
+                        <label for="appName">اسم التطبيق</label>
+                        <input type="text" id="appName" placeholder="مثال: تطبيقي الرائع" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appUrl">رابط الموقع</label>
+                        <input type="url" id="appUrl" placeholder="https://example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appEmail">بريدك الإلكتروني</label>
+                        <input type="email" id="appEmail" placeholder="your@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appDesc">وصف التطبيق</label>
+                        <input type="text" id="appDesc" placeholder="وصف قصير للتطبيق" required>
+                    </div>
+                </div>
+
+                <!-- Design Section -->
+                <div class="form-section">
+                    <h3>التصميم والألوان</h3>
+
+                    <div class="form-group">
+                        <label>لون التطبيق الأساسي</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="primaryColor" value="#6C63FF">
+                            <div class="color-value" id="primaryColorValue">#6C63FF</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>لون النص</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="textColor" value="#FFFFFF">
+                            <div class="color-value" id="textColorValue">#FFFFFF</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appIcon">أيقونة التطبيق</label>
+                        <label class="file-upload-label">
+                            <div>
+                                <div style="font-size: 2rem; margin-bottom: 10px;">🖼️</div>
+                                <div>اختر صورة الأيقونة (PNG/JPG)</div>
+                                <small style="color: #7F8C8D;">الحجم الأمثل: 512x512 بكسل</small>
+                            </div>
+                            <input type="file" id="appIcon" accept="image/*">
+                        </label>
+                        <div class="icon-preview" id="iconPreview">🎨</div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button class="btn-primary" onclick="createApp()">
+                        ✨ إنشاء التطبيق
+                    </button>
+                    <button class="btn-secondary" onclick="resetForm()">
+                        🔄 مسح
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="card preview">
+                <h2 style="margin-bottom: 20px; color: var(--dark);">معاينة التطبيق</h2>
+                <div class="phone-preview">
+                    <div class="phone-notch">
+                        <div class="phone-notch-inner"></div>
+                    </div>
+                    <div class="phone-screen">
+                        <div class="app-preview">
+                            <div class="app-header" id="previewHeader" style="background: #6C63FF;">
+                                <span id="previewAppName">تطبيقي</span>
+                            </div>
+                            <div class="app-content">
+                                <p style="text-align: center; color: #7F8C8D; padding: 20px;">
+                                    سيتم عرض موقعك هنا
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Apps List -->
+        <div class="apps-container">
+            <h2>📱 تطبيقاتك المُنشأة</h2>
+            <div class="apps-grid" id="appsList">
+                <div style="text-align: center; grid-column: 1/-1; color: #7F8C8D; padding: 40px;">
+                    <p>لم تقم بإنشاء أي تطبيقات بعد</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_YOUR_API_KEY",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase (استبدل بمفاتيح Firebase الخاصة بك)
+        // firebase.initializeApp(firebaseConfig);
+        // const db = firebase.firestore();
+        // const storage = firebase.storage();
+
+        // التطبيقات المحفوظة محليًا
+        let apps = JSON.parse(localStorage.getItem('apps')) || [];
+
+        // Update Color Values
+        document.getElementById('primaryColor').addEventListener('input', function() {
+            document.getElementById('primaryColorValue').textContent = this.value;
+            document.getElementById('previewHeader').style.background = this.value;
+        });
+
+        document.getElementById('textColor').addEventListener('input', function() {
+            document.getElementById('textColorValue').textContent = this.value;
+            document.getElementById('previewHeader').style.color = this.value;
+        });
+
+        // Update App Name Preview
+        document.getElementById('appName').addEventListener('input', function() {
+            document.getElementById('previewAppName').textContent = this.value || 'تطبيقي';
+        });
+
+        // Icon Preview
+        document.getElementById('appIcon').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('iconPreview').innerHTML = 
+                        `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Show Status Message
+        function showStatus(message, type = 'success') {
+            const status = document.getElementById('statusMessage');
+            status.textContent = message;
+            status.className = `status show ${type}`;
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 4000);
+        }
+
+        // Create App
+        async function createApp() {
+            const appName = document.getElementById('appName').value;
+            const appUrl = document.getElementById('appUrl').value;
+            const appEmail = document.getElementById('appEmail').value;
+            const appDesc = document.getElementById('appDesc').value;
+            const primaryColor = document.getElementById('primaryColor').value;
+            const textColor = document.getElementById('textColor').value;
+
+            if (!appName || !appUrl || !appEmail || !appDesc) {
+                showStatus('يرجى ملء جميع الحقول المطلوبة', 'error');
+                return;
+            }
+
+            showStatus('جاري إنشاء التطبيق...', 'loading');
+
+            const app = {
+                id: Date.now(),
+                name: appName,
+                url: appUrl,
+                email: appEmail,
+                description: appDesc,
+                primaryColor: primaryColor,
+                textColor: textColor,
+                createdAt: new Date().toLocaleDateString('ar-SA'),
+                icon: document.getElementById('iconPreview').innerHTML
+            };
+
+            apps.push(app);
+            localStorage.setItem('apps', JSON.stringify(apps));
+
+            // محاكاة إرسال إلى Firebase
+            setTimeout(() => {
+                showStatus(`✅ تم إنشاء التطبيق "${appName}" بنجاح!`, 'success');
+                displayApps();
+                resetForm();
+            }, 2000);
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('appName').value = '';
+            document.getElementById('appUrl').value = '';
+            document.getElementById('appEmail').value = '';
+            document.getElementById('appDesc').value = '';
+            document.getElementById('primaryColor').value = '#6C63FF';
+            document.getElementById('textColor').value = '#FFFFFF';
+            document.getElementById('appIcon').value = '';
+            document.getElementById('previewAppName').textContent = 'تطبيقي';
+            document.getElementById('iconPreview').innerHTML = '🎨';
+            document.getElementById('previewHeader').style.background = '#6C63FF';
+            document.getElementById('previewHeader').style.color = '#FFFFFF';
+        }
+
+        // Display Apps
+        function displayApps() {
+            const appsList = document.getElementById('appsList');
+            
+            if (apps.length === 0) {
+                appsList.innerHTML = `
+                    <div style="text-align: center; grid-column: 1/-1; color: #7F8C8D; padding: 40px;">
+                        <p>لم تقم بإنشاء أي تطبيقات بعد</p>
+                    </div>
+                `;
+                return;
+            }
+
+            appsList.innerHTML = apps.map(app => `
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <div class="app-icon" style="background: ${app.primaryColor};">
+                            ${app.icon ? app.icon : app.name.charAt(0)}
+                        </div>
+                        <div class="app-info">
+                            <h3>${app.name}</h3>
+                            <p>${app.createdAt}</p>
+                        </div>
+                    </div>
+                    <p style="color: #7F8C8D; font-size: 0.9rem; margin-bottom: 10px;">
+                        ${app.description}
+                    </p>
+                    <p style="color: #95A5A6; font-size: 0.8rem; word-break: break-all;">
+                        ${app.url}
+                    </p>
+                    <div class="app-actions">
+                        <button class="btn-download" onclick="downloadAPK(${app.id})">
+                            📥 تحميل
+                        </button>
+                        <button class="btn-delete" onclick="deleteApp(${app.id})">
+                            🗑️ حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Download APK (محاكاة)
+        function downloadAPK(appId) {
+            const app = apps.find(a => a.id === appId);
+            if (app) {
+                showStatus(`جاري تحميل ${app.name}...`, 'loading');
+                setTimeout(() => {
+                    showStatus(`تم تحميل ${app.name} بنجاح! يمكنك الآن تثبيته على جهازك`, 'success');
+                    // في تطبيق حقيقي، يتم إرسال طلب إلى خادم لإنشاء APK
+                }, 2000);
+            }
+        }
+
+        // Delete App
+        function deleteApp(appId) {
+            if (confirm('هل أنت متأكد من حذف هذا التطبيق؟')) {
+                apps = apps.filter(a => a.id !== appId);
+                localStorage.setItem('apps', JSON.stringify(apps));
+                displayApps();
+                showStatus('تم حذف التطبيق بنجاح', 'success');
+            }
+        }
+
+        // Load Apps on Page Load
+        displayApps();
+    </script>
+</body>
+</html>
