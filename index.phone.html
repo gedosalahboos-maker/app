@@ -1,1 +1,1508 @@
-.
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سوق فون - Sudan Phone Market</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        body { background: #f8fafc; overflow-x: hidden; }
+
+        /* شريط دعائي */
+        .promo-banner {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+            position: relative;
+            overflow: hidden;
+            min-height: 140px;
+        }
+        .promo-shape {
+            position: absolute;
+            border-radius: 16px;
+            opacity: 0.12;
+            animation: shapeFloat 6s ease-in-out infinite;
+        }
+        .promo-shape-1 { width: 100px; height: 70px; background: white; top: 15px; right: -10px; transform: rotate(12deg); animation-delay: 0s; }
+        .promo-shape-2 { width: 70px; height: 100px; background: white; bottom: 5px; left: 5px; transform: rotate(-8deg); animation-delay: 1.5s; }
+        .promo-shape-3 { width: 50px; height: 50px; background: white; top: 40%; right: 25%; transform: rotate(20deg); animation-delay: 3s; }
+        .promo-shape-4 { width: 80px; height: 40px; background: white; bottom: 25px; right: 15%; transform: rotate(-3deg); animation-delay: 2s; }
+        .promo-shape-5 { width: 35px; height: 80px; background: white; top: 5px; left: 35%; transform: rotate(18deg); animation-delay: 4s; }
+        .promo-shape-6 { width: 60px; height: 60px; background: white; bottom: 40%; left: -5px; transform: rotate(30deg); animation-delay: 0.5s; }
+        @keyframes shapeFloat {
+            0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); opacity: 0.08; }
+            50% { transform: translateY(-15px) rotate(calc(var(--rot, 0deg) + 8deg)); opacity: 0.18; }
+        }
+
+        /* Navbar */
+        .app-nav {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226,232,240,0.6);
+        }
+
+        /* ====== بطاقة الهاتف الجديدة - تصميم فاخر ====== */
+        .phone-card {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+            border: 1px solid #f1f5f9;
+            position: relative;
+            flex-shrink: 0;
+            width: 280px;
+            scroll-snap-align: start;
+        }
+        .phone-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(79, 70, 229, 0.15);
+            border-color: #e0e7ff;
+        }
+        .phone-card:active { transform: scale(0.97); }
+
+        .card-image-area {
+            position: relative;
+            height: 220px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+            overflow: hidden;
+        }
+        .card-image-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 20px;
+            transition: transform 0.5s ease;
+        }
+        .phone-card:hover .card-image-area img {
+            transform: scale(1.08);
+        }
+
+        .card-badge-status {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2;
+        }
+        .status-new { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .status-like-new { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+        .status-used { background: linear-gradient(135deg, #f59e0b, #ea580c); }
+
+        .card-badge-brand {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #4f46e5;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(79,70,229,0.1);
+            z-index: 2;
+        }
+
+        .card-fav-btn {
+            position: absolute;
+            bottom: 14px;
+            left: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            z-index: 2;
+        }
+        .card-fav-btn:hover { transform: scale(1.1); }
+        .card-fav-btn.liked { color: #ef4444; }
+        .card-fav-btn.liked i { animation: heartBeat 0.4s ease; }
+        @keyframes heartBeat { 0% { transform: scale(1); } 30% { transform: scale(1.4); } 60% { transform: scale(0.9); } 100% { transform: scale(1); } }
+
+        .card-price-tag {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-weight: 900;
+            font-size: 15px;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .card-price-tag .currency {
+            font-size: 10px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        .card-body {
+            padding: 18px;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-specs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .card-spec {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+        }
+        .card-spec i {
+            font-size: 10px;
+            color: #6366f1;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1.5px solid #f1f5f9;
+        }
+        .card-seller {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-seller-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #4f46e5;
+            font-weight: 700;
+        }
+        .card-seller-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .card-seller-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+        }
+        .card-seller-city {
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .card-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 14px;
+        }
+        .card-action-btn:hover { transform: scale(1.1); }
+        .card-action-btn.whatsapp {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .card-action-btn.call {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .card-action-btn.chat {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        /* ====== معرض الصور المحسّن ====== */
+        .gallery-wrapper {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+            overflow: hidden;
+            touch-action: pan-y;
+            user-select: none;
+        }
+        .gallery-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: grab;
+        }
+        .gallery-track:active { cursor: grabbing; }
+        .gallery-slide {
+            min-width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .gallery-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.15));
+            pointer-events: none;
+        }
+        .gallery-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .gallery-dot.active {
+            width: 24px;
+            border-radius: 6px;
+            background: #4f46e5;
+            border-color: rgba(255,255,255,0.5);
+        }
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 14px;
+            color: #475569;
+        }
+        .gallery-nav:hover { transform: translateY(-50%) scale(1.1); background: white; }
+        .gallery-nav.prev { right: 16px; }
+        .gallery-nav.next { left: 16px; }
+
+        /* ====== هواتف مشابهة - تصميم أفقي ====== */
+        .similar-card {
+            min-width: 150px;
+            max-width: 150px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #f1f5f9;
+            scroll-snap-align: start;
+        }
+        .similar-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .similar-card:active { transform: scale(0.95); }
+        .similar-card .sim-img {
+            height: 120px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+        .similar-card .sim-img img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .similar-card .sim-body {
+            padding: 10px 12px 12px;
+        }
+        .similar-card .sim-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+        .similar-card .sim-price {
+            font-size: 13px;
+            font-weight: 900;
+            color: #4f46e5;
+        }
+
+        /* ====== فلاتر ====== */
+        .filter-chip {
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .filter-chip.active {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            box-shadow: 0 4px 16px rgba(79,70,229,0.3);
+        }
+        .filter-chip:not(.active) {
+            background: white;
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+        .filter-chip:not(.active):hover {
+            border-color: #4f46e5;
+            color: #4f46e5;
+            background: #eef2ff;
+        }
+
+        .brand-chip {
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .brand-chip.active {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: white;
+            box-shadow: 0 4px 16px rgba(14,165,233,0.3);
+        }
+        .brand-chip:not(.active) {
+            background: white;
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+        .brand-chip:not(.active):hover {
+            border-color: #0ea5e9;
+            color: #0ea5e9;
+            background: #f0f9ff;
+        }
+
+        .filters-section {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .filter-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ====== المتاجر ====== */
+        .stores-section {
+            background: white;
+            border-top: 8px solid #f1f5f9;
+            padding-top: 24px;
+            padding-bottom: 24px;
+        }
+        .store-card {
+            min-width: 260px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #f1f5f9;
+            scroll-snap-align: start;
+        }
+        .store-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+        .store-card:active { transform: scale(0.97); }
+        .store-header { position: relative; height: 90px; overflow: hidden; }
+        .store-header-bg { width: 100%; height: 100%; object-fit: cover; }
+        .store-header-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 100%); }
+        .store-avatar { position: absolute; bottom: -28px; right: 16px; width: 56px; height: 56px; border-radius: 18px; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); object-fit: cover; background: white; }
+        .store-body { padding: 36px 16px 16px; }
+
+        /* ====== FAB ====== */
+        .fab-container { position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%); z-index: 50; pointer-events: none; }
+        .fab-btn { pointer-events: auto; background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 8px 32px rgba(79, 70, 229, 0.4), 0 2px 8px rgba(0,0,0,0.15); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .fab-btn:hover { transform: scale(1.05); box-shadow: 0 12px 40px rgba(79, 70, 229, 0.5); }
+        .fab-btn:active { transform: scale(0.95); }
+
+        /* ====== شريط سفلي ====== */
+        .bottom-nav { position: fixed; bottom: 0; right: 0; left: 0; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(226,232,240,0.6); box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        .bottom-item { position: relative; transition: all 0.2s ease; }
+        .bottom-item.active { color: #4f46e5; }
+        .bottom-item.active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 32px; height: 3px; background: linear-gradient(90deg, #4f46e5, #7c3aed); border-radius: 0 0 8px 8px; }
+        .bottom-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; background: #ef4444; color: white; font-size: 10px; font-weight: 700; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 5px; border: 2px solid white; }
+
+        .horizontal-scroll {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        .horizontal-scroll::-webkit-scrollbar { display: none; }
+
+        .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%); background-size: 200% 100%; animation: skeleton 1.5s infinite; }
+        @keyframes skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .main-content { padding-bottom: 160px; }
+        html { scroll-behavior: smooth; }
+
+        .feature-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: #f8fafc; border-radius: 16px; margin-bottom: 8px; border: 1px solid #f1f5f9; }
+        .feature-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+
+        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .view-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            font-weight: 800;
+            font-size: 13px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(79,70,229,0.3);
+            margin-top: 16px;
+        }
+        .view-all-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,70,229,0.4); }
+        .view-all-btn:active { transform: scale(0.95); }
+
+        /* Store Modal */
+        .store-modal-header { position: relative; height: 180px; overflow: hidden; }
+        .store-modal-bg { width: 100%; height: 100%; object-fit: cover; }
+        .store-modal-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%); }
+        .store-modal-avatar { position: absolute; bottom: -36px; right: 50%; transform: translateX(50%); width: 72px; height: 72px; border-radius: 22px; border: 4px solid white; box-shadow: 0 8px 24px rgba(0,0,0,0.2); object-fit: cover; background: white; }
+    </style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body class="min-h-screen">
+
+    <!-- شريط دعائي -->
+    <div class="promo-banner text-white py-6 px-4 relative">
+        <div class="promo-shape promo-shape-1" style="--rot: 12deg;"></div>
+        <div class="promo-shape promo-shape-2" style="--rot: -8deg;"></div>
+        <div class="promo-shape promo-shape-3" style="--rot: 20deg;"></div>
+        <div class="promo-shape promo-shape-4" style="--rot: -3deg;"></div>
+        <div class="promo-shape promo-shape-5" style="--rot: 18deg;"></div>
+        <div class="promo-shape promo-shape-6" style="--rot: 30deg;"></div>
+        <div class="max-w-lg mx-auto flex items-center justify-between relative z-10">
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur border border-white/30">
+                        <i class="fas fa-mobile-alt text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black leading-none tracking-tight">سوق فون</h1>
+                        <p class="text-[10px] text-white/80 font-semibold mt-1">Phone Souq Sudan</p>
+                    </div>
+                </div>
+                <p class="text-xs text-white/90 mb-3 leading-relaxed font-medium">
+                    منصتك الأولى لبيع وشراء الهواتف في السودان
+                </p>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="bg-white/20 backdrop-blur px-2.5 py-1 rounded-lg text-[10px] font-bold border border-white/20"><i class="fas fa-shield-alt ml-1"></i> آمن</span>
+                    <span class="bg-white/20 backdrop-blur px-2.5 py-1 rounded-lg text-[10px] font-bold border border-white/20"><i class="fas fa-bolt ml-1"></i> سريع</span>
+                    <span class="bg-white/20 backdrop-blur px-2.5 py-1 rounded-lg text-[10px] font-bold border border-white/20"><i class="fas fa-check-circle ml-1"></i> موثوق</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="app-nav sticky top-0 z-40">
+        <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
+            <div class="flex-1 relative">
+                <i class="fas fa-search absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="ابحث عن هاتف، بائع، أو مدينة..."
+                    class="w-full pr-10 pl-4 py-2 bg-slate-100 border-2 border-transparent rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
+                    oninput="filterPhones()">
+            </div>
+            <div class="flex items-center gap-1">
+                <button onclick="showNotifications()" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all relative">
+                    <i class="fas fa-bell text-lg"></i>
+                    <span class="absolute top-1 left-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+                </button>
+                <button onclick="showProfile()" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all">
+                    <div class="w-7 h-7 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-xs"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- فلاتر -->
+    <section class="filters-section py-3">
+        <div class="max-w-lg mx-auto px-4 space-y-3">
+            <div>
+                <div class="filter-label"><i class="fas fa-filter text-[10px]"></i> حالة الهاتف</div>
+                <div class="flex gap-2 overflow-x-auto pb-1" id="statusFilters">
+                    <button onclick="setStatusFilter('')" class="filter-chip active flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-status="">
+                        <i class="fas fa-th-large"></i> الكل
+                    </button>
+                    <button onclick="setStatusFilter('new')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-status="new">
+                        <i class="fas fa-box-open text-green-500"></i> جديد
+                    </button>
+                    <button onclick="setStatusFilter('like-new')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-status="like-new">
+                        <i class="fas fa-star text-blue-500"></i> شبه جديد
+                    </button>
+                    <button onclick="setStatusFilter('used')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-status="used">
+                        <i class="fas fa-mobile-screen text-orange-500"></i> مستعمل
+                    </button>
+                </div>
+            </div>
+            <div>
+                <div class="filter-label"><i class="fas fa-tag text-[10px]"></i> الشركة المصنعة</div>
+                <div class="flex gap-2 overflow-x-auto pb-1" id="brandFilters">
+                    <button onclick="setBrandFilter('')" class="brand-chip active flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-brand="">
+                        <i class="fas fa-th-large"></i> الكل
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main-content max-w-lg mx-auto px-4 py-5">
+        <!-- أحدث الهواتف -->
+        <div class="flex items-center justify-between mb-4">
+            <div class="section-title">
+                <div class="section-title-icon"><i class="fas fa-fire"></i></div>
+                <span>أحدث الهواتف</span>
+            </div>
+            <span id="phonesCount" class="bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg font-bold text-xs">جاري التحميل...</span>
+        </div>
+
+        <!-- حالة التحميل -->
+        <div id="loadingState" class="horizontal-scroll pb-2">
+            <div class="phone-card" style="width:280px;flex-shrink:0;">
+                <div class="card-image-area"><div class="skeleton" style="width:100%;height:100%;"></div></div>
+                <div class="p-4 space-y-3">
+                    <div class="h-4 skeleton rounded w-3/4"></div>
+                    <div class="h-3 skeleton rounded w-1/2"></div>
+                    <div class="flex justify-between">
+                        <div class="h-8 skeleton rounded-xl w-20"></div>
+                        <div class="h-8 skeleton rounded-full w-8"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="phone-card" style="width:280px;flex-shrink:0;">
+                <div class="card-image-area"><div class="skeleton" style="width:100%;height:100%;"></div></div>
+                <div class="p-4 space-y-3">
+                    <div class="h-4 skeleton rounded w-3/4"></div>
+                    <div class="h-3 skeleton rounded w-1/2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- شبكة الهواتف - أفقية -->
+        <div id="phonesGrid" class="hidden horizontal-scroll pb-2"></div>
+
+        <!-- زر جميع الأجهزة -->
+        <div id="viewAllContainer" class="hidden text-center mt-2">
+            <button onclick="showAllPhones()" class="view-all-btn">
+                <i class="fas fa-th-large"></i>
+                <span>جميع الأجهزة</span>
+            </button>
+        </div>
+
+        <!-- عرض جميع الأجهزة -->
+        <div id="allPhonesGrid" class="hidden mt-6"></div>
+
+        <div id="noResults" class="hidden text-center py-16">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-search text-3xl text-slate-400"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-700">لا توجد نتائج</h3>
+            <p class="text-slate-500 text-sm">جرب بحث مختلف أو فلتر آخر</p>
+        </div>
+    </main>
+
+    <!-- قسم المتاجر - مفصول بوضوح -->
+    <section class="stores-section">
+        <div class="max-w-lg mx-auto px-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="section-title">
+                    <div class="section-title-icon"><i class="fas fa-store"></i></div>
+                    <span>المتاجر</span>
+                </div>
+            </div>
+            <div id="storesContainer" class="horizontal-scroll pb-2"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-8 mb-20">
+        <div class="max-w-lg mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-2 mb-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-mobile-alt text-white"></i>
+                </div>
+                <span class="text-xl font-black">سوق فون</span>
+            </div>
+            <p class="text-slate-400 text-xs">منصتك الأولى لبيع وشراء الهواتف في السودان</p>
+            <div class="flex justify-center gap-3 mt-4">
+                <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors text-sm"><i class="fab fa-whatsapp"></i></a>
+                <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-colors text-sm"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-pink-600 rounded-lg flex items-center justify-center transition-colors text-sm"><i class="fab fa-instagram"></i></a>
+            </div>
+            <p class="text-slate-600 text-[10px] mt-6">© 2026 سوق فون - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <!-- FAB -->
+    <div class="fab-container">
+        <a href="publish.html" class="fab-btn flex items-center gap-2 px-6 py-3.5 rounded-full text-white font-bold text-sm">
+            <i class="fas fa-plus text-lg"></i>
+            <span>أضف إعلان</span>
+        </a>
+    </div>
+
+    <!-- الشريط السفلي -->
+    <nav class="bottom-nav h-16">
+        <div class="max-w-lg mx-auto h-full flex items-center justify-around px-4">
+            <a href="index.html" class="bottom-item active flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
+                <div class="relative"><i class="fas fa-home text-xl"></i></div>
+                <span class="text-[10px] font-bold">الرئيسية</span>
+            </a>
+            <a href="my-ads.html" class="bottom-item flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
+                <div class="relative">
+                    <i class="fas fa-list-alt text-xl"></i>
+                    <span class="bottom-badge">2</span>
+                </div>
+                <span class="text-[10px] font-bold">إعلاناتي</span>
+            </a>
+            <a href="messages.html" class="bottom-item flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
+                <div class="relative">
+                    <i class="fas fa-comment-dots text-xl"></i>
+                    <span class="bottom-badge">5</span>
+                </div>
+                <span class="text-[10px] font-bold">المراسلة</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Modal تفاصيل الهاتف -->
+    <div id="phoneModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
+        <div class="absolute inset-0 md:inset-4 md:max-w-2xl md:mx-auto bg-white md:rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <button onclick="closeModal()" class="absolute top-4 left-4 z-20 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                <i class="fas fa-times text-slate-600"></i>
+            </button>
+            <button onclick="toggleFavorite()" id="modalFavBtn" class="absolute top-4 right-4 z-20 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                <i class="far fa-heart text-slate-600 text-lg"></i>
+            </button>
+            <div id="modalContent" class="flex-1 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- Modal صفحة المتجر -->
+    <div id="storeModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeStoreModal()"></div>
+        <div class="absolute inset-0 md:inset-4 md:max-w-2xl md:mx-auto bg-slate-50 md:rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <button onclick="closeStoreModal()" class="absolute top-4 left-4 z-20 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                <i class="fas fa-times text-slate-600"></i>
+            </button>
+            <div id="storeModalContent" class="flex-1 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- Firebase + JavaScript -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
+        import { getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
+            authDomain: "phone-soug.firebaseapp.com",
+            databaseURL: "https://phone-soug-default-rtdb.firebaseio.com",
+            projectId: "phone-soug",
+            storageBucket: "phone-soug.firebasestorage.app",
+            messagingSenderId: "224588578227",
+            appId: "1:224588578227:web:f3127dfbea31a77d521fc6",
+            measurementId: "G-S87955B526"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let allPhones = [];
+        let allStores = [];
+        let currentStatus = '';
+        let currentBrand = '';
+        let currentPhoneId = null;
+        let galleryInterval = null;
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        let currentUser = null;
+        let unsubscribePhones = null;
+        let showingAll = false;
+
+        // تتبع حالة تسجيل الدخول
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                loadUserFavorites(user.uid);
+            }
+        });
+
+        async function loadUserFavorites(uid) {
+            try {
+                const favDoc = await getDoc(doc(db, 'users', uid, 'favorites', 'list'));
+                if (favDoc.exists()) {
+                    favorites = favDoc.data().items || [];
+                    localStorage.setItem('favorites', JSON.stringify(favorites));
+                    renderPhones(allPhones);
+                }
+            } catch (e) { console.log('Favorites load error:', e); }
+        }
+
+        async function saveFavorites() {
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            if (currentUser) {
+                try {
+                    await setDoc(doc(db, 'users', currentUser.uid, 'favorites', 'list'), {
+                        items: favorites,
+                        updatedAt: new Date()
+                    });
+                } catch (e) { console.log('Favorites save error:', e); }
+            }
+        }
+
+        async function loadPhones() {
+            try {
+                const phonesQuery = query(collection(db, 'ads'), orderBy('createdAt', 'desc'), limit(50));
+                unsubscribePhones = onSnapshot(phonesQuery, (snapshot) => {
+                    allPhones = [];
+                    snapshot.forEach((doc) => { allPhones.push({ id: doc.id, ...doc.data() }); });
+                    hideLoading();
+                    renderPhones(allPhones);
+                    extractStoresFromAds(allPhones);
+                    renderBrandFilters(allPhones);
+                }, (error) => { console.error('Error:', error); fallbackLoad(); });
+            } catch (error) { console.error('Critical Error:', error); hideLoading(); }
+        }
+
+        async function fallbackLoad() {
+            try {
+                const q = query(collection(db, 'ads'), limit(50));
+                const snapshot = await getDocs(q);
+                allPhones = [];
+                snapshot.forEach((doc) => { allPhones.push({ id: doc.id, ...doc.data() }); });
+                hideLoading();
+                renderPhones(allPhones);
+                extractStoresFromAds(allPhones);
+                renderBrandFilters(allPhones);
+            } catch (err) { console.error('Fallback failed:', err); hideLoading(); document.getElementById('phonesCount').textContent = 'خطأ في الاتصال'; }
+        }
+
+        function extractStoresFromAds(ads) {
+            const sellersMap = new Map();
+            ads.forEach(ad => {
+                const key = ad.userId || ad.userEmail || ad.userName;
+                if (!key) return;
+                if (!sellersMap.has(key)) {
+                    sellersMap.set(key, {
+                        id: key,
+                        name: ad.userName || 'بائع',
+                        city: ad.city || 'السودان',
+                        phoneCount: 1,
+                        whatsapp: ad.whatsApp || ad.contactPhone,
+                        phone: ad.contactPhone,
+                        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(ad.userName || 'B')}&background=6366f1&color=fff&size=256&bold=true`,
+                        bgImage: `https://images.unsplash.com/photo-1556656793-02715d8dd660?w=600&h=200&fit=crop`,
+                        phones: [ad]
+                    });
+                } else {
+                    const store = sellersMap.get(key);
+                    store.phoneCount += 1;
+                    store.phones.push(ad);
+                }
+            });
+            allStores = Array.from(sellersMap.values());
+            renderStores(allStores);
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('phonesGrid').classList.remove('hidden');
+        }
+
+        window.renderBrandFilters = function(phones) {
+            const container = document.getElementById('brandFilters');
+            const activePhones = phones.filter(p => p.isActive !== false && p.isSold !== true);
+            const brandsMap = new Map();
+            activePhones.forEach(phone => {
+                const brand = phone.brand ? phone.brand.toString().trim().toLowerCase() : '';
+                if (brand) {
+                    const displayBrand = phone.brand.toString().trim();
+                    if (!brandsMap.has(brand)) {
+                        brandsMap.set(brand, { display: displayBrand, count: 1 });
+                    } else {
+                        brandsMap.get(brand).count += 1;
+                    }
+                }
+            });
+            const sortedBrands = Array.from(brandsMap.entries()).sort((a, b) => b[1].count - a[1].count).slice(0, 8);
+            let html = `<button onclick="setBrandFilter('')" class="brand-chip ${currentBrand === '' ? 'active' : ''} flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-brand=""><i class="fas fa-th-large"></i> الكل</button>`;
+            sortedBrands.forEach(([key, data]) => {
+                const isActive = currentBrand.toLowerCase() === key;
+                html += `<button onclick="setBrandFilter('${data.display.replace(/'/g, "\'")}')" class="brand-chip ${isActive ? 'active' : ''} flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-brand="${data.display.replace(/"/g, '&quot;')}"><i class="fas fa-mobile-alt"></i> ${data.display}<span class="text-[10px] opacity-70 bg-white/20 px-1.5 py-0.5 rounded-md">${data.count}</span></button>`;
+            });
+            container.innerHTML = html;
+        };
+
+        function buildCardHTML(phone, isHorizontal = true) {
+            const statusConfig = {
+                'new': { label: 'جديد', class: 'status-new' },
+                'like-new': { label: 'شبه جديد', class: 'status-like-new' },
+                'used': { label: 'مستعمل', class: 'status-used' }
+            }[phone.status] || { label: 'مستعمل', class: 'status-used' };
+            const price = phone.price ? parseInt(phone.price).toLocaleString() : '???';
+            const image = phone.mainImage || (phone.images && phone.images[0]) || 'https://via.placeholder.com/400?text=No+Image';
+            const isFav = favorites.includes(phone.id);
+            const brandLabel = phone.brand ? phone.brand.toString().trim() : '';
+
+            const specs = [];
+            if (phone.ram) specs.push(`<span class="card-spec"><i class="fas fa-memory"></i> ${phone.ram}GB</span>`);
+            if (phone.storage) specs.push(`<span class="card-spec"><i class="fas fa-hdd"></i> ${phone.storage}GB</span>`);
+            if (phone.batteryHealth) specs.push(`<span class="card-spec"><i class="fas fa-battery-full"></i> ${phone.batteryHealth}%</span>`);
+
+            const waLink = buildWhatsAppLink(phone);
+            const callLink = phone.contactPhone ? `tel:${phone.contactPhone}` : '#';
+
+            return `
+                <div class="phone-card" onclick="openPhoneModal('${phone.id}')">
+                    <div class="card-image-area">
+                        <img src="${image}" alt="${phone.phoneModel || 'هاتف'}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400?text=No+Image';">
+                        <span class="card-badge-status ${statusConfig.class}">${statusConfig.label}</span>
+                        ${brandLabel ? `<span class="card-badge-brand">${brandLabel}</span>` : ''}
+                        <button onclick="event.stopPropagation(); toggleFavCard('${phone.id}')" class="card-fav-btn ${isFav ? 'liked' : 'text-slate-400'}">
+                            <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
+                        </button>
+                        <div class="card-price-tag">${price}<span class="currency">ج.س</span></div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">${phone.phoneModel || 'هاتف'}</h3>
+                        <div class="card-specs">${specs.join('')}</div>
+                        <div class="card-footer">
+                            <div class="card-seller">
+                                <div class="card-seller-avatar"><i class="fas fa-user"></i></div>
+                                <div class="card-seller-info">
+                                    <span class="card-seller-name">${phone.userName || 'بائع'}</span>
+                                    <span class="card-seller-city">${phone.city || 'السودان'}</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                ${waLink ? `<a href="${waLink}" onclick="event.stopPropagation()" class="card-action-btn whatsapp" title="واتساب"><i class="fab fa-whatsapp"></i></a>` : ''}
+                                ${phone.contactPhone ? `<a href="${callLink}" onclick="event.stopPropagation()" class="card-action-btn call" title="اتصال"><i class="fas fa-phone"></i></a>` : ''}
+                                <button onclick="event.stopPropagation()" class="card-action-btn chat" title="مراسلة"><i class="fas fa-comment"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function buildWhatsAppLink(phone) {
+            const num = phone.whatsApp || phone.contactPhone;
+            if (!num) return '';
+            const cleanNum = num.toString().replace(/[\s\-]/g, '').replace(/^\+/, '');
+            const model = phone.phoneModel || 'هاتف';
+            const price = phone.price ? `${parseInt(phone.price).toLocaleString()} جنيه سوداني` : '';
+            const specs = [];
+            if (phone.ram) specs.push(`رام ${phone.ram}GB`);
+            if (phone.storage) specs.push(`تخزين ${phone.storage}GB`);
+            if (phone.batteryHealth) specs.push(`بطارية ${phone.batteryHealth}%`);
+            const specsText = specs.length > 0 ? `\n📋 المواصفات: ${specs.join(' | ')}` : '';
+            const message = `👋 مرحباً!\n\nأنا مهتم بهذا الإعلان على سوق فون:\n📱 ${model}${specsText}\n💰 السعر: ${price}\n\nهل لا يزال متاحاً؟`;
+            return `https://wa.me/${cleanNum}?text=${encodeURIComponent(message)}`;
+        }
+
+        window.renderPhones = function(phones) {
+            const grid = document.getElementById('phonesGrid');
+            const allGrid = document.getElementById('allPhonesGrid');
+            const noResults = document.getElementById('noResults');
+            const countEl = document.getElementById('phonesCount');
+            const viewAllContainer = document.getElementById('viewAllContainer');
+
+            const activePhones = phones.filter(p => p.isActive !== false && p.isSold !== true);
+            countEl.textContent = activePhones.length + ' هاتف';
+
+            if (activePhones.length === 0) {
+                grid.innerHTML = '';
+                allGrid.innerHTML = '';
+                allGrid.classList.add('hidden');
+                viewAllContainer.classList.add('hidden');
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+
+            // عرض 10 هواتف فقط في التمرير الأفقي
+            const featured = activePhones.slice(0, 10);
+            grid.innerHTML = featured.map(phone => buildCardHTML(phone)).join('');
+
+            // إذا كان هناك أكثر من 10، أظهر زر "جميع الأجهزة"
+            if (activePhones.length > 10) {
+                viewAllContainer.classList.remove('hidden');
+            } else {
+                viewAllContainer.classList.add('hidden');
+            }
+
+            // الشبكة الكاملة (مخفية افتراضياً)
+            if (showingAll) {
+                allGrid.classList.remove('hidden');
+                allGrid.innerHTML = `<div class="grid grid-cols-1 gap-4">${activePhones.map(phone => buildCardHTML(phone, false)).join('')}</div>`;
+            } else {
+                allGrid.classList.add('hidden');
+            }
+        };
+
+        window.showAllPhones = function() {
+            showingAll = true;
+            const allGrid = document.getElementById('allPhonesGrid');
+            const activePhones = allPhones.filter(p => p.isActive !== false && p.isSold !== true);
+            allGrid.classList.remove('hidden');
+            allGrid.innerHTML = `<div class="grid grid-cols-1 gap-4">${activePhones.map(phone => buildCardHTML(phone, false)).join('')}</div>`;
+            document.getElementById('viewAllContainer').classList.add('hidden');
+            // scroll to all phones
+            setTimeout(() => {
+                allGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        };
+
+        window.renderStores = function(stores) {
+            const container = document.getElementById('storesContainer');
+            if (stores.length === 0) { container.innerHTML = '<p class="text-slate-500 text-sm">لا يوجد متاجر حالياً</p>'; return; }
+            container.innerHTML = stores.map(store => {
+                return `
+                    <div class="store-card" onclick="openStoreModal('${store.id}')">
+                        <div class="store-header">
+                            <img src="${store.bgImage}" class="store-header-bg" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #4f46e5, #7c3aed)';">
+                            <div class="store-header-overlay"></div>
+                            <img src="${store.avatar}" class="store-avatar" onerror="this.src='https://ui-avatars.com/api/?name=S&background=6366f1&color=fff'">
+                        </div>
+                        <div class="store-body">
+                            <h3 class="font-bold text-slate-900 text-base">${store.name}</h3>
+                            <p class="text-xs text-slate-500 mb-2">${store.city || 'السودان'}</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-mobile-alt text-indigo-500 text-xs"></i>
+                                    <span class="text-sm font-bold text-slate-700">${store.phoneCount || 0} هاتف</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                    <span class="text-sm font-bold text-slate-700">4.5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.openStoreModal = function(storeId) {
+            const store = allStores.find(s => s.id === storeId);
+            if (!store) return;
+            const modal = document.getElementById('storeModal');
+            const content = document.getElementById('storeModalContent');
+            const storePhones = store.phones || [];
+            content.innerHTML = `
+                <div class="store-modal-header">
+                    <img src="${store.bgImage}" class="store-modal-bg" onerror="this.parentElement.style.background='linear-gradient(135deg, #4f46e5, #7c3aed)'">
+                    <div class="store-modal-overlay"></div>
+                    <img src="${store.avatar}" class="store-modal-avatar" onerror="this.src='https://ui-avatars.com/api/?name=S&background=6366f1&color=fff'">
+                </div>
+                <div class="bg-white rounded-t-3xl -mt-6 relative z-10 p-6">
+                    <div class="text-center mb-5">
+                        <h2 class="text-xl font-black text-slate-900">${store.name}</h2>
+                        <p class="text-sm text-slate-500 mt-1">${store.city || 'السودان'}</p>
+                        <div class="flex items-center justify-center gap-3 mt-3">
+                            <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-sm font-bold"><i class="fas fa-mobile-alt ml-1"></i> ${store.phoneCount || 0} هاتف</span>
+                            <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-lg text-sm font-bold"><i class="fas fa-star ml-1"></i> 4.5</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mb-5">
+                        ${store.whatsapp ? `<a href="https://wa.me/${formatWaForLink(store.whatsapp)}" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"><i class="fab fa-whatsapp text-xl"></i> واتساب</a>` : ''}
+                        ${store.phone ? `<a href="tel:${store.phone}" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"><i class="fas fa-phone"></i> اتصال</a>` : ''}
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2"><i class="fas fa-mobile-alt text-indigo-500"></i> الهواتف المعروضة</h3>
+                    <div class="space-y-3">
+                        ${storePhones.map(phone => {
+                            const price = phone.price ? parseInt(phone.price).toLocaleString() : '???';
+                            const image = phone.mainImage || (phone.images && phone.images[0]) || 'https://via.placeholder.com/400?text=No+Image';
+                            const statusConfig = {
+                                'new': { label: 'جديد', class: 'status-new' },
+                                'like-new': { label: 'شبه جديد', class: 'status-like-new' },
+                                'used': { label: 'مستعمل', class: 'status-used' }
+                            }[phone.status] || { label: 'مستعمل', class: 'status-used' };
+                            return `
+                                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100" onclick="closeStoreModal(); setTimeout(()=>openPhoneModal('${phone.id}'), 300)">
+                                    <div class="flex gap-3 p-3">
+                                        <div class="w-20 h-20 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl flex-shrink-0 overflow-hidden">
+                                            <img src="${image}" class="w-full h-full object-contain p-2" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="${statusConfig.class} text-white px-2 py-0.5 rounded-lg text-[10px] font-bold">${statusConfig.label}</span>
+                                            </div>
+                                            <h4 class="font-bold text-slate-900 text-sm mb-1">${phone.phoneModel || 'هاتف'}</h4>
+                                            <div class="flex items-center gap-2 text-[10px] text-slate-500 mb-1">
+                                                ${phone.ram ? `<span>${phone.ram}GB رام</span>` : ''}
+                                                ${phone.storage ? `<span>${phone.storage}GB</span>` : ''}
+                                            </div>
+                                            <p class="text-base font-black text-indigo-600">${price} <span class="text-xs text-slate-500 font-normal">ج.س</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeStoreModal = function() {
+            document.getElementById('storeModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        window.setStatusFilter = function(status) {
+            currentStatus = status;
+            showingAll = false;
+            document.querySelectorAll('#statusFilters .filter-chip').forEach(btn => {
+                if (btn.dataset.status === status) {
+                    btn.classList.add('active');
+                    btn.classList.remove('bg-white', 'border-slate-200', 'text-slate-600');
+                } else {
+                    btn.classList.remove('active');
+                    btn.classList.add('bg-white', 'border-slate-200', 'text-slate-600');
+                }
+            });
+            filterPhones();
+        };
+
+        window.setBrandFilter = function(brand) {
+            currentBrand = brand;
+            showingAll = false;
+            document.querySelectorAll('#brandFilters .brand-chip').forEach(btn => {
+                const btnBrand = btn.dataset.brand || '';
+                const targetBrand = brand || '';
+                if (btnBrand.toLowerCase() === targetBrand.toLowerCase()) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            filterPhones();
+        };
+
+        window.filterPhones = function() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allPhones.filter(phone => {
+                const isActive = phone.isActive !== false && phone.isSold !== true;
+                const matchesSearch = !searchTerm || 
+                    phone.phoneModel?.toLowerCase().includes(searchTerm) ||
+                    phone.userName?.toLowerCase().includes(searchTerm) ||
+                    phone.city?.toLowerCase().includes(searchTerm) ||
+                    phone.neighborhood?.toLowerCase().includes(searchTerm) ||
+                    phone.description?.toLowerCase().includes(searchTerm) ||
+                    phone.brand?.toLowerCase().includes(searchTerm);
+                const matchesStatus = !currentStatus || phone.status === currentStatus;
+                const matchesBrand = !currentBrand || (phone.brand && phone.brand.toLowerCase() === currentBrand.toLowerCase());
+                return isActive && matchesSearch && matchesStatus && matchesBrand;
+            });
+            renderPhones(filtered);
+        };
+
+        // ====== معرض الصور مع swipe ======
+        let galleryState = { current: 0, total: 0, startX: 0, currentX: 0, isDragging: false };
+
+        window.openPhoneModal = function(phoneId) {
+            const phone = allPhones.find(p => p.id === phoneId);
+            if (!phone) return;
+            currentPhoneId = phoneId;
+
+            const statusConfig = {
+                'new': { label: 'جديد', class: 'status-new' },
+                'like-new': { label: 'شبه جديد', class: 'status-like-new' },
+                'used': { label: 'مستعمل', class: 'status-used' }
+            }[phone.status] || { label: 'مستعمل', class: 'status-used' };
+
+            const price = phone.price ? parseInt(phone.price).toLocaleString() : '???';
+            const images = phone.images || [];
+            const hasImages = images.length > 0;
+            const isFav = favorites.includes(phoneId);
+            const favBtn = document.getElementById('modalFavBtn');
+            favBtn.innerHTML = `<i class="${isFav ? 'fas liked text-red-500' : 'far text-slate-600'} fa-heart text-lg"></i>`;
+
+            const modal = document.getElementById('phoneModal');
+            const content = document.getElementById('modalContent');
+
+            let galleryHtml = '';
+            if (hasImages) {
+                galleryState.total = images.length;
+                galleryState.current = 0;
+                galleryHtml = `
+                    <div class="gallery-wrapper" id="galleryWrapper" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" ontouchend="handleTouchEnd(event)">
+                        <div class="gallery-track" id="galleryTrack">
+                            ${images.map((img, idx) => `
+                                <div class="gallery-slide">
+                                    <img src="${img}" alt="صورة ${idx + 1}" onerror="this.style.display='none'">
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${images.length > 1 ? `
+                            <button class="gallery-nav prev" onclick="moveGallery(-1)"><i class="fas fa-chevron-right text-slate-600"></i></button>
+                            <button class="gallery-nav next" onclick="moveGallery(1)"><i class="fas fa-chevron-left text-slate-600"></i></button>
+                            <div class="gallery-dots" id="galleryDots">
+                                ${images.map((_, i) => `<div class="gallery-dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></div>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                galleryHtml = `<div class="aspect-[4/3] bg-gradient-to-br from-slate-50 to-indigo-50 flex items-center justify-center p-8"><img src="${phone.mainImage || 'https://via.placeholder.com/400?text=No+Image'}" class="max-h-64 object-contain drop-shadow-xl"></div>`;
+            }
+
+            // هواتف مشابهة من نفس الشركة فقط
+            const similar = allPhones.filter(p => 
+                p.id !== phoneId && 
+                p.isActive !== false && 
+                p.isSold !== true &&
+                p.brand && 
+                phone.brand &&
+                p.brand.toLowerCase() === phone.brand.toLowerCase()
+            ).slice(0, 8);
+
+            const similarHtml = similar.length > 0 ? `
+                <div class="mt-6 pt-5 border-t border-slate-200">
+                    <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-sm">
+                        <i class="fas fa-clone text-indigo-500"></i> 
+                        ${phone.brand ? `أجهزة ${phone.brand} أخرى` : 'إعلانات مشابهة'}
+                    </h3>
+                    <div class="horizontal-scroll pb-2">
+                        ${similar.map(p => {
+                            const simPrice = p.price ? parseInt(p.price).toLocaleString() : '???';
+                            const simImg = p.mainImage || (p.images && p.images[0]) || 'https://via.placeholder.com/150?text=No+Image';
+                            const simStatus = {
+                                'new': { label: 'جديد', color: '#22c55e' },
+                                'like-new': { label: 'شبه جديد', color: '#3b82f6' },
+                                'used': { label: 'مستعمل', color: '#f59e0b' }
+                            }[p.status] || { label: 'مستعمل', color: '#f59e0b' };
+                            return `
+                                <div class="similar-card" onclick="switchToPhone('${p.id}')">
+                                    <div class="sim-img">
+                                        <img src="${simImg}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                                    </div>
+                                    <div class="sim-body">
+                                        <div class="flex items-center gap-1 mb-1">
+                                            <span style="width:6px;height:6px;border-radius:50%;background:${simStatus.color};"></span>
+                                            <span class="text-[9px] font-bold text-slate-500">${simStatus.label}</span>
+                                        </div>
+                                        <p class="sim-title">${p.phoneModel || 'هاتف'}</p>
+                                        <p class="sim-price">${simPrice} ج.س</p>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            ` : '';
+
+            const waLink = buildWhatsAppLink(phone);
+
+            content.innerHTML = `
+                ${galleryHtml}
+                <div class="p-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="${statusConfig.class} text-white px-3 py-1 rounded-lg text-xs font-bold">${statusConfig.label}</span>
+                        ${phone.brand ? `<span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-bold">${phone.brand.toUpperCase()}</span>` : ''}
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">${phone.phoneModel || 'هاتف'}</h2>
+                    ${phone.description ? `<p class="text-slate-500 text-sm mb-4 leading-relaxed">${phone.description}</p>` : ''}
+                    <div class="flex items-baseline gap-2 mb-5">
+                        <span class="text-3xl font-black text-indigo-600">${price}</span>
+                        <span class="text-sm text-slate-500">جنيه سوداني</span>
+                    </div>
+                    <div class="space-y-2 mb-5">
+                        ${phone.ram ? `<div class="feature-item"><div class="feature-icon bg-indigo-100 text-indigo-600"><i class="fas fa-memory"></i></div><div><p class="text-xs text-slate-500">الرام</p><p class="font-bold text-slate-900">${phone.ram} GB</p></div></div>` : ''}
+                        ${phone.storage ? `<div class="feature-item"><div class="feature-icon bg-blue-100 text-blue-600"><i class="fas fa-hdd"></i></div><div><p class="text-xs text-slate-500">التخزين</p><p class="font-bold text-slate-900">${phone.storage} GB</p></div></div>` : ''}
+                        ${phone.batteryHealth ? `<div class="feature-item"><div class="feature-icon bg-green-100 text-green-600"><i class="fas fa-battery-full"></i></div><div><p class="text-xs text-slate-500">صحة البطارية</p><p class="font-bold text-slate-900">${phone.batteryHealth}%</p></div></div>` : ''}
+                        ${phone.camera ? `<div class="feature-item"><div class="feature-icon bg-purple-100 text-purple-600"><i class="fas fa-camera"></i></div><div><p class="text-xs text-slate-500">الكاميرا</p><p class="font-bold text-slate-900">${phone.camera} MP</p></div></div>` : ''}
+                        ${phone.waterResistant !== undefined && phone.waterResistant !== null ? `<div class="feature-item"><div class="feature-icon bg-cyan-100 text-cyan-600"><i class="fas fa-tint-slash"></i></div><div><p class="text-xs text-slate-500">مقاومة الماء</p><p class="font-bold text-slate-900">${phone.waterResistant === true || phone.waterResistant === 'true' ? 'نعم ✓' : 'لا ✗'}</p></div></div>` : ''}
+                        ${phone.color ? `<div class="feature-item"><div class="feature-icon bg-pink-100 text-pink-600"><i class="fas fa-palette"></i></div><div><p class="text-xs text-slate-500">اللون</p><p class="font-bold text-slate-900">${phone.color}</p></div></div>` : ''}
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-4 mb-5">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center"><i class="fas fa-user text-white"></i></div>
+                            <div><h4 class="font-bold text-slate-900">${phone.userName || 'بائع'}</h4><p class="text-xs text-slate-500">${phone.city || 'السودان'} ${phone.neighborhood ? '• ' + phone.neighborhood : ''}</p></div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        ${waLink ? `
+                        <a href="${waLink}" class="block w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3.5 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20">
+                            <i class="fab fa-whatsapp text-xl"></i> تواصل عبر واتساب
+                        </a>` : ''}
+                        ${(phone.contactMethods?.includes('call') || phone.contactPhone) ? `
+                        <a href="tel:${phone.contactPhone}" class="block w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3.5 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20">
+                            <i class="fas fa-phone"></i> اتصل الآن
+                        </a>` : ''}
+                    </div>
+                    ${similarHtml}
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            if (hasImages && images.length > 1) {
+                startAutoGallery(images.length);
+                setupGallerySwipe();
+            }
+        };
+
+        function setupGallerySwipe() {
+            const wrapper = document.getElementById('galleryWrapper');
+            if (!wrapper) return;
+
+            wrapper.addEventListener('touchstart', handleTouchStart, { passive: true });
+            wrapper.addEventListener('touchmove', handleTouchMove, { passive: true });
+            wrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+            // Mouse events for desktop
+            wrapper.addEventListener('mousedown', (e) => {
+                galleryState.isDragging = true;
+                galleryState.startX = e.clientX;
+                wrapper.style.cursor = 'grabbing';
+            });
+            wrapper.addEventListener('mousemove', (e) => {
+                if (!galleryState.isDragging) return;
+                const diff = galleryState.startX - e.clientX;
+                const track = document.getElementById('galleryTrack');
+                if (track) {
+                    track.style.transition = 'none';
+                    track.style.transform = `translateX(calc(-${galleryState.current * 100}% - ${diff}px))`;
+                }
+            });
+            wrapper.addEventListener('mouseup', (e) => {
+                if (!galleryState.isDragging) return;
+                galleryState.isDragging = false;
+                wrapper.style.cursor = 'grab';
+                const diff = galleryState.startX - e.clientX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) moveGallery(1);
+                    else moveGallery(-1);
+                } else {
+                    updateGallery();
+                }
+            });
+            wrapper.addEventListener('mouseleave', () => {
+                if (galleryState.isDragging) {
+                    galleryState.isDragging = false;
+                    wrapper.style.cursor = 'grab';
+                    updateGallery();
+                }
+            });
+        }
+
+        window.handleTouchStart = function(e) {
+            galleryState.startX = e.touches[0].clientX;
+            galleryState.isDragging = true;
+        };
+
+        window.handleTouchMove = function(e) {
+            if (!galleryState.isDragging) return;
+            const diff = galleryState.startX - e.touches[0].clientX;
+            const track = document.getElementById('galleryTrack');
+            if (track) {
+                track.style.transition = 'none';
+                track.style.transform = `translateX(calc(-${galleryState.current * 100}% - ${diff}px))`;
+            }
+        };
+
+        window.handleTouchEnd = function(e) {
+            if (!galleryState.isDragging) return;
+            galleryState.isDragging = false;
+            const endX = e.changedTouches[0].clientX;
+            const diff = galleryState.startX - endX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) moveGallery(1);
+                else moveGallery(-1);
+            } else {
+                updateGallery();
+            }
+        };
+
+        function startAutoGallery(total) {
+            if (galleryInterval) clearInterval(galleryInterval);
+            galleryState.current = 0;
+            galleryState.total = total;
+            updateGallery();
+            galleryInterval = setInterval(() => {
+                galleryState.current = (galleryState.current + 1) % total;
+                updateGallery();
+            }, 4000);
+        }
+
+        window.moveGallery = function(dir) {
+            if (galleryState.total <= 1) return;
+            galleryState.current = (galleryState.current + dir + galleryState.total) % galleryState.total;
+            updateGallery();
+        };
+
+        window.goToSlide = function(index) {
+            galleryState.current = index;
+            updateGallery();
+        };
+
+        function updateGallery() {
+            const track = document.getElementById('galleryTrack');
+            const dots = document.querySelectorAll('.gallery-dot');
+            if (track) {
+                track.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                track.style.transform = `translateX(-${galleryState.current * 100}%)`;
+            }
+            dots.forEach((dot, i) => { dot.classList.toggle('active', i === galleryState.current); });
+        }
+
+        window.switchToPhone = function(phoneId) {
+            closeModal();
+            setTimeout(() => openPhoneModal(phoneId), 350);
+        };
+
+        window.toggleFavorite = function() {
+            if (!currentPhoneId) return;
+            const index = favorites.indexOf(currentPhoneId);
+            if (index > -1) favorites.splice(index, 1);
+            else favorites.push(currentPhoneId);
+            saveFavorites();
+            const favBtn = document.getElementById('modalFavBtn');
+            const isFav = favorites.includes(currentPhoneId);
+            favBtn.innerHTML = `<i class="${isFav ? 'fas liked text-red-500' : 'far text-slate-600'} fa-heart text-lg"></i>`;
+            renderPhones(allPhones);
+        };
+
+        window.toggleFavCard = function(phoneId) {
+            const index = favorites.indexOf(phoneId);
+            if (index > -1) favorites.splice(index, 1);
+            else favorites.push(phoneId);
+            saveFavorites();
+            renderPhones(allPhones);
+        };
+
+        window.closeModal = function() {
+            if (galleryInterval) { clearInterval(galleryInterval); galleryInterval = null; }
+            document.getElementById('phoneModal').classList.add('hidden');
+            document.body.style.overflow = '';
+            currentPhoneId = null;
+        };
+
+        function formatWaForLink(num) {
+            if (!num) return '';
+            return num.toString().replace(/[\s\-]/g, '').replace(/^\+/, '');
+        }
+
+        window.showProfile = function() { alert('سيتم فتح صفحة البروفايل قريباً!'); };
+        window.showNotifications = function() { alert('لديك 3 إشعارات جديدة!'); };
+
+        document.addEventListener('DOMContentLoaded', () => { loadPhones(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); closeStoreModal(); } });
+        window.addEventListener('beforeunload', () => { if (unsubscribePhones) unsubscribePhones(); if (galleryInterval) clearInterval(galleryInterval); });
+    </script>
+</body>
+</html>
