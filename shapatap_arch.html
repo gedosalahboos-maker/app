@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -9,387 +9,296 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-        body { background: #f8fafc; overflow-x: hidden; }
+        body { background: #0f172a; overflow-x: hidden; }
+
+        /* Header */
         .header-banner {
-            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3d7ab5 100%);
-            position: relative; overflow: hidden; min-height: 160px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            position: relative; overflow: hidden;
         }
         .header-shape {
-            position: absolute; border-radius: 16px; opacity: 0.1; background: white;
-            animation: shapeFloat 8s ease-in-out infinite;
+            position: absolute; border-radius: 50%; opacity: 0.05; background: white;
         }
-        @keyframes shapeFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
+
+        /* Search bar */
+        .search-bar {
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .app-nav {
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(226,232,240,0.6);
+        .search-bar input {
+            background: transparent; color: white;
         }
-        .archive-card {
-            background: white; border-radius: 24px; overflow: hidden;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-            border: 1px solid #f1f5f9; position: relative; flex-shrink: 0;
-            width: 300px; scroll-snap-align: start;
+        .search-bar input::placeholder { color: rgba(255,255,255,0.5); }
+
+        /* Photo Grid - 3 columns */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            padding: 4px;
         }
-        .archive-card:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(30, 58, 95, 0.15); border-color: #dbeafe;
+        @media (min-width: 768px) {
+            .photo-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px; }
         }
-        .archive-card:active { transform: scale(0.97); }
-        .card-image-area {
-            position: relative; height: 240px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+        @media (min-width: 1024px) {
+            .photo-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 8px; }
+        }
+
+        /* Photo Item */
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
             overflow: hidden;
+            cursor: pointer;
+            background: #1e293b;
+            border-radius: 4px;
         }
-        .card-image-area img {
-            width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;
+        .photo-item img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease, opacity 0.3s ease;
+            opacity: 0;
         }
-        .archive-card:hover .card-image-area img { transform: scale(1.08); }
-        .card-category-badge {
-            position: absolute; top: 14px; right: 14px; padding: 6px 14px;
-            border-radius: 14px; font-size: 11px; font-weight: 800; color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2;
+        .photo-item img.loaded { opacity: 1; }
+        .photo-item:hover img { transform: scale(1.08); }
+        .photo-item:hover .photo-overlay { opacity: 1; }
+
+        .photo-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 8px;
         }
-        .cat-children { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .cat-events { background: linear-gradient(135deg, #ec4899, #db2777); }
-        .cat-achievements { background: linear-gradient(135deg, #22c55e, #16a34a); }
-        .cat-people { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-        .cat-houses { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-        .cat-shops { background: linear-gradient(135deg, #06b6d4, #0891b2); }
-        .card-date-badge {
-            position: absolute; top: 14px; left: 14px; padding: 5px 12px;
-            border-radius: 12px; font-size: 11px; font-weight: 800; color: #1e3a5f;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
-            border: 1px solid rgba(30,58,95,0.1); z-index: 2;
+        .photo-overlay .names {
+            color: white; font-size: 11px; font-weight: 700;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .card-body { padding: 18px; }
-        .card-title {
-            font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 8px;
-            line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden;
+        .photo-overlay .category-badge {
+            font-size: 9px; font-weight: 700; padding: 2px 6px;
+            border-radius: 4px; display: inline-block; width: fit-content; margin-bottom: 4px;
         }
-        .card-desc {
-            font-size: 13px; color: #64748b; line-height: 1.6;
-            display: -webkit-box; -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px;
+        .cat-children { background: #f59e0b; color: white; }
+        .cat-events { background: #ec4899; color: white; }
+        .cat-achievements { background: #22c55e; color: white; }
+        .cat-people { background: #3b82f6; color: white; }
+        .cat-houses { background: #8b5cf6; color: white; }
+        .cat-shops { background: #06b6d4; color: white; }
+
+        /* Skeleton loading */
+        .skeleton-photo {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            aspect-ratio: 1;
+            border-radius: 4px;
         }
-        .card-footer {
-            display: flex; align-items: center; justify-content: space-between;
-            padding-top: 12px; border-top: 1.5px solid #f1f5f9;
-        }
-        .card-uploader { display: flex; align-items: center; gap: 8px; }
-        .card-uploader-avatar {
-            width: 32px; height: 32px; border-radius: 50%;
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* Load more */
+        .load-more-btn {
             background: linear-gradient(135deg, #1e3a5f, #3d7ab5);
+            color: white; padding: 12px 32px;
+            border-radius: 24px; font-weight: 800; font-size: 14px;
+            border: none; cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(30,58,95,0.4);
+        }
+        .load-more-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(30,58,95,0.5); }
+        .load-more-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: center;
-            font-size: 12px; color: white; font-weight: 700;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
-        .card-uploader-name { font-size: 12px; font-weight: 700; color: #334155; }
-        .card-date { font-size: 11px; color: #94a3b8; font-weight: 600; }
-        .filter-chip {
-            transition: all 0.2s ease; border: 2px solid transparent; white-space: nowrap;
+        .lightbox.active { opacity: 1; pointer-events: auto; }
+        .lightbox img {
+            max-width: 95vw; max-height: 85vh;
+            object-fit: contain; border-radius: 8px;
         }
-        .filter-chip.active {
-            background: linear-gradient(135deg, #1e3a5f, #3d7ab5); color: white;
-            box-shadow: 0 4px 16px rgba(30,58,95,0.3);
+        .lightbox-close {
+            position: absolute; top: 16px; left: 16px;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white; font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
         }
-        .filter-chip:not(.active) {
-            background: white; border-color: #e2e8f0; color: #64748b;
+        .lightbox-close:hover { background: rgba(255,255,255,0.2); }
+        .lightbox-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 48px; height: 48px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
         }
-        .filter-chip:not(.active):hover {
-            border-color: #1e3a5f; color: #1e3a5f; background: #eff6ff;
+        .lightbox-nav:hover { background: rgba(255,255,255,0.2); }
+        .lightbox-nav.prev { right: 16px; }
+        .lightbox-nav.next { left: 16px; }
+        .lightbox-info {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 24px 16px 32px;
+            color: white;
         }
-        .filters-section { background: white; border-bottom: 1px solid #e2e8f0; }
-        .filter-label {
-            font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;
-            display: flex; align-items: center; gap: 4px;
+        .lightbox-info h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+        .lightbox-info p { font-size: 13px; color: rgba(255,255,255,0.7); }
+        .lightbox-counter {
+            position: absolute; top: 16px; right: 16px;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; color: white;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .gallery-wrapper {
-            position: relative; width: 100%; height: 350px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
-            overflow: hidden;
-        }
-        .gallery-track { display: flex; height: 100%; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .gallery-slide { min-width: 100%; height: 100%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .gallery-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .gallery-dots {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 8px; z-index: 10;
-        }
-        .gallery-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,0.2); transition: all 0.3s ease; cursor: pointer; }
-        .gallery-dot.active { width: 24px; border-radius: 6px; background: #1e3a5f; }
-        .gallery-nav {
-            position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px;
-            background: rgba(255,255,255,0.95); border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; cursor: pointer; z-index: 10;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15); border: none; font-size: 14px; color: #475569;
-        }
-        .gallery-nav:hover { transform: translateY(-50%) scale(1.1); background: white; }
-        .gallery-nav.prev { right: 16px; }
-        .gallery-nav.next { left: 16px; }
-        .fab-container { position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%); z-index: 50; pointer-events: none; }
+
+        /* FAB */
+        .fab-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 50; }
         .fab-btn {
-            pointer-events: auto; background: linear-gradient(135deg, #1e3a5f, #3d7ab5);
-            box-shadow: 0 8px 32px rgba(30, 58, 95, 0.4), 0 2px 8px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #1e3a5f, #3d7ab5);
+            box-shadow: 0 8px 32px rgba(30, 58, 95, 0.5);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .fab-btn:hover { transform: scale(1.05); box-shadow: 0 12px 40px rgba(30, 58, 95, 0.5); }
+        .fab-btn:hover { transform: scale(1.05); }
         .fab-btn:active { transform: scale(0.95); }
-        .bottom-nav {
-            position: fixed; bottom: 0; right: 0; left: 0; z-index: 50;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(226,232,240,0.6);
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-        }
-        .bottom-item { position: relative; transition: all 0.2s ease; }
-        .bottom-item.active { color: #1e3a5f; }
-        .bottom-item.active::before {
-            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 32px; height: 3px; background: linear-gradient(90deg, #1e3a5f, #3d7ab5); border-radius: 0 0 8px 8px;
-        }
-        .horizontal-scroll {
-            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;
-        }
-        .horizontal-scroll::-webkit-scrollbar { display: none; }
-        .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%); background-size: 200% 100%; animation: skeleton 1.5s infinite; }
-        @keyframes skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .main-content { padding-bottom: 160px; }
-        html { scroll-behavior: smooth; }
-        .section-title { font-size: 18px; font-weight: 900; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-        .section-title-icon {
-            width: 32px; height: 32px; border-radius: 10px;
-            background: linear-gradient(135deg, #1e3a5f, #3d7ab5);
-            display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;
-        }
-        .view-all-btn {
-            display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px;
-            background: linear-gradient(135deg, #1e3a5f, #3d7ab5); color: white;
-            font-weight: 800; font-size: 13px; border-radius: 16px; border: none;
-            cursor: pointer; transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(30,58,95,0.3); margin-top: 16px;
-        }
-        .view-all-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(30,58,95,0.4); }
-        .view-all-btn:active { transform: scale(0.95); }
-        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
-        .feature-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: #f8fafc; border-radius: 16px; margin-bottom: 8px; border: 1px solid #f1f5f9; }
-        .feature-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
-        .site-footer {
-            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
-            color: white; padding: 40px 0 100px;
-        }
-        .footer-credit {
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-            border-radius: 16px; padding: 16px 24px; text-align: center;
+
+        /* Category filter pills */
+        .filter-pill {
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+            white-space: nowrap; cursor: pointer; transition: all 0.2s;
             border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6);
+        }
+        .filter-pill:hover { background: rgba(255,255,255,0.1); color: white; }
+        .filter-pill.active {
+            background: linear-gradient(135deg, #1e3a5f, #3d7ab5);
+            color: white; border-color: transparent;
+            box-shadow: 0 4px 12px rgba(30,58,95,0.4);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* No results */
+        .no-results { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.4); }
+        .no-results i { font-size: 48px; margin-bottom: 16px; }
+
+        /* Footer */
+        .site-footer {
+            background: #0a0f1d; padding: 24px 0 80px;
+            text-align: center; border-top: 1px solid rgba(255,255,255,0.05);
         }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- شريط علوي -->
-    <div class="header-banner text-white py-6 px-4 relative">
-        <div class="header-shape" style="width:120px;height:80px;top:10px;right:-20px;animation-delay:0s;"></div>
-        <div class="header-shape" style="width:80px;height:120px;bottom:0;left:10px;animation-delay:2s;"></div>
-        <div class="header-shape" style="width:60px;height:60px;top:30%;right:30%;animation-delay:4s;"></div>
-        <div class="header-shape" style="width:100px;height:50px;bottom:20px;right:20%;animation-delay:1s;"></div>
-        <div class="header-shape" style="width:40px;height:90px;top:5px;left:40%;animation-delay:3s;"></div>
-        <div class="max-w-lg mx-auto flex items-center justify-between relative z-10">
-            <div class="flex-1">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur border border-white/30">
-                        <i class="fas fa-landmark text-white text-xl"></i>
+    <!-- Header -->
+    <div class="header-banner text-white py-4 px-4">
+        <div class="header-shape" style="width:200px;height:200px;top:-50px;right:-50px;"></div>
+        <div class="header-shape" style="width:150px;height:150px;bottom:-30px;left:-30px;"></div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur border border-white/20">
+                        <i class="fas fa-landmark text-white"></i>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-black leading-none tracking-tight">أرشيف الشبطاب</h1>
-                        <p class="text-[10px] text-white/80 font-semibold mt-1">ذاكرة القرية الرقمية</p>
+                        <h1 class="text-lg font-black leading-tight">أرشيف الشبطاب</h1>
+                        <p class="text-[10px] text-white/50">ذاكرة القرية الرقمية</p>
                     </div>
                 </div>
-                <p class="text-xs text-white/90 mb-3 leading-relaxed font-medium">
-                    نحفظ ذكرياتنا، صور أطفالنا، مناسباتنا، إنجازاتنا، وتاريخ بيوتنا العريقة
-                </p>
-                <div class="flex items-center gap-2 flex-wrap">
-                    <span class="bg-white/20 backdrop-blur px-2.5 py-1 rounded-lg text-[10px] font-bold border border-white/20"><i class="fas fa-camera ml-1"></i> صور</span>
-                    <span class="bg-white/20 backdrop-blur px-2.5 py-1 rounded-lg text-[10px] font-bold border border-white/20"><i class="fas fa-history ml-1"></i> تاريخ</span>
-                    <span class="bg-white/20 backdrop-blur px-2.5 py-1 rounded-lg text-[10px] font-bold border border-white/20"><i class="fas fa-users ml-1"></i> مجتمع</span>
-                </div>
+                <span id="totalCount" class="text-xs font-bold text-white/40 bg-white/5 px-3 py-1 rounded-full">0 صورة</span>
+            </div>
+
+            <!-- Search -->
+            <div class="search-bar rounded-xl px-4 py-2.5 flex items-center gap-3 mb-3">
+                <i class="fas fa-search text-white/40 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="ابحث بالاسم أو المناسبة..."
+                    class="flex-1 text-sm outline-none bg-transparent" oninput="filterArchives()">
+            </div>
+
+            <!-- Category Filters -->
+            <div class="flex gap-2 overflow-x-auto pb-1" id="categoryFilters" style="scrollbar-width:none;">
+                <button onclick="setCategoryFilter('')" class="filter-pill active" data-category="">الكل</button>
+                <button onclick="setCategoryFilter('children')" class="filter-pill" data-category="children">👶 الأطفال</button>
+                <button onclick="setCategoryFilter('events')" class="filter-pill" data-category="events">🎉 المناسبات</button>
+                <button onclick="setCategoryFilter('achievements')" class="filter-pill" data-category="achievements">🏆 الإنجازات</button>
+                <button onclick="setCategoryFilter('people')" class="filter-pill" data-category="people">👤 الشخصيات</button>
+                <button onclick="setCategoryFilter('houses')" class="filter-pill" data-category="houses">🏠 المنازل</button>
+                <button onclick="setCategoryFilter('shops')" class="filter-pill" data-category="shops">🏪 المحلات</button>
             </div>
         </div>
     </div>
 
-    <!-- Navbar -->
-    <nav class="app-nav sticky top-0 z-40">
-        <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
-            <div class="flex-1 relative">
-                <i class="fas fa-search absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="ابحث بالاسم، الوصف، أو التاريخ..."
-                    class="w-full pr-10 pl-4 py-2 bg-slate-100 border-2 border-transparent rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-900 transition-all"
-                    oninput="filterArchives()">
-            </div>
-            <div class="flex items-center gap-1">
-                <button onclick="showNotifications()" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-blue-900 transition-all relative">
-                    <i class="fas fa-bell text-lg"></i>
-                    <span class="absolute top-1 left-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
-                </button>
-            </div>
-        </div>
-    </nav>
+    <!-- Photo Grid -->
+    <div id="photoGrid" class="photo-grid max-w-6xl mx-auto">
+        <!-- Skeletons -->
+        <div class="skeleton-photo"></div><div class="skeleton-photo"></div><div class="skeleton-photo"></div>
+        <div class="skeleton-photo"></div><div class="skeleton-photo"></div><div class="skeleton-photo"></div>
+        <div class="skeleton-photo"></div><div class="skeleton-photo"></div><div class="skeleton-photo"></div>
+        <div class="skeleton-photo"></div><div class="skeleton-photo"></div><div class="skeleton-photo"></div>
+    </div>
 
-    <!-- فلاتر -->
-    <section class="filters-section py-3">
-        <div class="max-w-lg mx-auto px-4 space-y-3">
-            <div>
-                <div class="filter-label"><i class="fas fa-folder-open text-[10px]"></i> تصنيف الأرشيف</div>
-                <div class="flex gap-2 overflow-x-auto pb-1" id="categoryFilters">
-                    <button onclick="setCategoryFilter('')" class="filter-chip active flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-category="">
-                        <i class="fas fa-th-large"></i> الكل
-                    </button>
-                    <button onclick="setCategoryFilter('children')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-category="children">
-                        <i class="fas fa-child text-amber-500"></i> الأطفال
-                    </button>
-                    <button onclick="setCategoryFilter('events')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-category="events">
-                        <i class="fas fa-calendar-alt text-pink-500"></i> المناسبات
-                    </button>
-                    <button onclick="setCategoryFilter('achievements')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-category="achievements">
-                        <i class="fas fa-trophy text-green-500"></i> الإنجازات
-                    </button>
-                    <button onclick="setCategoryFilter('people')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-category="people">
-                        <i class="fas fa-user-tie text-blue-500"></i> الشخصيات
-                    </button>
-                    <button onclick="setCategoryFilter('houses')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-category="houses">
-                        <i class="fas fa-home text-purple-500"></i> المنازل العريقة
-                    </button>
-                    <button onclick="setCategoryFilter('shops')" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0" data-category="shops">
-                        <i class="fas fa-store text-cyan-500"></i> المحلات
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Load More -->
+    <div id="loadMoreContainer" class="text-center py-6 hidden">
+        <button id="loadMoreBtn" onclick="loadMore()" class="load-more-btn">
+            <i class="fas fa-spinner fa-spin mr-2 hidden" id="loadMoreSpinner"></i>
+            عرض المزيد
+        </button>
+    </div>
 
-    <!-- المحتوى الرئيسي -->
-    <main class="main-content max-w-lg mx-auto px-4 py-5">
-        <!-- أحدث الإضافات -->
-        <div class="flex items-center justify-between mb-4">
-            <div class="section-title">
-                <div class="section-title-icon"><i class="fas fa-images"></i></div>
-                <span>أحدث الإضافات</span>
-            </div>
-            <span id="archiveCount" class="bg-blue-100 text-blue-900 px-2.5 py-1 rounded-lg font-bold text-xs">جاري التحميل...</span>
-        </div>
-
-        <!-- حالة التحميل -->
-        <div id="loadingState" class="horizontal-scroll pb-2">
-            <div class="archive-card" style="width:300px;flex-shrink:0;">
-                <div class="card-image-area"><div class="skeleton" style="width:100%;height:100%;"></div></div>
-                <div class="p-4 space-y-3">
-                    <div class="h-4 skeleton rounded w-3/4"></div>
-                    <div class="h-3 skeleton rounded w-full"></div>
-                    <div class="h-3 skeleton rounded w-2/3"></div>
-                    <div class="flex justify-between pt-2">
-                        <div class="h-8 skeleton rounded-xl w-24"></div>
-                        <div class="h-8 skeleton rounded-full w-8"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="archive-card" style="width:300px;flex-shrink:0;">
-                <div class="card-image-area"><div class="skeleton" style="width:100%;height:100%;"></div></div>
-                <div class="p-4 space-y-3">
-                    <div class="h-4 skeleton rounded w-3/4"></div>
-                    <div class="h-3 skeleton rounded w-1/2"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- شبكة الأرشيف - أفقية -->
-        <div id="archiveGrid" class="hidden horizontal-scroll pb-2"></div>
-
-        <!-- زر عرض الكل -->
-        <div id="viewAllContainer" class="hidden text-center mt-2">
-            <button onclick="showAllArchives()" class="view-all-btn">
-                <i class="fas fa-th-large"></i>
-                <span>عرض كل الأرشيف</span>
-            </button>
-        </div>
-
-        <!-- عرض كل الأرشيف -->
-        <div id="allArchivesGrid" class="hidden mt-6"></div>
-
-        <div id="noResults" class="hidden text-center py-16">
-            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-search text-3xl text-slate-400"></i>
-            </div>
-            <h3 class="text-lg font-bold text-slate-700">لا توجد نتائج</h3>
-            <p class="text-slate-500 text-sm">جرب بحث مختلف أو فلتر آخر</p>
-        </div>
-    </main>
+    <!-- No Results -->
+    <div id="noResults" class="no-results hidden">
+        <i class="fas fa-image"></i>
+        <p class="text-lg font-bold mb-2">لا توجد نتائج</p>
+        <p class="text-sm">جرب بحثاً مختلفاً</p>
+    </div>
 
     <!-- Footer -->
     <footer class="site-footer">
-        <div class="max-w-lg mx-auto px-4">
-            <div class="flex items-center justify-center gap-2 mb-4">
-                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-landmark text-white"></i>
-                </div>
-                <span class="text-xl font-black">أرشيف الشبطاب</span>
-            </div>
-            <p class="text-slate-400 text-xs text-center mb-4">نحفظ ذكرياتنا وتاريخنا للأجيال القادمة</p>
-            <div class="flex justify-center gap-3 mb-6">
-                <a href="#" class="w-9 h-9 bg-white/10 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors text-sm"><i class="fab fa-whatsapp"></i></a>
-                <a href="#" class="w-9 h-9 bg-white/10 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-colors text-sm"><i class="fab fa-facebook-f"></i></a>
-            </div>
-            <div class="footer-credit">
-                <p class="text-white/90 font-bold text-sm">إعداد: سليمان صلاح الدين محمد</p>
-                <p class="text-white/50 text-[10px] mt-1">© 2026 أرشيف الشبطاب - جميع الحقوق محفوظة</p>
-            </div>
-        </div>
+        <p class="text-white/60 font-bold text-sm">إعداد: سليمان صلاح الدين محمد</p>
+        <p class="text-white/30 text-[10px] mt-1">© 2026 أرشيف الشبطاب</p>
     </footer>
 
     <!-- FAB -->
     <div class="fab-container">
-        <a href="add.html" class="fab-btn flex items-center gap-2 px-6 py-3.5 rounded-full text-white font-bold text-sm">
-            <i class="fas fa-plus text-lg"></i>
-            <span>أضف للأرشيف</span>
+        <a href="add.html" class="fab-btn flex items-center gap-2 px-6 py-3 rounded-full text-white font-bold text-sm">
+            <i class="fas fa-plus"></i>
+            <span>أضف صورة</span>
         </a>
     </div>
 
-    <!-- الشريط السفلي -->
-    <nav class="bottom-nav h-16">
-        <div class="max-w-lg mx-auto h-full flex items-center justify-around px-4">
-            <a href="index.html" class="bottom-item active flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
-                <div class="relative"><i class="fas fa-home text-xl"></i></div>
-                <span class="text-[10px] font-bold">الرئيسية</span>
-            </a>
-            <a href="add.html" class="bottom-item flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
-                <div class="relative"><i class="fas fa-plus-circle text-xl"></i></div>
-                <span class="text-[10px] font-bold">إضافة</span>
-            </a>
-            <a href="#" onclick="showAbout()" class="bottom-item flex flex-col items-center gap-1 py-2 px-4 text-slate-500">
-                <div class="relative"><i class="fas fa-info-circle text-xl"></i></div>
-                <span class="text-[10px] font-bold">عن الأرشيف</span>
-            </a>
-        </div>
-    </nav>
-
-    <!-- Modal تفاصيل الأرشيف -->
-    <div id="archiveModal" class="fixed inset-0 z-50 hidden">
-        <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
-        <div class="absolute inset-0 md:inset-4 md:max-w-2xl md:mx-auto bg-white md:rounded-3xl shadow-2xl overflow-hidden flex flex-col">
-            <button onclick="closeModal()" class="absolute top-4 left-4 z-20 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
-                <i class="fas fa-times text-slate-600"></i>
-            </button>
-            <div id="modalContent" class="flex-1 overflow-y-auto"></div>
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+        <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+        <span id="lightboxCounter" class="lightbox-counter">1 / 1</span>
+        <button class="lightbox-nav prev" onclick="navigateLightbox(-1)"><i class="fas fa-chevron-right"></i></button>
+        <button class="lightbox-nav next" onclick="navigateLightbox(1)"><i class="fas fa-chevron-left"></i></button>
+        <img id="lightboxImg" src="" alt="">
+        <div class="lightbox-info">
+            <span id="lightboxCategory" class="category-badge mb-2">تصنيف</span>
+            <h3 id="lightboxNames">الاسم</h3>
+            <p id="lightboxDesc">الوصف</p>
+            <p id="lightboxMeta" class="text-xs text-white/40 mt-2"></p>
         </div>
     </div>
 
-    <!-- Firebase + JavaScript -->
+    <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs, startAfter } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
@@ -405,333 +314,217 @@
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
-        const auth = getAuth(app);
 
         let allArchives = [];
+        let displayedArchives = [];
         let currentCategory = '';
-        let currentArchiveId = null;
-        let galleryInterval = null;
-        let showingAll = false;
-        let unsubscribeArchives = null;
+        let currentSearch = '';
+        let currentLightboxIndex = 0;
+        let filteredArchives = [];
+        let lastDoc = null;
+        let isLoading = false;
+        const PAGE_SIZE = 24;
 
         const categoryConfig = {
-            'children': { label: 'الأطفال', class: 'cat-children', icon: 'fa-child' },
-            'events': { label: 'مناسبة', class: 'cat-events', icon: 'fa-calendar-alt' },
-            'achievements': { label: 'إنجاز', class: 'cat-achievements', icon: 'fa-trophy' },
-            'people': { label: 'شخصية', class: 'cat-people', icon: 'fa-user-tie' },
-            'houses': { label: 'منزل عريق', class: 'cat-houses', icon: 'fa-home' },
-            'shops': { label: 'محل', class: 'cat-shops', icon: 'fa-store' }
+            'children': { label: 'أطفال', class: 'cat-children' },
+            'events': { label: 'مناسبة', class: 'cat-events' },
+            'achievements': { label: 'إنجاز', class: 'cat-achievements' },
+            'people': { label: 'شخصية', class: 'cat-people' },
+            'houses': { label: 'منزل', class: 'cat-houses' },
+            'shops': { label: 'محل', class: 'cat-shops' }
         };
 
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return dateStr;
-            return date.toLocaleDateString('ar-SD', { year: 'numeric', month: 'long', day: 'numeric' });
-        }
-
-        function formatRelativeDate(dateStr) {
-            if (!dateStr) return '';
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return dateStr;
-            const now = new Date();
-            const diffMs = now - date;
-            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            if (diffDays === 0) return 'اليوم';
-            if (diffDays === 1) return 'أمس';
-            if (diffDays < 7) return `قبل ${diffDays} أيام`;
-            if (diffDays < 30) return `قبل ${Math.floor(diffDays / 7)} أسابيع`;
-            return date.toLocaleDateString('ar-SD', { year: 'numeric', month: 'short', day: 'numeric' });
-        }
+        // Lazy load images
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.onload = () => img.classList.add('loaded');
+                    observer.unobserve(img);
+                }
+            });
+        }, { rootMargin: '50px' });
 
         async function loadArchives() {
             try {
-                const archivesQuery = query(collection(db, 'archives'), orderBy('createdAt', 'desc'), limit(100));
-                unsubscribeArchives = onSnapshot(archivesQuery, (snapshot) => {
-                    allArchives = [];
-                    snapshot.forEach((doc) => { allArchives.push({ id: doc.id, ...doc.data() }); });
-                    hideLoading();
-                    renderArchives(allArchives);
-                }, (error) => { console.error('Error:', error); fallbackLoad(); });
-            } catch (error) { console.error('Critical Error:', error); hideLoading(); }
-        }
-
-        async function fallbackLoad() {
-            try {
-                const q = query(collection(db, 'archives'), limit(100));
+                const q = query(collection(db, 'archives'), orderBy('createdAt', 'desc'), limit(PAGE_SIZE));
                 const snapshot = await getDocs(q);
                 allArchives = [];
-                snapshot.forEach((doc) => { allArchives.push({ id: doc.id, ...doc.data() }); });
-                hideLoading();
-                renderArchives(allArchives);
-            } catch (err) { console.error('Fallback failed:', err); hideLoading(); document.getElementById('archiveCount').textContent = 'خطأ في الاتصال'; }
+                snapshot.forEach(doc => { allArchives.push({ id: doc.id, ...doc.data() }); });
+                if (allArchives.length > 0) lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                filterAndRender();
+            } catch (e) { console.error(e); showError(); }
         }
 
-        function hideLoading() {
-            document.getElementById('loadingState').classList.add('hidden');
-            document.getElementById('archiveGrid').classList.remove('hidden');
+        async function loadMore() {
+            if (isLoading || !lastDoc) return;
+            isLoading = true;
+            document.getElementById('loadMoreSpinner').classList.remove('hidden');
+            document.getElementById('loadMoreBtn').disabled = true;
+
+            try {
+                const q = query(collection(db, 'archives'), orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(PAGE_SIZE));
+                const snapshot = await getDocs(q);
+                const newArchives = [];
+                snapshot.forEach(doc => { newArchives.push({ id: doc.id, ...doc.data() }); });
+                if (newArchives.length > 0) {
+                    allArchives = [...allArchives, ...newArchives];
+                    lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                }
+                filterAndRender(true);
+            } catch (e) { console.error(e); }
+
+            isLoading = false;
+            document.getElementById('loadMoreSpinner').classList.add('hidden');
+            document.getElementById('loadMoreBtn').disabled = false;
         }
 
-        function buildCardHTML(archive) {
-            const cat = categoryConfig[archive.category] || { label: 'عام', class: 'cat-children', icon: 'fa-image' };
-            const image = archive.images && archive.images.length > 0 ? archive.images[0] : (archive.mainImage || 'https://via.placeholder.com/400?text=No+Image');
-            const names = archive.names || archive.name || 'بدون اسم';
-            const desc = archive.description || '';
-            const uploader = archive.uploaderName || archive.userName || 'مجهول';
-            const date = formatRelativeDate(archive.createdAt);
-            const fullDate = formatDate(archive.createdAt);
-            const eventDate = archive.eventDate ? formatDate(archive.eventDate) : null;
-
-            return `
-                <div class="archive-card" onclick="openArchiveModal('${archive.id}')">
-                    <div class="card-image-area">
-                        <img src="${image}" alt="${names}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400?text=No+Image';">
-                        <span class="card-category-badge ${cat.class}"><i class="fas ${cat.icon} ml-1"></i> ${cat.label}</span>
-                        <span class="card-date-badge"><i class="far fa-clock ml-1"></i> ${date}</span>
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">${names}</h3>
-                        <p class="card-desc">${desc}</p>
-                        <div class="card-footer">
-                            <div class="card-uploader">
-                                <div class="card-uploader-avatar"><i class="fas fa-user"></i></div>
-                                <div>
-                                    <span class="card-uploader-name">${uploader}</span>
-                                    ${eventDate ? `<span class="card-date">${eventDate}</span>` : `<span class="card-date">${fullDate}</span>`}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+        function filterArchives() {
+            currentSearch = document.getElementById('searchInput').value.toLowerCase().trim();
+            filterAndRender();
         }
 
-        window.renderArchives = function(archives) {
-            const grid = document.getElementById('archiveGrid');
-            const allGrid = document.getElementById('allArchivesGrid');
-            const noResults = document.getElementById('noResults');
-            const countEl = document.getElementById('archiveCount');
-            const viewAllContainer = document.getElementById('viewAllContainer');
+        function filterAndRender(append = false) {
+            filteredArchives = allArchives.filter(a => {
+                const matchesSearch = !currentSearch ||
+                    (a.names || a.name || '').toLowerCase().includes(currentSearch) ||
+                    (a.description || '').toLowerCase().includes(currentSearch);
+                const matchesCategory = !currentCategory || a.category === currentCategory;
+                return matchesSearch && matchesCategory;
+            });
 
-            countEl.textContent = archives.length + ' صورة/مادة';
+            document.getElementById('totalCount').textContent = filteredArchives.length + ' صورة';
 
-            if (archives.length === 0) {
-                grid.innerHTML = '';
-                allGrid.innerHTML = '';
-                allGrid.classList.add('hidden');
-                viewAllContainer.classList.add('hidden');
-                noResults.classList.remove('hidden');
+            if (filteredArchives.length === 0) {
+                document.getElementById('photoGrid').innerHTML = '';
+                document.getElementById('noResults').classList.remove('hidden');
+                document.getElementById('loadMoreContainer').classList.add('hidden');
                 return;
             }
 
-            noResults.classList.add('hidden');
+            document.getElementById('noResults').classList.add('hidden');
+            renderGrid(filteredArchives, append);
 
-            const featured = archives.slice(0, 10);
-            grid.innerHTML = featured.map(archive => buildCardHTML(archive)).join('');
+            // Show load more if we have more in allArchives than filtered
+            const hasMore = allArchives.length >= PAGE_SIZE && lastDoc != null;
+            document.getElementById('loadMoreContainer').classList.toggle('hidden', !hasMore);
+        }
 
-            if (archives.length > 10) {
-                viewAllContainer.classList.remove('hidden');
-            } else {
-                viewAllContainer.classList.add('hidden');
-            }
+        function renderGrid(archives, append) {
+            const grid = document.getElementById('photoGrid');
+            if (!append) grid.innerHTML = '';
 
-            if (showingAll) {
-                allGrid.classList.remove('hidden');
-                allGrid.innerHTML = `<div class="grid grid-cols-1 gap-4">${archives.map(archive => buildCardHTML(archive)).join('')}</div>`;
-            } else {
-                allGrid.classList.add('hidden');
-            }
-        };
+            archives.forEach((archive, idx) => {
+                const image = archive.images && archive.images.length > 0
+                    ? archive.images[0]
+                    : (archive.mainImage || 'https://via.placeholder.com/400?text=No+Image');
+                const cat = categoryConfig[archive.category] || { label: '', class: '' };
+                const names = archive.names || archive.name || '';
 
-        window.showAllArchives = function() {
-            showingAll = true;
-            const allGrid = document.getElementById('allArchivesGrid');
-            allGrid.classList.remove('hidden');
-            allGrid.innerHTML = `<div class="grid grid-cols-1 gap-4">${allArchives.map(archive => buildCardHTML(archive)).join('')}</div>`;
-            document.getElementById('viewAllContainer').classList.add('hidden');
-            setTimeout(() => { allGrid.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-        };
+                const div = document.createElement('div');
+                div.className = 'photo-item';
+                div.onclick = () => openLightbox(archive.id);
+                div.innerHTML = `
+                    <img data-src="${image}" alt="${names}" loading="lazy">
+                    <div class="photo-overlay">
+                        ${cat.label ? `<span class="category-badge ${cat.class}">${cat.label}</span>` : ''}
+                        ${names ? `<span class="names">${names}</span>` : ''}
+                    </div>
+                `;
+                grid.appendChild(div);
+
+                // Observe for lazy loading
+                const img = div.querySelector('img');
+                imageObserver.observe(img);
+            });
+        }
 
         window.setCategoryFilter = function(category) {
             currentCategory = category;
-            showingAll = false;
-            document.querySelectorAll('#categoryFilters .filter-chip').forEach(btn => {
-                if (btn.dataset.category === category) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === category);
             });
-            filterArchives();
+            filterAndRender();
         };
 
-        window.filterArchives = function() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allArchives.filter(archive => {
-                const matchesSearch = !searchTerm || 
-                    (archive.names || archive.name || '').toLowerCase().includes(searchTerm) ||
-                    (archive.description || '').toLowerCase().includes(searchTerm) ||
-                    (archive.uploaderName || archive.userName || '').toLowerCase().includes(searchTerm) ||
-                    (archive.eventDate || '').includes(searchTerm);
-                const matchesCategory = !currentCategory || archive.category === currentCategory;
-                return matchesSearch && matchesCategory;
-            });
-            renderArchives(filtered);
-        };
+        window.loadMore = loadMore;
 
-        let galleryState = { current: 0, total: 0 };
-
-        window.openArchiveModal = function(archiveId) {
-            const archive = allArchives.find(a => a.id === archiveId);
+        // Lightbox
+        window.openLightbox = function(archiveId) {
+            const archive = filteredArchives.find(a => a.id === archiveId);
             if (!archive) return;
-            currentArchiveId = archiveId;
+            currentLightboxIndex = filteredArchives.findIndex(a => a.id === archiveId);
+            updateLightbox();
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
 
-            const cat = categoryConfig[archive.category] || { label: 'عام', class: 'cat-children', icon: 'fa-image' };
-            const images = archive.images || [];
-            const hasImages = images.length > 0;
-            const mainImage = archive.mainImage || (images.length > 0 ? images[0] : 'https://via.placeholder.com/400?text=No+Image');
-            const names = archive.names || archive.name || 'بدون اسم';
-            const desc = archive.description || 'لا يوجد وصف';
-            const uploader = archive.uploaderName || archive.userName || 'مجهول';
-            const date = formatDate(archive.createdAt);
-            const eventDate = archive.eventDate ? formatDate(archive.eventDate) : null;
+        function updateLightbox() {
+            const archive = filteredArchives[currentLightboxIndex];
+            if (!archive) return;
 
-            const modal = document.getElementById('archiveModal');
-            const content = document.getElementById('modalContent');
+            const image = archive.images && archive.images.length > 0
+                ? archive.images[0]
+                : (archive.mainImage || '');
+            const cat = categoryConfig[archive.category] || { label: '', class: '' };
 
-            let galleryHtml = '';
-            if (hasImages && images.length > 1) {
-                galleryState.total = images.length;
-                galleryState.current = 0;
-                galleryHtml = `
-                    <div class="gallery-wrapper" id="galleryWrapper">
-                        <div class="gallery-track" id="galleryTrack">
-                            ${images.map((img, idx) => `
-                                <div class="gallery-slide">
-                                    <img src="${img}" alt="صورة ${idx + 1}" onerror="this.style.display='none'" style="max-width:100%;max-height:100%;object-fit:contain;">
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button class="gallery-nav prev" onclick="moveGallery(-1)"><i class="fas fa-chevron-right text-slate-600"></i></button>
-                        <button class="gallery-nav next" onclick="moveGallery(1)"><i class="fas fa-chevron-left text-slate-600"></i></button>
-                        <div class="gallery-dots" id="galleryDots">
-                            ${images.map((_, i) => `<div class="gallery-dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></div>`).join('')}
-                        </div>
-                    </div>
-                `;
-            } else {
-                galleryHtml = `<div class="aspect-[4/3] bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-8"><img src="${mainImage}" class="max-h-72 object-contain drop-shadow-xl" onerror="this.src='https://via.placeholder.com/400?text=No+Image'"></div>`;
-            }
+            document.getElementById('lightboxImg').src = image;
+            document.getElementById('lightboxCounter').textContent = (currentLightboxIndex + 1) + ' / ' + filteredArchives.length;
+            document.getElementById('lightboxNames').textContent = archive.names || archive.name || '';
+            document.getElementById('lightboxDesc').textContent = archive.description || '';
 
-            const similar = allArchives.filter(a => a.id !== archiveId && a.category === archive.category).slice(0, 6);
+            const catBadge = document.getElementById('lightboxCategory');
+            catBadge.textContent = cat.label;
+            catBadge.className = 'category-badge mb-2 ' + cat.class;
 
-            const similarHtml = similar.length > 0 ? `
-                <div class="mt-6 pt-5 border-t border-slate-200">
-                    <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-sm">
-                        <i class="fas fa-images text-blue-900"></i> ${cat.label} أخرى
-                    </h3>
-                    <div class="horizontal-scroll pb-2">
-                        ${similar.map(a => {
-                            const simImg = a.images && a.images.length > 0 ? a.images[0] : (a.mainImage || 'https://via.placeholder.com/150?text=No+Image');
-                            const simNames = a.names || a.name || 'بدون اسم';
-                            const simCat = categoryConfig[a.category] || { label: 'عام', color: '#1e3a5f' };
-                            return `
-                                <div class="similar-card" onclick="switchToArchive('${a.id}')" style="min-width:150px;max-width:150px;flex-shrink:0;background:white;border-radius:20px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:pointer;border:1px solid #f1f5f9;scroll-snap-align:start;">
-                                    <div style="height:120px;background:linear-gradient(135deg,#f8fafc,#f1f5f9);display:flex;align-items:center;justify-content:center;padding:12px;">
-                                        <img src="${simImg}" style="max-width:100%;max-height:100%;object-fit:cover;border-radius:12px;" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-                                    </div>
-                                    <div style="padding:10px 12px 12px;">
-                                        <div class="flex items-center gap-1 mb-1">
-                                            <span style="width:6px;height:6px;border-radius:50%;background:${simCat.color || '#1e3a5f'};"></span>
-                                            <span class="text-[9px] font-bold text-slate-500">${simCat.label}</span>
-                                        </div>
-                                        <p style="font-size:12px;font-weight:800;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;">${simNames}</p>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                </div>
-            ` : '';
+            const date = archive.eventDate
+                ? new Date(archive.eventDate).toLocaleDateString('ar-SD')
+                : (archive.createdAt ? new Date(archive.createdAt).toLocaleDateString('ar-SD') : '');
+            const uploader = archive.uploaderName || archive.userName || 'زائر';
+            document.getElementById('lightboxMeta').textContent = (date ? date + ' • ' : '') + uploader;
+        }
 
-            content.innerHTML = `
-                ${galleryHtml}
-                <div class="p-5">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="${cat.class} text-white px-3 py-1 rounded-lg text-xs font-bold"><i class="fas ${cat.icon} ml-1"></i> ${cat.label}</span>
-                    </div>
-                    <h2 class="text-xl font-bold text-slate-900 mb-2">${names}</h2>
-                    <p class="text-slate-500 text-sm mb-4 leading-relaxed">${desc}</p>
-                    <div class="space-y-2 mb-5">
-                        ${eventDate ? `<div class="feature-item"><div class="feature-icon bg-amber-100 text-amber-600"><i class="fas fa-calendar-alt"></i></div><div><p class="text-xs text-slate-500">تاريخ المناسبة</p><p class="font-bold text-slate-900">${eventDate}</p></div></div>` : ''}
-                        <div class="feature-item"><div class="feature-icon bg-blue-100 text-blue-600"><i class="fas fa-user"></i></div><div><p class="text-xs text-slate-500">أضافها</p><p class="font-bold text-slate-900">${uploader}</p></div></div>
-                        <div class="feature-item"><div class="feature-icon bg-slate-100 text-slate-600"><i class="fas fa-clock"></i></div><div><p class="text-xs text-slate-500">تاريخ الإضافة</p><p class="font-bold text-slate-900">${date}</p></div></div>
-                        ${archive.eventDate ? `<div class="feature-item"><div class="feature-icon bg-green-100 text-green-600"><i class="fas fa-calendar-check"></i></div><div><p class="text-xs text-slate-500">تاريخ الحدث</p><p class="font-bold text-slate-900">${formatDate(archive.eventDate)}</p></div></div>` : ''}
-                        ${archive.extraInfo ? `<div class="feature-item"><div class="feature-icon bg-purple-100 text-purple-600"><i class="fas fa-info-circle"></i></div><div><p class="text-xs text-slate-500">معلومات إضافية</p><p class="font-bold text-slate-900">${archive.extraInfo}</p></div></div>` : ''}
-                    </div>
-                    ${similarHtml}
+        window.navigateLightbox = function(dir) {
+            currentLightboxIndex = (currentLightboxIndex + dir + filteredArchives.length) % filteredArchives.length;
+            updateLightbox();
+        };
+
+        window.closeLightbox = function(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        // Keyboard nav
+        document.addEventListener('keydown', e => {
+            if (!document.getElementById('lightbox').classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') navigateLightbox(-1);
+            if (e.key === 'ArrowLeft') navigateLightbox(1);
+        });
+
+        // Infinite scroll
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !isLoading) loadMore();
+            });
+        }, { rootMargin: '200px' });
+
+        function showError() {
+            document.getElementById('photoGrid').innerHTML = `
+                <div class="col-span-3 text-center py-12 text-white/40">
+                    <i class="fas fa-exclamation-circle text-3xl mb-3"></i>
+                    <p>خطأ في تحميل الصور</p>
                 </div>
             `;
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-
-            if (hasImages && images.length > 1) {
-                startAutoGallery(images.length);
-            }
-        };
-
-        function startAutoGallery(total) {
-            if (galleryInterval) clearInterval(galleryInterval);
-            galleryState.current = 0;
-            galleryState.total = total;
-            updateGallery();
-            galleryInterval = setInterval(() => {
-                galleryState.current = (galleryState.current + 1) % total;
-                updateGallery();
-            }, 4000);
         }
 
-        window.moveGallery = function(dir) {
-            if (galleryState.total <= 1) return;
-            galleryState.current = (galleryState.current + dir + galleryState.total) % galleryState.total;
-            updateGallery();
-        };
-
-        window.goToSlide = function(index) {
-            galleryState.current = index;
-            updateGallery();
-        };
-
-        function updateGallery() {
-            const track = document.getElementById('galleryTrack');
-            const dots = document.querySelectorAll('.gallery-dot');
-            if (track) {
-                track.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-                track.style.transform = `translateX(-${galleryState.current * 100}%)`;
-            }
-            dots.forEach((dot, i) => { dot.classList.toggle('active', i === galleryState.current); });
-        }
-
-        window.switchToArchive = function(archiveId) {
-            closeModal();
-            setTimeout(() => openArchiveModal(archiveId), 350);
-        };
-
-        window.closeModal = function() {
-            if (galleryInterval) { clearInterval(galleryInterval); galleryInterval = null; }
-            document.getElementById('archiveModal').classList.add('hidden');
-            document.body.style.overflow = '';
-            currentArchiveId = null;
-        };
-
-        window.showNotifications = function() { alert('سيتم فتح الإشعارات قريباً!'); };
-        window.showAbout = function() { 
-            alert('أرشيف الشبطاب\n\nنحفظ ذكرياتنا وتاريخنا للأجيال القادمة\n\nإعداد: سليمان صلاح الدين محمد'); 
-        };
-
-        document.addEventListener('DOMContentLoaded', () => { loadArchives(); });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-        window.addEventListener('beforeunload', () => { if (unsubscribeArchives) unsubscribeArchives(); if (galleryInterval) clearInterval(galleryInterval); });
+        document.addEventListener('DOMContentLoaded', () => {
+            loadArchives();
+            // Observe load more button for infinite scroll
+            scrollObserver.observe(document.getElementById('loadMoreBtn'));
+        });
     </script>
 </body>
 </html>
