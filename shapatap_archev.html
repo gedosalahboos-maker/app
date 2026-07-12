@@ -7,165 +7,70 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            onAuthStateChanged,
-            updateProfile,
-            signInAnonymously
-        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            serverTimestamp,
-            setDoc,
-            doc,
-            getDocs,
-            query,
-            orderBy
-        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
-            authDomain: "phone-soug.firebaseapp.com",
-            databaseURL: "https://phone-soug-default-rtdb.firebaseio.com",
-            projectId: "phone-soug",
-            storageBucket: "phone-soug.firebasestorage.app",
-            messagingSenderId: "224588578227",
-            appId: "1:224588578227:web:f3127dfbea31a77d521fc6",
-            measurementId: "G-S87955B526"
-        };
-
-        const firebaseApp = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(firebaseApp);
-        const auth = getAuth(firebaseApp);
-        const db = getFirestore(firebaseApp);
-
-        window.firebaseApp = firebaseApp;
-        window.firebaseAuth = auth;
-        window.firebaseDb = db;
-        window.firebaseAuthFns = { 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            onAuthStateChanged,
-            updateProfile,
-            signInAnonymously
-        };
-        window.firebaseFirestoreFns = { 
-            collection, 
-            addDoc, 
-            serverTimestamp,
-            setDoc,
-            doc,
-            getDocs,
-            query,
-            orderBy
-        };
-
-        console.log("✅ Firebase تم تهيئتها بنجاح");
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, setDoc, doc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        const firebaseConfig = { apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c", authDomain: "phone-soug.firebaseapp.com", databaseURL: "https://phone-soug-default-rtdb.firebaseio.com", projectId: "phone-soug", storageBucket: "phone-soug.firebasestorage.app", messagingSenderId: "224588578227", appId: "1:224588578227:web:f3127dfbea31a77d521fc6", measurementId: "G-S87955B526" };
+        const firebaseApp = initializeApp(firebaseConfig); const analytics = getAnalytics(firebaseApp); const auth = getAuth(firebaseApp); const db = getFirestore(firebaseApp);
+        window.firebaseApp = firebaseApp; window.firebaseAuth = auth; window.firebaseDb = db;
+        window.firebaseAuthFns = { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, signInAnonymously };
+        window.firebaseFirestoreFns = { collection, addDoc, serverTimestamp, setDoc, doc, getDocs, query, orderBy };
+        console.log("Firebase initialized");
     </script>
-
     <style>
         * { font-family: 'Cairo', sans-serif; }
-        .input-field:focus { box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1); }
+        .input-field:focus { box-shadow: 0 0 0 3px rgba(30,58,95,0.1); }
         .radio-card { transition: all 0.2s ease; cursor: pointer; }
         .radio-card:hover { border-color: #1e3a5f; }
         .radio-card.selected { border-color: #1e3a5f; background: #eff6ff; }
         .step-content { display: none; }
         .step-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         .progress-line { transition: width 0.5s ease; }
-        .image-preview { transition: all 0.3s ease; }
-        .image-preview:hover { transform: scale(1.02); }
-        .custom-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: left 1rem center;
-            background-size: 1.5rem;
-        }
         .auth-tab { cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; }
         .auth-tab.active { border-bottom-color: #1e3a5f; color: #1e3a5f; font-weight: 700; }
         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #1e3a5f; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .upload-progress { width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; margin-top: 8px; }
-        .upload-progress-bar { height: 100%; background: #1e3a5f; transition: width 0.3s ease; }
-        .toast {
-            position: fixed; bottom: 20px; left: 20px; padding: 16px 20px;
-            background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            display: flex; align-items: center; gap: 12px; max-width: 400px; z-index: 1000;
-            animation: slideIn 0.3s ease;
-        }
+        .toast { position: fixed; bottom: 20px; left: 20px; padding: 16px 20px; background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; max-width: 400px; z-index: 1000; animation: slideIn 0.3s ease; }
         .toast.error { border-left: 4px solid #ef4444; }
         .toast.success { border-left: 4px solid #10b981; }
         .toast.warning { border-left: 4px solid #f59e0b; }
         @keyframes slideIn { from { transform: translateX(-400px); } to { transform: translateX(0); } }
-        .color-option { transition: all 0.2s; cursor: pointer; border: 2px solid transparent; }
-        .color-option:hover { transform: scale(1.05); }
-        .color-option.selected { border-color: #1e3a5f; box-shadow: 0 0 0 2px #eff6ff; }
-        .loading-skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .drop-zone { border: 2px dashed #cbd5e1; border-radius: 20px; transition: all 0.3s ease; }
         .drop-zone:hover, .drop-zone.dragover { border-color: #1e3a5f; background: #eff6ff; }
         .image-preview-item { position: relative; border-radius: 16px; overflow: hidden; aspect-ratio: 4/3; }
         .image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
-        .image-preview-item .remove-btn {
-            position: absolute; top: 8px; left: 8px;
-            width: 32px; height: 32px; background: rgba(239,68,68,0.9);
-            color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; opacity: 0; transition: opacity 0.2s;
-        }
+        .image-preview-item .remove-btn { position: absolute; top: 8px; left: 8px; width: 32px; height: 32px; background: rgba(239,68,68,0.9); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
         .image-preview-item:hover .remove-btn { opacity: 1; }
-        .image-preview-item .main-badge {
-            position: absolute; top: 8px; right: 8px;
-            background: #1e3a5f; color: white; padding: 4px 10px;
-            border-radius: 10px; font-size: 10px; font-weight: 800;
-        }
-        .category-card {
-            border: 2px solid #e2e8f0; border-radius: 20px; padding: 20px;
-            text-align: center; cursor: pointer; transition: all 0.2s;
-        }
+        .image-preview-item .main-badge { position: absolute; top: 8px; right: 8px; background: #1e3a5f; color: white; padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 800; }
+        .image-preview-item .photo-date-badge { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+        .category-card { border: 2px solid #e2e8f0; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
         .category-card:hover { border-color: #1e3a5f; background: #f8fafc; }
         .category-card.selected { border-color: #1e3a5f; background: #eff6ff; }
-        .category-card .cat-icon {
-            width: 56px; height: 56px; border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 12px; font-size: 24px;
-        }
+        .category-card .cat-icon { width: 56px; height: 56px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
-
-    <!-- Navigation Bar -->
     <nav class="bg-white border-b border-slate-200 sticky top-0 z-40">
         <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2 text-slate-600 hover:text-blue-900 transition-colors">
-                <i class="fas fa-arrow-right"></i>
-                <span class="font-semibold">رجوع للأرشيف</span>
+                <i class="fas fa-arrow-right"></i><span class="font-semibold">رجوع للأرشيف</span>
             </a>
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-900 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-landmark text-white text-sm"></i>
-                </div>
+                <div class="w-8 h-8 bg-blue-900 rounded-lg flex items-center justify-center"><i class="fas fa-landmark text-white text-sm"></i></div>
                 <h1 class="font-bold text-lg text-slate-900">إضافة للأرشيف</h1>
             </div>
             <div class="w-20"></div>
         </div>
     </nav>
 
-    <!-- Progress Bar -->
     <div class="bg-white border-b border-slate-200 py-6" id="progressBar">
         <div class="max-w-3xl mx-auto px-4">
             <div class="flex items-center justify-between relative">
                 <div class="absolute top-1/2 left-0 right-0 h-1 bg-slate-200 -translate-y-1/2 z-0"></div>
                 <div id="progressFill" class="absolute top-1/2 right-0 h-1 bg-blue-900 -translate-y-1/2 z-0 progress-line" style="width: 0%"></div>
-
                 <div class="step-indicator relative z-10 flex flex-col items-center" data-step="1">
                     <div class="w-10 h-10 rounded-full bg-blue-900 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow">1</div>
                     <span class="text-xs font-semibold mt-2 text-blue-900">التصنيف</span>
@@ -190,14 +95,11 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <main class="max-w-2xl mx-auto px-4 py-8" id="mainContent">
-
-        <!-- Step 1: Category Selection -->
+        <!-- Step 1 -->
         <div id="step-1" class="step-content active">
             <h2 class="text-xl font-bold text-slate-900 mb-2">اختر التصنيف</h2>
             <p class="text-slate-500 mb-6 text-sm">حدد نوع المحتوى الذي تريد إضافته للأرشيف</p>
-
             <form onsubmit="handleCategorySubmit(); return false;">
                 <div class="grid grid-cols-2 gap-3 mb-8">
                     <label class="category-card" onclick="selectCategory(this, 'children')">
@@ -206,35 +108,30 @@
                         <p class="font-bold text-slate-900">الأطفال</p>
                         <p class="text-xs text-slate-500 mt-1">صور الأطفال والمواليد</p>
                     </label>
-
                     <label class="category-card" onclick="selectCategory(this, 'events')">
                         <input type="radio" name="category" value="events" class="hidden">
                         <div class="cat-icon bg-pink-100 text-pink-600"><i class="fas fa-calendar-alt"></i></div>
                         <p class="font-bold text-slate-900">المناسبات</p>
                         <p class="text-xs text-slate-500 mt-1">أعراس، أعياد، ولائم</p>
                     </label>
-
                     <label class="category-card" onclick="selectCategory(this, 'achievements')">
                         <input type="radio" name="category" value="achievements" class="hidden">
                         <div class="cat-icon bg-green-100 text-green-600"><i class="fas fa-trophy"></i></div>
                         <p class="font-bold text-slate-900">الإنجازات</p>
                         <p class="text-xs text-slate-500 mt-1">شهادات، ترقيات، مشاريع</p>
                     </label>
-
                     <label class="category-card" onclick="selectCategory(this, 'people')">
                         <input type="radio" name="category" value="people" class="hidden">
                         <div class="cat-icon bg-blue-100 text-blue-600"><i class="fas fa-user-tie"></i></div>
                         <p class="font-bold text-slate-900">الشخصيات</p>
                         <p class="text-xs text-slate-500 mt-1">كبار السن، مشايخ، معلمين</p>
                     </label>
-
                     <label class="category-card" onclick="selectCategory(this, 'houses')">
                         <input type="radio" name="category" value="houses" class="hidden">
                         <div class="cat-icon bg-purple-100 text-purple-600"><i class="fas fa-home"></i></div>
                         <p class="font-bold text-slate-900">المنازل العريقة</p>
                         <p class="text-xs text-slate-500 mt-1">بيوت تراثية وتاريخية</p>
                     </label>
-
                     <label class="category-card" onclick="selectCategory(this, 'shops')">
                         <input type="radio" name="category" value="shops" class="hidden">
                         <div class="cat-icon bg-cyan-100 text-cyan-600"><i class="fas fa-store"></i></div>
@@ -242,279 +139,165 @@
                         <p class="text-xs text-slate-500 mt-1">محال تجارية قديمة وجديدة</p>
                     </label>
                 </div>
-
                 <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-4 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-lg">
-                    التالي
-                    <i class="fas fa-arrow-left"></i>
+                    التالي <i class="fas fa-arrow-left"></i>
                 </button>
             </form>
         </div>
 
-        <!-- Step 2: Images Upload -->
+        <!-- Step 2 -->
         <div id="step-2" class="step-content">
             <h2 class="text-xl font-bold text-slate-900 mb-2">صور المحتوى</h2>
             <p class="text-slate-500 mb-6 text-sm">أضف صوراً توثيقية. <span class="text-blue-900 font-bold">الصورة الأولى ستكون الرئيسية</span></p>
-
             <form onsubmit="handleImagesSubmit(); return false;">
-                <div id="dropZone" class="drop-zone p-8 text-center mb-6 cursor-pointer"
-                    onclick="document.getElementById('imageInput').click()"
-                    ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                <div id="dropZone" class="drop-zone p-8 text-center mb-6 cursor-pointer" onclick="document.getElementById('imageInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
                     <input type="file" id="imageInput" multiple accept="image/*" class="hidden" onchange="handleImages(this.files)">
                     <div id="uploadPrompt">
-                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-camera text-2xl text-blue-900"></i>
-                        </div>
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-camera text-2xl text-blue-900"></i></div>
                         <p class="font-semibold text-slate-700 mb-1">اضغط أو اسحب الصور هنا</p>
                         <p class="text-sm text-slate-500">يمكنك رفع حتى 5 صور</p>
-                        <p class="text-xs text-slate-400 mt-1">PNG, JPG - حتى 5MB لكل صورة</p>
+                        <p class="text-xs text-slate-400 mt-1">PNG, JPG - أي دقة</p>
                     </div>
                 </div>
-
                 <div id="imagePreview" class="grid grid-cols-2 gap-3 mb-6 hidden"></div>
-
                 <div class="flex items-center justify-between mb-6 bg-slate-50 rounded-xl p-4">
                     <span class="text-sm font-semibold text-slate-700">الصور المرفوعة:</span>
                     <span id="imageCount" class="text-lg font-bold text-blue-900">0/5</span>
                 </div>
-
                 <div class="flex gap-3">
-                    <button type="button" onclick="prevStep(1)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
-                        رجوع
-                    </button>
-                    <button type="submit" id="nextToDetails" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2" disabled>
-                        التالي
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
+                    <button type="button" onclick="prevStep(1)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">رجوع</button>
+                    <button type="submit" id="nextToDetails" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2" disabled>التالي <i class="fas fa-arrow-left"></i></button>
                 </div>
             </form>
         </div>
 
-        <!-- Step 3: Details -->
+        <!-- Step 3 -->
         <div id="step-3" class="step-content">
             <h2 class="text-xl font-bold text-slate-900 mb-2">تفاصيل المحتوى</h2>
             <p class="text-slate-500 mb-6 text-sm">أدخل المعلومات الأساسية عن المحتوى</p>
-
             <form onsubmit="handleDetailsSubmit(); return false;">
-                <!-- Selected Category Info -->
                 <div class="bg-blue-50 rounded-xl p-4 mb-6 flex items-center gap-4">
-                    <div id="selectedCategoryIcon" class="w-14 h-14 bg-white rounded-xl flex items-center justify-center text-2xl shadow-sm">
-                        📁
-                    </div>
+                    <div id="selectedCategoryIcon" class="w-14 h-14 bg-white rounded-xl flex items-center justify-center text-2xl shadow-sm">📁</div>
                     <div class="flex-1">
                         <p id="selectedCategoryName" class="font-bold text-slate-900">-</p>
                         <p class="text-xs text-slate-500">تم اختيار هذا التصنيف</p>
                     </div>
                     <button type="button" onclick="prevStep(1)" class="text-sm text-blue-900 font-semibold hover:underline">تغيير</button>
                 </div>
-
-                <!-- Names -->
                 <div class="mb-5">
                     <label class="block text-sm font-bold text-slate-700 mb-2">الاسم / الأسماء <span class="text-red-500">*</span></label>
-                    <input type="text" id="names" placeholder="مثال: محمد أحمد، فاطمة علي..."
-                        class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" required>
+                    <input type="text" id="names" placeholder="مثال: محمد أحمد، فاطمة علي..." class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" required>
                     <p class="text-xs text-slate-500 mt-1">يمكنك إدخال أكثر من اسم مفصول بفاصلة</p>
                 </div>
-
-                <!-- Description -->
                 <div class="mb-5">
                     <label class="block text-sm font-bold text-slate-700 mb-2">الوصف <span class="text-red-500">*</span></label>
-                    <textarea id="description" rows="4" placeholder="صف المحتوى بتفصيل..."
-                        class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 resize-none" required></textarea>
+                    <textarea id="description" rows="4" placeholder="صف المحتوى بتفصيل..." class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 resize-none" required></textarea>
                 </div>
-
-                <!-- Event Date (optional) -->
                 <div class="mb-5">
                     <label class="block text-sm font-bold text-slate-700 mb-2">تاريخ المناسبة / الحدث</label>
-                    <input type="date" id="eventDate"
-                        class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 text-left">
+                    <input type="date" id="eventDate" class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 text-left">
                     <p class="text-xs text-slate-500 mt-1">اختياري - إذا كانت الصورة لمناسبة محددة</p>
                 </div>
-
-                <!-- Additional Info -->
                 <div class="mb-5">
                     <label class="block text-sm font-bold text-slate-700 mb-2">معلومات إضافية</label>
-                    <textarea id="extraInfo" rows="2" placeholder="أي تفاصيل إضافية ترغب في إضافتها..."
-                        class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 resize-none"></textarea>
+                    <textarea id="extraInfo" rows="2" placeholder="أي تفاصيل إضافية ترغب في إضافتها..." class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 resize-none"></textarea>
                 </div>
-
                 <div class="flex gap-3">
-                    <button type="button" onclick="prevStep(2)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
-                        رجوع
-                    </button>
-                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
-                        التالي
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
+                    <button type="button" onclick="prevStep(2)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">رجوع</button>
+                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">التالي <i class="fas fa-arrow-left"></i></button>
                 </div>
             </form>
         </div>
 
-        <!-- Step 4: Uploader Info -->
+        <!-- Step 4 -->
         <div id="step-4" class="step-content">
             <h2 class="text-xl font-bold text-slate-900 mb-2">معلومات الناشر</h2>
             <p class="text-slate-500 mb-6 text-sm">من قام برفع هذا المحتوى للأرشيف؟</p>
-
             <form onsubmit="handleUploaderSubmit(); return false;">
-                <!-- Uploader Name (optional) -->
                 <div class="mb-5">
                     <label class="block text-sm font-bold text-slate-700 mb-2">اسم الناشر</label>
-                    <input type="text" id="uploaderName" placeholder="اسمك أو اسم الشخص الذي رفع الصورة"
-                        class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900">
+                    <input type="text" id="uploaderName" placeholder="اسمك أو اسم الشخص الذي رفع الصورة" class="input-field w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900">
                     <p class="text-xs text-slate-500 mt-1">اختياري - يمكن تركه فارغاً</p>
                 </div>
-
-                <!-- Contact (optional) -->
                 <div class="mb-5">
                     <label class="block text-sm font-bold text-slate-700 mb-2">رقم التواصل (اختياري)</label>
                     <div class="relative">
                         <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">+249</span>
-                        <input type="tel" id="contactPhone" placeholder="912345678" maxlength="9"
-                            class="input-field w-full pr-20 pl-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 text-left">
+                        <input type="tel" id="contactPhone" placeholder="912345678" maxlength="9" class="input-field w-full pr-20 pl-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 text-left">
                     </div>
                     <p class="text-xs text-slate-500 mt-1">للتواصل في حال وجود استفسارات عن المحتوى</p>
                 </div>
-
                 <div class="flex gap-3">
-                    <button type="button" onclick="prevStep(3)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
-                        رجوع
-                    </button>
-                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
-                        التالي
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
+                    <button type="button" onclick="prevStep(3)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">رجوع</button>
+                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">التالي <i class="fas fa-arrow-left"></i></button>
                 </div>
             </form>
         </div>
 
-        <!-- Step 5: Review & Publish -->
+        <!-- Step 5 -->
         <div id="step-5" class="step-content">
             <h2 class="text-xl font-bold text-slate-900 mb-2">مراجعة ونشر</h2>
             <p class="text-slate-500 mb-6 text-sm">تأكد من صحة المعلومات قبل النشر</p>
-
             <form onsubmit="publishArchive(event)">
-                <!-- Summary -->
                 <div class="bg-slate-100 rounded-xl p-4 mb-6 space-y-3">
                     <h3 class="font-bold text-slate-900 mb-3 text-sm">ملخص المحتوى</h3>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-slate-500">التصنيف:</span>
-                        <span id="summaryCategory" class="font-semibold text-slate-900">-</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-slate-500">الاسم/الأسماء:</span>
-                        <span id="summaryNames" class="font-semibold text-slate-900">-</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-slate-500">الوصف:</span>
-                        <span id="summaryDesc" class="font-semibold text-slate-900 text-right max-w-[60%]">-</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-slate-500">تاريخ الحدث:</span>
-                        <span id="summaryEventDate" class="font-semibold text-slate-900">-</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-slate-500">الناشر:</span>
-                        <span id="summaryUploader" class="font-semibold text-slate-900">-</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-slate-500">عدد الصور:</span>
-                        <span id="summaryImages" class="font-semibold text-blue-900">-</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-slate-500">تاريخ الإضافة:</span>
-                        <span id="summaryDate" class="font-semibold text-slate-900">-</span>
-                    </div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">التصنيف:</span><span id="summaryCategory" class="font-semibold text-slate-900">-</span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">الاسم/الأسماء:</span><span id="summaryNames" class="font-semibold text-slate-900">-</span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">الوصف:</span><span id="summaryDesc" class="font-semibold text-slate-900 text-right max-w-[60%]">-</span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">تاريخ الحدث:</span><span id="summaryEventDate" class="font-semibold text-slate-900">-</span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">الناشر:</span><span id="summaryUploader" class="font-semibold text-slate-900">-</span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">عدد الصور:</span><span id="summaryImages" class="font-semibold text-blue-900">-</span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-500">تاريخ الإضافة:</span><span id="summaryDate" class="font-semibold text-slate-900">-</span></div>
                 </div>
-
                 <div class="flex gap-3">
-                    <button type="button" onclick="prevStep(4)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">
-                        رجوع
-                    </button>
-                    <button type="submit" id="publishBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
-                        <span>نشر في الأرشيف</span><i class="fas fa-check"></i>
-                    </button>
+                    <button type="button" onclick="prevStep(4)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">رجوع</button>
+                    <button type="submit" id="publishBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"><span>نشر في الأرشيف</span><i class="fas fa-check"></i></button>
                 </div>
             </form>
         </div>
 
-        <!-- Auth Modal -->
+        <!-- Auth -->
         <div id="auth-step" class="hidden">
             <div class="text-center mb-8">
-                <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-user-lock text-3xl text-amber-600"></i>
-                </div>
+                <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-user-lock text-3xl text-amber-600"></i></div>
                 <h2 class="text-2xl font-bold text-slate-900 mb-2">أكمل إضافتك للأرشيف</h2>
                 <p class="text-slate-500">سجل دخول أو أنشئ حساباً لإتمام النشر. أو يمكنك النشر كزائر.</p>
             </div>
-
             <div class="flex border-b border-slate-200 mb-6">
                 <div class="auth-tab active flex-1 text-center py-3" onclick="switchAuthTab('guest')">نشر كزائر</div>
                 <div class="auth-tab flex-1 text-center py-3" onclick="switchAuthTab('login')">تسجيل الدخول</div>
                 <div class="auth-tab flex-1 text-center py-3" onclick="switchAuthTab('register')">حساب جديد</div>
             </div>
-
-            <!-- Guest Publish -->
             <div id="guestForm">
                 <div class="bg-blue-50 rounded-xl p-4 mb-6">
-                    <p class="text-sm text-slate-700 leading-relaxed">
-                        <i class="fas fa-info-circle text-blue-600 ml-1"></i>
-                        سيتم نشر المحتوى باسمك المذكور في حقل "الناشر". لا تحتاج لإنشاء حساب.
-                    </p>
+                    <p class="text-sm text-slate-700 leading-relaxed"><i class="fas fa-info-circle text-blue-600 ml-1"></i> سيتم نشر المحتوى باسمك المذكور في حقل "الناشر". لا تحتاج لإنشاء حساب.</p>
                 </div>
-                <button onclick="finalizePublishAsGuest()" id="guestPublishBtn" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors mb-4 flex items-center justify-center gap-2">
-                    <span>نشر كزائر</span>
-                </button>
+                <button onclick="finalizePublishAsGuest()" id="guestPublishBtn" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors mb-4 flex items-center justify-center gap-2"><span>نشر كزائر</span></button>
                 <button type="button" onclick="backToAd()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">رجوع للمراجعة</button>
             </div>
-
             <div id="loginForm" class="hidden">
                 <form onsubmit="handleLogin(event)">
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
-                        <input type="email" id="loginEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 text-left" placeholder="example@email.com" required>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label>
-                        <input type="password" id="loginPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" minlength="6" required>
-                    </div>
-                    <button type="submit" id="loginSubmitBtn" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors mb-4 flex items-center justify-center gap-2">
-                        <span>تسجيل الدخول ونشر</span>
-                    </button>
+                    <div class="mb-4"><label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label><input type="email" id="loginEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 text-left" placeholder="example@email.com" required></div>
+                    <div class="mb-6"><label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label><input type="password" id="loginPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" minlength="6" required></div>
+                    <button type="submit" id="loginSubmitBtn" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition-colors mb-4 flex items-center justify-center gap-2"><span>تسجيل الدخول ونشر</span></button>
                     <button type="button" onclick="backToAd()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">رجوع للمراجعة</button>
                 </form>
             </div>
-
             <div id="registerForm" class="hidden">
                 <form onsubmit="handleRegister(event)">
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label>
-                        <input type="text" id="regName" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label>
-                        <input type="email" id="regEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 text-left" placeholder="example@email.com" required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label>
-                        <input type="password" id="regPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" minlength="6" required>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">تأكيد كلمة المرور</label>
-                        <input type="password" id="regPasswordConfirm" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" minlength="6" required>
-                        <p id="passwordMatchError" class="text-sm text-red-500 mt-2 hidden">كلمتا المرور غير متطابقتين</p>
-                    </div>
-                    <button type="submit" id="registerSubmitBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition-colors mb-4 flex items-center justify-center gap-2">
-                        <span>إنشاء حساب ونشر</span>
-                    </button>
+                    <div class="mb-4"><label class="block text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label><input type="text" id="regName" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" required></div>
+                    <div class="mb-4"><label class="block text-sm font-bold text-slate-700 mb-2">البريد الإلكتروني</label><input type="email" id="regEmail" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900 text-left" placeholder="example@email.com" required></div>
+                    <div class="mb-4"><label class="block text-sm font-bold text-slate-700 mb-2">كلمة المرور</label><input type="password" id="regPassword" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" minlength="6" required></div>
+                    <div class="mb-6"><label class="block text-sm font-bold text-slate-700 mb-2">تأكيد كلمة المرور</label><input type="password" id="regPasswordConfirm" class="input-field w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-900" minlength="6" required><p id="passwordMatchError" class="text-sm text-red-500 mt-2 hidden">كلمتا المرور غير متطابقتين</p></div>
+                    <button type="submit" id="registerSubmitBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition-colors mb-4 flex items-center justify-center gap-2"><span>إنشاء حساب ونشر</span></button>
                     <button type="button" onclick="backToAd()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">رجوع للمراجعة</button>
                 </form>
             </div>
         </div>
 
-        <!-- Success Screen -->
+        <!-- Success -->
         <div id="final-success" class="hidden text-center py-12">
-            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="fas fa-check text-4xl text-green-600"></i>
-            </div>
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"><i class="fas fa-check text-4xl text-green-600"></i></div>
             <h2 class="text-2xl font-bold text-slate-900 mb-2">تمت الإضافة بنجاح!</h2>
             <p class="text-slate-500 mb-8">تم حفظ المحتوى في أرشيف الشبطاب بنجاح</p>
             <div class="flex gap-3 justify-center">
@@ -522,439 +305,208 @@
                 <button onclick="location.reload()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold transition-colors">إضافة جديدة</button>
             </div>
         </div>
-
     </main>
 
-    <!-- Footer Credit -->
     <footer class="bg-slate-900 text-white py-6 text-center">
         <p class="text-white/80 font-bold text-sm">إعداد: سليمان صلاح الدين محمد</p>
         <p class="text-white/40 text-[10px] mt-1">© 2026 أرشيف الشبطاب</p>
     </footer>
 
     <script>
-        // Global variables
-        let currentStep = 1;
-        let selectedCategory = '';
-        let uploadedImages = [];
-        let formData = {};
-        let isUploading = false;
-        let authMode = 'guest';
+        let currentStep = 1, selectedCategory = '', uploadedImages = [], formData = {}, isUploading = false, authMode = 'guest';
+        const categoryConfig = { 'children': { label: 'الأطفال', icon: 'fa-child', color: 'bg-amber-100 text-amber-600' }, 'events': { label: 'المناسبات', icon: 'fa-calendar-alt', color: 'bg-pink-100 text-pink-600' }, 'achievements': { label: 'الإنجازات', icon: 'fa-trophy', color: 'bg-green-100 text-green-600' }, 'people': { label: 'الشخصيات', icon: 'fa-user-tie', color: 'bg-blue-100 text-blue-600' }, 'houses': { label: 'المنازل العريقة', icon: 'fa-home', color: 'bg-purple-100 text-purple-600' }, 'shops': { label: 'المحلات', icon: 'fa-store', color: 'bg-cyan-100 text-cyan-600' } };
 
-        const categoryConfig = {
-            'children': { label: 'الأطفال', icon: 'fa-child', color: 'bg-amber-100 text-amber-600' },
-            'events': { label: 'المناسبات', icon: 'fa-calendar-alt', color: 'bg-pink-100 text-pink-600' },
-            'achievements': { label: 'الإنجازات', icon: 'fa-trophy', color: 'bg-green-100 text-green-600' },
-            'people': { label: 'الشخصيات', icon: 'fa-user-tie', color: 'bg-blue-100 text-blue-600' },
-            'houses': { label: 'المنازل العريقة', icon: 'fa-home', color: 'bg-purple-100 text-purple-600' },
-            'shops': { label: 'المحلات', icon: 'fa-store', color: 'bg-cyan-100 text-cyan-600' }
-        };
-
-        function selectCategory(element, category) {
-            selectedCategory = category;
-            document.querySelectorAll('.category-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            element.querySelector('input').checked = true;
-        }
-
-        function handleCategorySubmit() {
-            if (!selectedCategory) {
-                showToast('اختر تصنيفاً أولاً', 'warning');
-                return;
-            }
-            nextStep(2);
-        }
-
-        function handleImagesSubmit() {
-            if (uploadedImages.length === 0) {
-                showToast('أضف صورة واحدة على الأقل', 'warning');
-                return;
-            }
-            nextStep(3);
-        }
-
-        function handleDetailsSubmit() {
-            const names = document.getElementById('names').value.trim();
-            const description = document.getElementById('description').value.trim();
-            
-            if (!names) {
-                showToast('أدخل الاسم/الأسماء', 'warning');
-                return;
-            }
-            if (!description) {
-                showToast('أدخل الوصف', 'warning');
-                return;
-            }
-            nextStep(4);
-        }
-
-        function handleUploaderSubmit() {
-            nextStep(5);
-            updateSummary();
-        }
-
-        function nextStep(step) {
-            saveStepData(currentStep);
-            document.getElementById(`step-${currentStep}`).classList.remove('active');
-            document.getElementById(`step-${step}`).classList.add('active');
-            updateProgress(step);
-            currentStep = step;
-            window.scrollTo(0, 0);
-        }
-
-        function prevStep(step) {
-            document.getElementById(`step-${currentStep}`).classList.remove('active');
-            document.getElementById(`step-${step}`).classList.add('active');
-            updateProgress(step);
-            currentStep = step;
-            window.scrollTo(0, 0);
-        }
-
-        function updateProgress(step) {
-            const percent = ((step - 1) / 4) * 100;
-            document.getElementById('progressFill').style.width = percent + '%';
-
-            document.querySelectorAll('.step-indicator').forEach((el, index) => {
-                const circle = el.querySelector('div');
-                const label = el.querySelector('span');
-                const stepNum = index + 1;
-
-                if (stepNum < step) {
-                    circle.className = 'w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow';
-                    circle.innerHTML = '<i class="fas fa-check text-xs"></i>';
-                    label.className = 'text-xs font-semibold mt-2 text-green-600';
-                } else if (stepNum === step) {
-                    circle.className = 'w-10 h-10 rounded-full bg-blue-900 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow';
-                    circle.innerHTML = stepNum;
-                    label.className = 'text-xs font-semibold mt-2 text-blue-900';
-                } else {
-                    circle.className = 'w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow';
-                    circle.innerHTML = stepNum;
-                    label.className = 'text-xs font-semibold mt-2 text-slate-500';
-                }
-            });
-        }
-
-        function saveStepData(step) {
-            if (step === 1) {
-                formData.category = selectedCategory;
-            } else if (step === 2) {
-                formData.images = uploadedImages.map(img => img.dataUrl);
-            } else if (step === 3) {
-                formData.names = document.getElementById('names').value.trim();
-                formData.description = document.getElementById('description').value.trim();
-                formData.eventDate = document.getElementById('eventDate').value || null;
-                formData.extraInfo = document.getElementById('extraInfo').value.trim() || null;
-            } else if (step === 4) {
-                formData.uploaderName = document.getElementById('uploaderName').value.trim() || null;
-                formData.contactPhone = document.getElementById('contactPhone').value.trim() || null;
-            }
-        }
-
-        function updateSummary() {
-            const cat = categoryConfig[formData.category] || { label: 'عام' };
-            document.getElementById('summaryCategory').textContent = cat.label;
-            document.getElementById('summaryNames').textContent = formData.names || '-';
-            document.getElementById('summaryDesc').textContent = formData.description || '-';
-            document.getElementById('summaryEventDate').textContent = formData.eventDate ? new Date(formData.eventDate).toLocaleDateString('ar-SD') : 'غير محدد';
-            document.getElementById('summaryUploader').textContent = formData.uploaderName || 'زائر';
-            document.getElementById('summaryImages').textContent = (formData.images ? formData.images.length : 0) + ' صورة';
-            document.getElementById('summaryDate').textContent = new Date().toLocaleDateString('ar-SD');
-
-            // Update category icon in step 3
-            const catInfo = categoryConfig[selectedCategory];
-            if (catInfo) {
-                document.getElementById('selectedCategoryIcon').innerHTML = `<i class="fas ${catInfo.icon} ${catInfo.color.split(' ')[1]}"></i>`;
-                document.getElementById('selectedCategoryIcon').className = `w-14 h-14 ${catInfo.color.split(' ')[0]} rounded-xl flex items-center justify-center text-2xl shadow-sm`;
-                document.getElementById('selectedCategoryName').textContent = catInfo.label;
-            }
-        }
-
-        // Image handling - Base64 (no Cloudinary needed!)
+        function selectCategory(el, cat) { selectedCategory = cat; document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); el.querySelector('input').checked = true; }
+        function handleCategorySubmit() { if (!selectedCategory) { showToast('اختر تصنيفاً أولاً', 'warning'); return; } nextStep(2); }
+        function handleImagesSubmit() { if (uploadedImages.length === 0) { showToast('أضف صورة واحدة على الأقل', 'warning'); return; } nextStep(3); }
+        function handleDetailsSubmit() { if (!document.getElementById('names').value.trim()) { showToast('أدخل الاسم/الأسماء', 'warning'); return; } if (!document.getElementById('description').value.trim()) { showToast('أدخل الوصف', 'warning'); return; } nextStep(4); }
+        function handleUploaderSubmit() { nextStep(5); updateSummary(); }
+        function nextStep(s) { saveStepData(currentStep); document.getElementById('step-' + currentStep).classList.remove('active'); document.getElementById('step-' + s).classList.add('active'); updateProgress(s); currentStep = s; window.scrollTo(0, 0); }
+        function prevStep(s) { document.getElementById('step-' + currentStep).classList.remove('active'); document.getElementById('step-' + s).classList.add('active'); updateProgress(s); currentStep = s; window.scrollTo(0, 0); }
+        function updateProgress(s) { const p = ((s - 1) / 4) * 100; document.getElementById('progressFill').style.width = p + '%'; document.querySelectorAll('.step-indicator').forEach((el, i) => { const c = el.querySelector('div'), l = el.querySelector('span'), n = i + 1; if (n < s) { c.className = 'w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow'; c.innerHTML = '<i class="fas fa-check text-xs"></i>'; l.className = 'text-xs font-semibold mt-2 text-green-600'; } else if (n === s) { c.className = 'w-10 h-10 rounded-full bg-blue-900 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow'; c.innerHTML = n; l.className = 'text-xs font-semibold mt-2 text-blue-900'; } else { c.className = 'w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm border-4 border-white shadow'; c.innerHTML = n; l.className = 'text-xs font-semibold mt-2 text-slate-500'; } }); }
+        function saveStepData(s) { if (s === 1) formData.category = selectedCategory; else if (s === 2) formData.images = uploadedImages.map(img => img.dataUrl); else if (s === 3) { formData.names = document.getElementById('names').value.trim(); formData.description = document.getElementById('description').value.trim(); formData.eventDate = document.getElementById('eventDate').value || null; formData.extraInfo = document.getElementById('extraInfo').value.trim() || null; } else if (s === 4) { formData.uploaderName = document.getElementById('uploaderName').value.trim() || null; formData.contactPhone = document.getElementById('contactPhone').value.trim() || null; } }
+        function updateSummary() { const cat = categoryConfig[formData.category] || { label: 'عام' }; document.getElementById('summaryCategory').textContent = cat.label; document.getElementById('summaryNames').textContent = formData.names || '-'; document.getElementById('summaryDesc').textContent = formData.description || '-'; document.getElementById('summaryEventDate').textContent = formData.eventDate ? new Date(formData.eventDate).toLocaleDateString('ar-SD') : 'غير محدد'; document.getElementById('summaryUploader').textContent = formData.uploaderName || 'زائر'; document.getElementById('summaryImages').textContent = (formData.images ? formData.images.length : 0) + ' صورة'; document.getElementById('summaryDate').textContent = new Date().toLocaleDateString('ar-SD'); const ci = categoryConfig[selectedCategory]; if (ci) { document.getElementById('selectedCategoryIcon').innerHTML = '<i class="fas ' + ci.icon + ' ' + ci.color.split(' ')[1] + '"></i>'; document.getElementById('selectedCategoryIcon').className = 'w-14 h-14 ' + ci.color.split(' ')[0] + ' rounded-xl flex items-center justify-center text-2xl shadow-sm'; document.getElementById('selectedCategoryName').textContent = ci.label; } }
         function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('dragover'); }
         function handleDragLeave(e) { e.preventDefault(); document.getElementById('dropZone').classList.remove('dragover'); }
         function handleDrop(e) { e.preventDefault(); document.getElementById('dropZone').classList.remove('dragover'); handleImages(e.dataTransfer.files); }
 
-        function handleImages(files) {
-            const remainingSlots = 5 - uploadedImages.length;
-            const filesToProcess = Array.from(files).slice(0, remainingSlots);
-            if (filesToProcess.length === 0) { showToast('لقد وصلت للحد الأقصى من الصور (5)', 'warning'); return; }
+        // Extract date from filename patterns like: IMG_20230715_143022.jpg, 2023-07-15.jpg, etc.
+        function extractDateFromFilename(filename) {
+            // Remove extension
+            const name = filename.replace(/\\.[^/.]+$/, '');
+            
+            // Pattern 1: IMG_YYYYMMDD_HHMMSS or VID_YYYYMMDD_HHMMSS (iPhone/Android camera)
+            let match = name.match(/(?:IMG|VID)_(\\d{4})(\\d{2})(\\d{2})_(\\d{2})(\\d{2})(\\d{2})/);
+            if (match) {
+                return { date: match[1] + '-' + match[2] + '-' + match[3], time: match[4] + ':' + match[5] + ':' + match[6], source: 'اسم الملف' };
+            }
+            
+            // Pattern 2: YYYYMMDD_HHMMSS
+            match = name.match(/(\\d{4})(\\d{2})(\\d{2})_(\\d{2})(\\d{2})(\\d{2})/);
+            if (match) {
+                return { date: match[1] + '-' + match[2] + '-' + match[3], time: match[4] + ':' + match[5] + ':' + match[6], source: 'اسم الملف' };
+            }
+            
+            // Pattern 3: YYYY-MM-DD or YYYY_MM_DD
+            match = name.match(/(\\d{4})[-_](\\d{2})[-_](\\d{2})/);
+            if (match) {
+                return { date: match[1] + '-' + match[2] + '-' + match[3], time: null, source: 'اسم الملف' };
+            }
+            
+            // Pattern 4: DD-MM-YYYY or DD_MM_YYYY
+            match = name.match(/(\\d{2})[-_](\\d{2})[-_](\\d{4})/);
+            if (match) {
+                return { date: match[3] + '-' + match[2] + '-' + match[1], time: null, source: 'اسم الملف' };
+            }
+            
+            // Pattern 5: YYYYMMDD (8 digits at start or end)
+            match = name.match(/^(\\d{4})(\\d{2})(\\d{2})/);
+            if (match && parseInt(match[1]) >= 1990 && parseInt(match[1]) <= 2099) {
+                return { date: match[1] + '-' + match[2] + '-' + match[3], time: null, source: 'اسم الملف' };
+            }
+            
+            return null;
+        }
 
-            filesToProcess.forEach(file => {
-                if (file.size > 5 * 1024 * 1024) { showToast(`الصورة "${file.name}" كبيرة جداً`, 'error'); return; }
+        // Format date for display
+        function formatDateForDisplay(dateStr) {
+            if (!dateStr) return 'غير معروف';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString('ar-SD', { year: 'numeric', month: 'long', day: 'numeric' });
+            } catch(e) { return dateStr; }
+        }
+
+        function handleImages(files) {
+            // Hard limit: exactly 5 max, reject if over
+            if (uploadedImages.length >= 5) {
+                showToast('الحد الأقصى 5 صور فقط', 'warning');
+                return;
+            }
+            
+            const filesArray = Array.from(files);
+            const totalAfterAdd = uploadedImages.length + filesArray.length;
+            
+            // If total would exceed 5, only take what fits
+            let toProc = filesArray;
+            if (totalAfterAdd > 5) {
+                const allowed = 5 - uploadedImages.length;
+                toProc = filesArray.slice(0, allowed);
+                showToast('تم اختيار أول ' + allowed + ' صور فقط (الحد 5)', 'warning');
+            }
+            
+            if (toProc.length === 0) return;
+
+            toProc.forEach(file => {
+                // Any resolution allowed - no size check
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    uploadedImages.push({ file: file, dataUrl: e.target.result, preview: e.target.result });
+                    // Extract date from filename
+                    const dateInfo = extractDateFromFilename(file.name);
+                    uploadedImages.push({ 
+                        file: file, 
+                        dataUrl: e.target.result, 
+                        preview: e.target.result,
+                        photoDate: dateInfo ? dateInfo.date : null,
+                        photoTime: dateInfo ? dateInfo.time : null,
+                        dateSource: dateInfo ? dateInfo.source : null
+                    });
                     updateImageUI();
                 };
                 reader.readAsDataURL(file);
             });
         }
-
+        
         function updateImageUI() {
             const preview = document.getElementById('imagePreview');
             const countEl = document.getElementById('imageCount');
             const nextBtn = document.getElementById('nextToDetails');
-
-            countEl.textContent = `${uploadedImages.length}/5`;
-
+            const uploadPrompt = document.getElementById('uploadPrompt');
+            const dropZone = document.getElementById('dropZone');
+            
+            countEl.textContent = uploadedImages.length + '/5';
+            
             if (uploadedImages.length > 0) {
                 preview.classList.remove('hidden');
-                preview.innerHTML = uploadedImages.map((img, index) => `
-                    <div class="image-preview-item">
-                        <img src="${img.preview}" alt="صورة ${index + 1}">
-                        <button type="button" onclick="removeImage(${index})" class="remove-btn">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        ${index === 0 ? '<span class="main-badge">الرئيسية</span>' : ''}
-                    </div>
-                `).join('');
+                preview.innerHTML = uploadedImages.map((img, i) => {
+                    const dateDisplay = img.photoDate ? formatDateForDisplay(img.photoDate) : 'غير معروف';
+                    return '<div class="image-preview-item"><img src="' + img.preview + '"><button type="button" onclick="removeImage(' + i + ')" class="remove-btn"><i class="fas fa-times"></i></button>' + (i === 0 ? '<span class="main-badge">الرئيسية</span>' : '') + '<span class="photo-date-badge"><i class="far fa-calendar-alt ml-1"></i>' + dateDisplay + '</span></div>';
+                }).join('');
             } else {
                 preview.classList.add('hidden');
             }
-
+            
             nextBtn.disabled = uploadedImages.length === 0;
-            if (uploadedImages.length > 0) {
-                nextBtn.classList.remove('opacity-50');
-            }
-
+            
+            // Update upload prompt based on count
             if (uploadedImages.length >= 5) {
-                document.getElementById('uploadPrompt').innerHTML = `<i class="fas fa-check-circle text-3xl text-green-500 mb-2"></i><p class="font-semibold text-slate-700">تم رفع 5 صور</p>`;
+                dropZone.style.pointerEvents = 'none';
+                dropZone.style.opacity = '0.6';
+                uploadPrompt.innerHTML = '<div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-check text-2xl text-green-600"></i></div><p class="font-semibold text-slate-700">تم اكتمال 5 صور</p><p class="text-sm text-slate-500">يمكنك حذف صورة لإضافة غيرها</p>';
+            } else {
+                dropZone.style.pointerEvents = 'auto';
+                dropZone.style.opacity = '1';
+                uploadPrompt.innerHTML = '<div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-camera text-2xl text-blue-900"></i></div><p class="font-semibold text-slate-700 mb-1">اضغط أو اسحب الصور هنا</p><p class="text-sm text-slate-500">يمكنك رفع حتى 5 صور</p><p class="text-xs text-slate-400 mt-1">PNG, JPG - أي دقة</p>';
             }
         }
-
-        function removeImage(index) {
-            uploadedImages.splice(index, 1);
+        
+        function removeImage(i) {
+            uploadedImages.splice(i, 1);
             updateImageUI();
             if (uploadedImages.length === 0) {
                 document.getElementById('imagePreview').classList.add('hidden');
-                document.getElementById('uploadPrompt').innerHTML = `
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-camera text-2xl text-blue-900"></i></div>
-                    <p class="font-semibold text-slate-700 mb-1">اضغط أو اسحب الصور هنا</p>
-                    <p class="text-sm text-slate-500">يمكنك رفع حتى 5 صور</p>
-                    <p class="text-xs text-slate-400 mt-1">PNG, JPG - حتى 5MB لكل صورة</p>
-                `;
             }
         }
-
-        // Firebase & Publishing
-        async function waitForFirebase() {
-            let attempts = 0;
-            while ((!window.firebaseAuth || !window.firebaseDb) && attempts < 50) {
-                await new Promise(r => setTimeout(r, 100)); attempts++;
-            }
-            if (!window.firebaseAuth) throw new Error('Firebase لم يتم تهيئتها');
-        }
-
-        async function publishArchive(e) {
-            e.preventDefault();
-            if (isUploading) return;
-
-            const btn = document.getElementById('publishBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner"></span> جاري الحفظ...';
-            btn.disabled = true;
-            isUploading = true;
-
-            try {
-                saveStepData(currentStep);
-                localStorage.setItem('pendingArchive', JSON.stringify(formData));
-                await waitForFirebase();
-
-                const user = window.firebaseAuth.currentUser;
-                if (!user) {
-                    // Show auth options
-                    document.getElementById(`step-${currentStep}`).classList.remove('active');
-                    document.getElementById('auth-step').classList.remove('hidden');
-                    document.getElementById('progressBar').classList.add('hidden');
-                    showToast('اختر طريقة النشر', 'info');
-                } else {
-                    await finalizePublish(user);
-                }
-            } catch (error) {
-                console.error('❌ خطأ:', error);
-                showToast('خطأ: ' + error.message, 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                isUploading = false;
-            }
-        }
-
-        async function finalizePublishAsGuest() {
-            const btn = document.getElementById('guestPublishBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner"></span> جاري النشر...';
-            btn.disabled = true;
-
-            try {
-                await waitForFirebase();
-                // Sign in anonymously
-                const { signInAnonymously } = window.firebaseAuthFns;
-                const userCredential = await signInAnonymously(window.firebaseAuth);
-                await finalizePublish(userCredential.user);
-            } catch (error) {
-                console.error('❌ خطأ:', error);
-                showToast('خطأ: ' + error.message, 'error');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        async function finalizePublish(user) {
-            try {
-                const pending = JSON.parse(localStorage.getItem('pendingArchive') || '{}');
-                
-                const archiveData = {
-                    category: pending.category,
-                    names: pending.names,
-                    name: pending.names,
-                    description: pending.description,
-                    eventDate: pending.eventDate || null,
-                    extraInfo: pending.extraInfo || null,
-                    images: pending.images || [],
-                    mainImage: pending.images && pending.images.length > 0 ? pending.images[0] : null,
-                    uploaderName: pending.uploaderName || user.displayName || 'زائر',
-                    userName: user.displayName || pending.uploaderName || 'زائر',
-                    contactPhone: pending.contactPhone || null,
-                    userId: user.uid,
-                    userEmail: user.email || null,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    isActive: true,
-                    views: 0
-                };
-
-                const { collection, addDoc } = window.firebaseFirestoreFns;
-                await addDoc(collection(window.firebaseDb, 'archives'), archiveData);
-                localStorage.removeItem('pendingArchive');
-
-                document.getElementById('auth-step').classList.add('hidden');
-                document.getElementById('final-success').classList.remove('hidden');
-                showToast('تمت الإضافة بنجاح!', 'success');
-            } catch (error) {
-                console.error('❌ خطأ في النشر:', error);
-                showToast('خطأ: ' + error.message, 'error');
-                throw error;
-            }
-        }
-
-        function switchAuthTab(mode) {
-            authMode = mode;
-            document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
+        
+        async function waitForFirebase() { let a = 0; while ((!window.firebaseAuth || !window.firebaseDb) && a < 50) { await new Promise(r => setTimeout(r, 100)); a++; } if (!window.firebaseAuth) throw new Error('Firebase لم يتم تهيئتها'); }
+        async function publishArchive(e) { e.preventDefault(); if (isUploading) return; const btn = document.getElementById('publishBtn'); const orig = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span> جاري الحفظ...'; btn.disabled = true; isUploading = true; try { saveStepData(currentStep); localStorage.setItem('pendingArchive', JSON.stringify(formData)); await waitForFirebase(); const user = window.firebaseAuth.currentUser; if (!user) { document.getElementById('step-' + currentStep).classList.remove('active'); document.getElementById('auth-step').classList.remove('hidden'); document.getElementById('progressBar').classList.add('hidden'); showToast('اختر طريقة النشر', 'info'); } else { await finalizePublish(user); } } catch (err) { showToast('خطأ: ' + err.message, 'error'); } finally { btn.innerHTML = orig; btn.disabled = false; isUploading = false; } }
+        async function finalizePublishAsGuest() { const btn = document.getElementById('guestPublishBtn'); const orig = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span> جاري النشر...'; btn.disabled = true; try { await waitForFirebase(); const { signInAnonymously } = window.firebaseAuthFns; const uc = await signInAnonymously(window.firebaseAuth); await finalizePublish(uc.user); } catch (err) { showToast('خطأ: ' + err.message, 'error'); btn.innerHTML = orig; btn.disabled = false; } }
+        async function finalizePublish(user) { try { const pending = JSON.parse(localStorage.getItem('pendingArchive') || '{}'); 
+            // Build images array with extracted dates
+            const imagesWithDates = uploadedImages.map(img => ({
+                dataUrl: img.dataUrl,
+                photoDate: img.photoDate,
+                photoTime: img.photoTime,
+                dateSource: img.dateSource,
+                filename: img.file ? img.file.name : null
+            }));
             
-            document.getElementById('guestForm').classList.add('hidden');
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('registerForm').classList.add('hidden');
-            
-            if (mode === 'guest') {
-                document.getElementById('guestForm').classList.remove('hidden');
-            } else if (mode === 'login') {
-                document.getElementById('loginForm').classList.remove('hidden');
-            } else {
-                document.getElementById('registerForm').classList.remove('hidden');
-            }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            if (isUploading) return;
-            const btn = document.getElementById('loginSubmitBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner"></span> جاري تسجيل الدخول...';
-            btn.disabled = true;
-            isUploading = true;
-
-            try {
-                await waitForFirebase();
-                const { signInWithEmailAndPassword } = window.firebaseAuthFns;
-                await signInWithEmailAndPassword(window.firebaseAuth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
-                showToast('تم تسجيل الدخول بنجاح', 'success');
-                await finalizePublish(window.firebaseAuth.currentUser);
-            } catch (error) {
-                let message = 'خطأ في تسجيل الدخول';
-                if (error.code === 'auth/user-not-found') message = 'البريد غير مسجل';
-                else if (error.code === 'auth/wrong-password') message = 'كلمة المرور غير صحيحة';
-                else if (error.code === 'auth/invalid-email') message = 'بريد غير صالح';
-                showToast(message, 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                isUploading = false;
-            }
-        }
-
-        async function handleRegister(e) {
-            e.preventDefault();
-            if (isUploading) return;
-            const btn = document.getElementById('registerSubmitBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner"></span> جاري إنشاء الحساب...';
-            btn.disabled = true;
-            isUploading = true;
-
-            try {
-                await waitForFirebase();
-                const name = document.getElementById('regName').value;
-                const email = document.getElementById('regEmail').value;
-                const password = document.getElementById('regPassword').value;
-                const confirm = document.getElementById('regPasswordConfirm').value;
-
-                if (password !== confirm) {
-                    document.getElementById('passwordMatchError').classList.remove('hidden');
-                    showToast('كلمتا المرور غير متطابقتين', 'error');
-                    return;
-                }
-                document.getElementById('passwordMatchError').classList.add('hidden');
-
-                const { createUserWithEmailAndPassword, updateProfile } = window.firebaseAuthFns;
-                const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
-                await updateProfile(userCredential.user, { displayName: name });
-                showToast('تم إنشاء الحساب بنجاح', 'success');
-                await finalizePublish(userCredential.user);
-            } catch (error) {
-                let message = 'خطأ في إنشاء الحساب';
-                if (error.code === 'auth/email-already-in-use') message = 'البريد مستخدم بالفعل';
-                else if (error.code === 'auth/weak-password') message = 'كلمة المرور ضعيفة';
-                showToast(message, 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                isUploading = false;
-            }
-        }
-
-        function backToAd() {
-            document.getElementById('auth-step').classList.add('hidden');
-            document.getElementById('progressBar').classList.remove('hidden');
-            document.getElementById(`step-${currentStep}`).classList.add('active');
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} text-lg ${type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : 'text-blue-500'}"></i><span>${message}</span>`;
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const checkAuth = setInterval(() => {
-                if (window.firebaseAuth && window.firebaseAuthFns) {
-                    clearInterval(checkAuth);
-                    const { onAuthStateChanged } = window.firebaseAuthFns;
-                    onAuthStateChanged(window.firebaseAuth, (user) => {
-                        if (user) console.log("✅ مسجل:", user.email || 'Anonymous');
-                        else console.log("ℹ️ لا يوجد مستخدم مسجل");
-                    });
-                }
-            }, 100);
-        });
-
-        window.addEventListener('error', (event) => console.error("❌ خطأ:", event.error));
-        window.addEventListener('unhandledrejection', (event) => console.error("❌ Promise:", event.reason));
+            const archiveData = { 
+                category: pending.category, 
+                names: pending.names, 
+                name: pending.names, 
+                description: pending.description, 
+                eventDate: pending.eventDate || null, 
+                extraInfo: pending.extraInfo || null, 
+                images: pending.images || [], 
+                imagesWithMeta: imagesWithDates,
+                mainImage: pending.images && pending.images.length > 0 ? pending.images[0] : null, 
+                uploaderName: pending.uploaderName || user.displayName || 'زائر', 
+                userName: user.displayName || pending.uploaderName || 'زائر', 
+                contactPhone: pending.contactPhone || null, 
+                userId: user.uid, 
+                userEmail: user.email || null, 
+                createdAt: new Date().toISOString(), 
+                updatedAt: new Date().toISOString(), 
+                isActive: true, 
+                views: 0 
+            }; 
+            const { collection, addDoc } = window.firebaseFirestoreFns; 
+            await addDoc(collection(window.firebaseDb, 'archives'), archiveData); 
+            localStorage.removeItem('pendingArchive'); 
+            document.getElementById('auth-step').classList.add('hidden'); 
+            document.getElementById('final-success').classList.remove('hidden'); 
+            showToast('تمت الإضافة بنجاح!', 'success'); 
+        } catch (err) { showToast('خطأ: ' + err.message, 'error'); throw err; } }
+        function switchAuthTab(mode) { authMode = mode; document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); document.getElementById('guestForm').classList.add('hidden'); document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.add('hidden'); if (mode === 'guest') document.getElementById('guestForm').classList.remove('hidden'); else if (mode === 'login') document.getElementById('loginForm').classList.remove('hidden'); else document.getElementById('registerForm').classList.remove('hidden'); }
+        async function handleLogin(e) { e.preventDefault(); if (isUploading) return; const btn = document.getElementById('loginSubmitBtn'); const orig = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span> جاري تسجيل الدخول...'; btn.disabled = true; isUploading = true; try { await waitForFirebase(); const { signInWithEmailAndPassword } = window.firebaseAuthFns; await signInWithEmailAndPassword(window.firebaseAuth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); showToast('تم تسجيل الدخول بنجاح', 'success'); await finalizePublish(window.firebaseAuth.currentUser); } catch (err) { let m = 'خطأ في تسجيل الدخول'; if (err.code === 'auth/user-not-found') m = 'البريد غير مسجل'; else if (err.code === 'auth/wrong-password') m = 'كلمة المرور غير صحيحة'; else if (err.code === 'auth/invalid-email') m = 'بريد غير صالح'; showToast(m, 'error'); } finally { btn.innerHTML = orig; btn.disabled = false; isUploading = false; } }
+        async function handleRegister(e) { e.preventDefault(); if (isUploading) return; const btn = document.getElementById('registerSubmitBtn'); const orig = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span> جاري إنشاء الحساب...'; btn.disabled = true; isUploading = true; try { await waitForFirebase(); const name = document.getElementById('regName').value, email = document.getElementById('regEmail').value, pass = document.getElementById('regPassword').value, conf = document.getElementById('regPasswordConfirm').value; if (pass !== conf) { document.getElementById('passwordMatchError').classList.remove('hidden'); showToast('كلمتا المرور غير متطابقتين', 'error'); return; } document.getElementById('passwordMatchError').classList.add('hidden'); const { createUserWithEmailAndPassword, updateProfile } = window.firebaseAuthFns; const uc = await createUserWithEmailAndPassword(window.firebaseAuth, email, pass); await updateProfile(uc.user, { displayName: name }); showToast('تم إنشاء الحساب بنجاح', 'success'); await finalizePublish(uc.user); } catch (err) { let m = 'خطأ في إنشاء الحساب'; if (err.code === 'auth/email-already-in-use') m = 'البريد مستخدم بالفعل'; else if (err.code === 'auth/weak-password') m = 'كلمة المرور ضعيفة'; showToast(m, 'error'); } finally { btn.innerHTML = orig; btn.disabled = false; isUploading = false; } }
+        function backToAd() { document.getElementById('auth-step').classList.add('hidden'); document.getElementById('progressBar').classList.remove('hidden'); document.getElementById('step-' + currentStep).classList.add('active'); }
+        function showToast(msg, type) { const t = document.createElement('div'); t.className = 'toast ' + type; t.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle text-green-500' : type === 'error' ? 'fa-exclamation-circle text-red-500' : 'fa-info-circle text-blue-500') + ' text-lg"></i><span>' + msg + '</span>'; document.body.appendChild(t); setTimeout(() => { t.style.animation = 'slideIn 0.3s ease reverse'; setTimeout(() => t.remove(), 300); }, 3000); }
+        document.addEventListener('DOMContentLoaded', () => { const ca = setInterval(() => { if (window.firebaseAuth && window.firebaseAuthFns) { clearInterval(ca); const { onAuthStateChanged } = window.firebaseAuthFns; onAuthStateChanged(window.firebaseAuth, (u) => { if (u) console.log("مسجل:", u.email || 'Anonymous'); else console.log("لا يوجد مستخدم مسجل"); }); } }, 100); });
+        window.addEventListener('error', (e) => console.error("خطأ:", e.error));
+        window.addEventListener('unhandledrejection', (e) => console.error("Promise:", e.reason));
     </script>
 </body>
 </html>
