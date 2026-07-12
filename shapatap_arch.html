@@ -5,43 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>أرشيف الشبطاب</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-        body { background: #0f172a; overflow-x: hidden; }
-
-        /* Header */
-        .header-banner {
-            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
-            position: relative; overflow: hidden;
-        }
-        .header-shape {
-            position: absolute; border-radius: 50%; opacity: 0.05; background: white;
+        body { 
+            background: #f5f0e8; 
+            overflow-x: hidden; 
+            color: #2c1810;
         }
 
-        /* Search bar */
-        .search-bar {
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
+        /* Header - classic archive style */
+        .archive-header {
+            background: linear-gradient(180deg, #f5f0e8 0%, #ebe4d8 100%);
+            padding: 24px 16px 16px;
+            text-align: center;
+            border-bottom: 1px solid #d4c9b8;
         }
-        .search-bar input {
-            background: transparent; color: white;
+        .archive-title {
+            font-family: 'Amiri', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c1810;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
         }
-        .search-bar input::placeholder { color: rgba(255,255,255,0.5); }
+        .archive-subtitle {
+            font-size: 14px;
+            color: #8b7355;
+            line-height: 1.8;
+            max-width: 320px;
+            margin: 0 auto;
+        }
 
-        /* Photo Grid - 3 columns */
+        /* Top bar */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #f5f0e8;
+            border-bottom: 1px solid #d4c9b8;
+        }
+        .menu-btn {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            color: #5c4a3a; font-size: 20px;
+        }
+        .site-name {
+            font-family: 'Amiri', serif;
+            font-size: 18px; font-weight: 700;
+            color: #2c1810;
+        }
+
+        /* Search */
+        .search-section {
+            padding: 16px;
+            background: #f5f0e8;
+        }
+        .search-box {
+            background: white;
+            border: 1px solid #d4c9b8;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .search-box i {
+            color: #8b7355; font-size: 16px;
+        }
+        .search-box input {
+            flex: 1; border: none; outline: none;
+            font-size: 14px; color: #2c1810;
+            background: transparent;
+        }
+        .search-box input::placeholder {
+            color: #b8a99a;
+        }
+
+        /* Category tabs */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 12px;
+            overflow-x: auto;
+            background: #f5f0e8;
+            scrollbar-width: none;
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        .cat-tab {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #d4c9b8;
+            background: white;
+            color: #8b7355;
+        }
+        .cat-tab:hover {
+            background: #f0ebe3;
+            color: #5c4a3a;
+        }
+        .cat-tab.active {
+            background: #2c1810;
+            color: #f5f0e8;
+            border-color: #2c1810;
+        }
+
+        /* Photo Grid - 2 columns like reference */
         .photo-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            padding: 4px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            padding: 0 16px 16px;
         }
         @media (min-width: 768px) {
-            .photo-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px; }
+            .photo-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 24px 24px; }
         }
         @media (min-width: 1024px) {
-            .photo-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 8px; }
+            .photo-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 32px 32px; }
         }
 
         /* Photo Item */
@@ -50,211 +136,247 @@
             aspect-ratio: 1;
             overflow: hidden;
             cursor: pointer;
-            background: #1e293b;
+            background: #e8e0d4;
             border-radius: 4px;
         }
         .photo-item img {
             width: 100%; height: 100%;
             object-fit: cover;
-            transition: transform 0.4s ease, opacity 0.3s ease;
+            transition: transform 0.5s ease, opacity 0.4s ease, filter 0.4s ease;
             opacity: 0;
+            filter: grayscale(30%);
         }
-        .photo-item img.loaded { opacity: 1; }
-        .photo-item:hover img { transform: scale(1.08); }
-        .photo-item:hover .photo-overlay { opacity: 1; }
+        .photo-item img.loaded { 
+            opacity: 1; 
+            filter: grayscale(0%);
+        }
+        .photo-item:hover img { 
+            transform: scale(1.05);
+            filter: grayscale(0%);
+        }
+        .photo-item:hover .photo-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-        .photo-overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+        .photo-info {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(44,24,16,0.85) 0%, transparent 100%);
+            padding: 20px 10px 10px;
             opacity: 0;
-            transition: opacity 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 8px;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
         }
-        .photo-overlay .names {
-            color: white; font-size: 11px; font-weight: 700;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        .photo-info .names {
+            color: #f5f0e8;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .photo-overlay .category-badge {
-            font-size: 9px; font-weight: 700; padding: 2px 6px;
-            border-radius: 4px; display: inline-block; width: fit-content; margin-bottom: 4px;
+        .photo-info .cat-label {
+            color: #d4c9b8;
+            font-size: 10px;
+            font-weight: 500;
+            margin-top: 2px;
         }
-        .cat-children { background: #f59e0b; color: white; }
-        .cat-events { background: #ec4899; color: white; }
-        .cat-achievements { background: #22c55e; color: white; }
-        .cat-people { background: #3b82f6; color: white; }
-        .cat-houses { background: #8b5cf6; color: white; }
-        .cat-shops { background: #06b6d4; color: white; }
 
-        /* Skeleton loading */
+        /* Skeleton */
         .skeleton-photo {
-            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background: linear-gradient(90deg, #e8e0d4 25%, #ddd5c8 50%, #e8e0d4 75%);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
             aspect-ratio: 1;
             border-radius: 4px;
         }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        @keyframes shimmer { 
+            0% { background-position: 200% 0; } 
+            100% { background-position: -200% 0; } 
+        }
 
         /* Load more */
-        .load-more-btn {
-            background: linear-gradient(135deg, #1e3a5f, #3d7ab5);
-            color: white; padding: 12px 32px;
-            border-radius: 24px; font-weight: 800; font-size: 14px;
-            border: none; cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(30,58,95,0.4);
+        .load-more-section {
+            text-align: center;
+            padding: 24px 16px 80px;
         }
-        .load-more-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(30,58,95,0.5); }
-        .load-more-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .load-more-btn {
+            background: #2c1810;
+            color: #f5f0e8;
+            padding: 12px 32px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+        }
+        .load-more-btn:hover {
+            background: #4a3020;
+        }
+        .load-more-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-        /* Lightbox */
+        /* Lightbox - classic style */
         .lightbox {
             position: fixed; inset: 0; z-index: 100;
-            background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
+            background: rgba(44,24,16,0.95);
             display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
         }
         .lightbox.active { opacity: 1; pointer-events: auto; }
         .lightbox img {
-            max-width: 95vw; max-height: 85vh;
-            object-fit: contain; border-radius: 8px;
+            max-width: 92vw; max-height: 75vh;
+            object-fit: contain; border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
         .lightbox-close {
             position: absolute; top: 16px; left: 16px;
-            width: 44px; height: 44px; border-radius: 50%;
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white; font-size: 18px;
+            width: 44px; height: 44px;
+            color: #f5f0e8; font-size: 20px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s;
+            cursor: pointer; background: rgba(255,255,255,0.1);
+            border-radius: 50%; border: none;
         }
-        .lightbox-close:hover { background: rgba(255,255,255,0.2); }
         .lightbox-nav {
             position: absolute; top: 50%; transform: translateY(-50%);
-            width: 48px; height: 48px; border-radius: 50%;
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white; font-size: 16px;
+            width: 48px; height: 48px;
+            color: #f5f0e8; font-size: 18px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s;
+            cursor: pointer; background: rgba(255,255,255,0.1);
+            border-radius: 50%; border: none;
+            transition: background 0.2s;
         }
         .lightbox-nav:hover { background: rgba(255,255,255,0.2); }
-        .lightbox-nav.prev { right: 16px; }
-        .lightbox-nav.next { left: 16px; }
+        .lightbox-nav.prev { right: 12px; }
+        .lightbox-nav.next { left: 12px; }
         .lightbox-info {
             position: absolute; bottom: 0; left: 0; right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            padding: 24px 16px 32px;
-            color: white;
+            background: linear-gradient(to top, rgba(44,24,16,0.95), transparent);
+            padding: 32px 20px 40px;
+            color: #f5f0e8;
         }
-        .lightbox-info h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
-        .lightbox-info p { font-size: 13px; color: rgba(255,255,255,0.7); }
+        .lightbox-info h3 {
+            font-family: 'Amiri', serif;
+            font-size: 22px; font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .lightbox-info p {
+            font-size: 14px; color: #d4c9b8;
+            line-height: 1.6;
+        }
         .lightbox-counter {
-            position: absolute; top: 16px; right: 16px;
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            position: absolute; top: 20px; right: 20px;
+            color: #d4c9b8; font-size: 13px; font-weight: 600;
+            background: rgba(255,255,255,0.1);
             padding: 6px 14px; border-radius: 20px;
-            font-size: 12px; font-weight: 700; color: white;
-            border: 1px solid rgba(255,255,255,0.2);
         }
 
         /* FAB */
-        .fab-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 50; }
+        .fab-container {
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%); z-index: 50;
+        }
         .fab-btn {
-            background: linear-gradient(135deg, #1e3a5f, #3d7ab5);
-            box-shadow: 0 8px 32px rgba(30, 58, 95, 0.5);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #2c1810;
+            color: #f5f0e8;
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-weight: 700; font-size: 14px;
+            border: 2px solid #d4c9b8;
+            box-shadow: 0 4px 20px rgba(44,24,16,0.3);
+            transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 8px;
+            font-family: 'Cairo', sans-serif;
         }
-        .fab-btn:hover { transform: scale(1.05); }
-        .fab-btn:active { transform: scale(0.95); }
+        .fab-btn:hover {
+            background: #4a3020;
+            transform: translateX(-50%) scale(1.03);
+        }
 
-        /* Category filter pills */
-        .filter-pill {
-            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
-            white-space: nowrap; cursor: pointer; transition: all 0.2s;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6);
+        /* No results */
+        .no-results {
+            text-align: center; padding: 60px 20px;
+            color: #8b7355;
         }
-        .filter-pill:hover { background: rgba(255,255,255,0.1); color: white; }
-        .filter-pill.active {
-            background: linear-gradient(135deg, #1e3a5f, #3d7ab5);
-            color: white; border-color: transparent;
-            box-shadow: 0 4px 12px rgba(30,58,95,0.4);
+        .no-results i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+
+        /* Footer */
+        .site-footer {
+            background: #2c1810;
+            padding: 20px;
+            text-align: center;
+        }
+        .site-footer p {
+            color: #d4c9b8; font-size: 12px;
+        }
+        .site-footer .credit {
+            color: #f5f0e8; font-weight: 700;
+            font-size: 13px; margin-bottom: 4px;
         }
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-        /* No results */
-        .no-results { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.4); }
-        .no-results i { font-size: 48px; margin-bottom: 16px; }
-
-        /* Footer */
-        .site-footer {
-            background: #0a0f1d; padding: 24px 0 80px;
-            text-align: center; border-top: 1px solid rgba(255,255,255,0.05);
-        }
+        ::-webkit-scrollbar-track { background: #f5f0e8; }
+        ::-webkit-scrollbar-thumb { background: #d4c9b8; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #b8a99a; }
     </style>
 </head>
 <body class="min-h-screen">
 
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="menu-btn" onclick="showMenu()"><i class="fas fa-bars"></i></button>
+        <span class="site-name">أرشيف الشبطاب</span>
+        <div class="w-10"></div>
+    </div>
+
     <!-- Header -->
-    <div class="header-banner text-white py-4 px-4">
-        <div class="header-shape" style="width:200px;height:200px;top:-50px;right:-50px;"></div>
-        <div class="header-shape" style="width:150px;height:150px;bottom:-30px;left:-30px;"></div>
-        <div class="max-w-6xl mx-auto relative z-10">
-            <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur border border-white/20">
-                        <i class="fas fa-landmark text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-black leading-tight">أرشيف الشبطاب</h1>
-                        <p class="text-[10px] text-white/50">ذاكرة القرية الرقمية</p>
-                    </div>
-                </div>
-                <span id="totalCount" class="text-xs font-bold text-white/40 bg-white/5 px-3 py-1 rounded-full">0 صورة</span>
-            </div>
+    <div class="archive-header">
+        <h1 class="archive-title">مكتبة الصور الأرشيفية</h1>
+        <p class="archive-subtitle">
+            نحفظ مجموعة من الصور المرتبطة بتاريخ القرية<br>
+            وحياة أهل الشبطاب.
+        </p>
+    </div>
 
-            <!-- Search -->
-            <div class="search-bar rounded-xl px-4 py-2.5 flex items-center gap-3 mb-3">
-                <i class="fas fa-search text-white/40 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="ابحث بالاسم أو المناسبة..."
-                    class="flex-1 text-sm outline-none bg-transparent" oninput="filterArchives()">
-            </div>
-
-            <!-- Category Filters -->
-            <div class="flex gap-2 overflow-x-auto pb-1" id="categoryFilters" style="scrollbar-width:none;">
-                <button onclick="setCategoryFilter('')" class="filter-pill active" data-category="">الكل</button>
-                <button onclick="setCategoryFilter('children')" class="filter-pill" data-category="children">👶 الأطفال</button>
-                <button onclick="setCategoryFilter('events')" class="filter-pill" data-category="events">🎉 المناسبات</button>
-                <button onclick="setCategoryFilter('achievements')" class="filter-pill" data-category="achievements">🏆 الإنجازات</button>
-                <button onclick="setCategoryFilter('people')" class="filter-pill" data-category="people">👤 الشخصيات</button>
-                <button onclick="setCategoryFilter('houses')" class="filter-pill" data-category="houses">🏠 المنازل</button>
-                <button onclick="setCategoryFilter('shops')" class="filter-pill" data-category="shops">🏪 المحلات</button>
-            </div>
+    <!-- Search -->
+    <div class="search-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="ابحث في الصور..." oninput="filterArchives()">
         </div>
     </div>
 
+    <!-- Category Tabs -->
+    <div class="category-tabs" id="categoryTabs">
+        <button class="cat-tab active" data-category="" onclick="setCategoryFilter('')">الكل</button>
+        <button class="cat-tab" data-category="children" onclick="setCategoryFilter('children')">الأطفال</button>
+        <button class="cat-tab" data-category="events" onclick="setCategoryFilter('events')">المناسبات</button>
+        <button class="cat-tab" data-category="achievements" onclick="setCategoryFilter('achievements')">الإنجازات</button>
+        <button class="cat-tab" data-category="people" onclick="setCategoryFilter('people')">الشخصيات</button>
+        <button class="cat-tab" data-category="houses" onclick="setCategoryFilter('houses')">المنازل العريقة</button>
+        <button class="cat-tab" data-category="shops" onclick="setCategoryFilter('shops')">المحلات</button>
+    </div>
+
     <!-- Photo Grid -->
-    <div id="photoGrid" class="photo-grid max-w-6xl mx-auto">
-        <!-- Skeletons -->
-        <div class="skeleton-photo"></div><div class="skeleton-photo"></div><div class="skeleton-photo"></div>
-        <div class="skeleton-photo"></div><div class="skeleton-photo"></div><div class="skeleton-photo"></div>
-        <div class="skeleton-photo"></div><div class="skeleton-photo"></div><div class="skeleton-photo"></div>
-        <div class="skeleton-photo"></div><div class="skeleton-photo"></div><div class="skeleton-photo"></div>
+    <div id="photoGrid" class="photo-grid">
+        <div class="skeleton-photo"></div><div class="skeleton-photo"></div>
+        <div class="skeleton-photo"></div><div class="skeleton-photo"></div>
+        <div class="skeleton-photo"></div><div class="skeleton-photo"></div>
+        <div class="skeleton-photo"></div><div class="skeleton-photo"></div>
     </div>
 
     <!-- Load More -->
-    <div id="loadMoreContainer" class="text-center py-6 hidden">
+    <div id="loadMoreSection" class="load-more-section hidden">
         <button id="loadMoreBtn" onclick="loadMore()" class="load-more-btn">
             <i class="fas fa-spinner fa-spin mr-2 hidden" id="loadMoreSpinner"></i>
-            عرض المزيد
+            عرض المزيد من الصور
         </button>
     </div>
 
@@ -267,13 +389,13 @@
 
     <!-- Footer -->
     <footer class="site-footer">
-        <p class="text-white/60 font-bold text-sm">إعداد: سليمان صلاح الدين محمد</p>
-        <p class="text-white/30 text-[10px] mt-1">© 2026 أرشيف الشبطاب</p>
+        <p class="credit">إعداد: سليمان صلاح الدين محمد</p>
+        <p>© 2026 أرشيف الشبطاب</p>
     </footer>
 
     <!-- FAB -->
     <div class="fab-container">
-        <a href="add.html" class="fab-btn flex items-center gap-2 px-6 py-3 rounded-full text-white font-bold text-sm">
+        <a href="add.html" class="fab-btn">
             <i class="fas fa-plus"></i>
             <span>أضف صورة</span>
         </a>
@@ -287,10 +409,9 @@
         <button class="lightbox-nav next" onclick="navigateLightbox(1)"><i class="fas fa-chevron-left"></i></button>
         <img id="lightboxImg" src="" alt="">
         <div class="lightbox-info">
-            <span id="lightboxCategory" class="category-badge mb-2">تصنيف</span>
             <h3 id="lightboxNames">الاسم</h3>
             <p id="lightboxDesc">الوصف</p>
-            <p id="lightboxMeta" class="text-xs text-white/40 mt-2"></p>
+            <p id="lightboxMeta" style="margin-top:8px;font-size:12px;color:#b8a99a;"></p>
         </div>
     </div>
 
@@ -298,7 +419,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs, startAfter } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, limit, getDocs, startAfter } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARzFwq6D3QI5xanevX_OLb0xQl-r_Fm8c",
@@ -316,22 +437,21 @@
         const db = getFirestore(app);
 
         let allArchives = [];
-        let displayedArchives = [];
+        let filteredArchives = [];
         let currentCategory = '';
         let currentSearch = '';
         let currentLightboxIndex = 0;
-        let filteredArchives = [];
         let lastDoc = null;
         let isLoading = false;
-        const PAGE_SIZE = 24;
+        const PAGE_SIZE = 20;
 
-        const categoryConfig = {
-            'children': { label: 'أطفال', class: 'cat-children' },
-            'events': { label: 'مناسبة', class: 'cat-events' },
-            'achievements': { label: 'إنجاز', class: 'cat-achievements' },
-            'people': { label: 'شخصية', class: 'cat-people' },
-            'houses': { label: 'منزل', class: 'cat-houses' },
-            'shops': { label: 'محل', class: 'cat-shops' }
+        const categoryLabels = {
+            'children': 'الأطفال',
+            'events': 'المناسبات',
+            'achievements': 'الإنجازات',
+            'people': 'الشخصيات',
+            'houses': 'المنازل العريقة',
+            'shops': 'المحلات'
         };
 
         // Lazy load images
@@ -344,7 +464,7 @@
                     observer.unobserve(img);
                 }
             });
-        }, { rootMargin: '50px' });
+        }, { rootMargin: '100px' });
 
         async function loadArchives() {
             try {
@@ -371,6 +491,8 @@
                 if (newArchives.length > 0) {
                     allArchives = [...allArchives, ...newArchives];
                     lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                } else {
+                    lastDoc = null;
                 }
                 filterAndRender(true);
             } catch (e) { console.error(e); }
@@ -394,32 +516,29 @@
                 return matchesSearch && matchesCategory;
             });
 
-            document.getElementById('totalCount').textContent = filteredArchives.length + ' صورة';
-
             if (filteredArchives.length === 0) {
                 document.getElementById('photoGrid').innerHTML = '';
                 document.getElementById('noResults').classList.remove('hidden');
-                document.getElementById('loadMoreContainer').classList.add('hidden');
+                document.getElementById('loadMoreSection').classList.add('hidden');
                 return;
             }
 
             document.getElementById('noResults').classList.add('hidden');
             renderGrid(filteredArchives, append);
 
-            // Show load more if we have more in allArchives than filtered
-            const hasMore = allArchives.length >= PAGE_SIZE && lastDoc != null;
-            document.getElementById('loadMoreContainer').classList.toggle('hidden', !hasMore);
+            const hasMore = lastDoc != null;
+            document.getElementById('loadMoreSection').classList.toggle('hidden', !hasMore);
         }
 
         function renderGrid(archives, append) {
             const grid = document.getElementById('photoGrid');
             if (!append) grid.innerHTML = '';
 
-            archives.forEach((archive, idx) => {
+            archives.forEach(archive => {
                 const image = archive.images && archive.images.length > 0
                     ? archive.images[0]
                     : (archive.mainImage || 'https://via.placeholder.com/400?text=No+Image');
-                const cat = categoryConfig[archive.category] || { label: '', class: '' };
+                const catLabel = categoryLabels[archive.category] || '';
                 const names = archive.names || archive.name || '';
 
                 const div = document.createElement('div');
@@ -427,14 +546,13 @@
                 div.onclick = () => openLightbox(archive.id);
                 div.innerHTML = `
                     <img data-src="${image}" alt="${names}" loading="lazy">
-                    <div class="photo-overlay">
-                        ${cat.label ? `<span class="category-badge ${cat.class}">${cat.label}</span>` : ''}
-                        ${names ? `<span class="names">${names}</span>` : ''}
+                    <div class="photo-info">
+                        ${catLabel ? `<div class="cat-label">${catLabel}</div>` : ''}
+                        ${names ? `<div class="names">${names}</div>` : ''}
                     </div>
                 `;
                 grid.appendChild(div);
 
-                // Observe for lazy loading
                 const img = div.querySelector('img');
                 imageObserver.observe(img);
             });
@@ -442,7 +560,7 @@
 
         window.setCategoryFilter = function(category) {
             currentCategory = category;
-            document.querySelectorAll('.filter-pill').forEach(btn => {
+            document.querySelectorAll('.cat-tab').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.category === category);
             });
             filterAndRender();
@@ -467,22 +585,22 @@
             const image = archive.images && archive.images.length > 0
                 ? archive.images[0]
                 : (archive.mainImage || '');
-            const cat = categoryConfig[archive.category] || { label: '', class: '' };
 
             document.getElementById('lightboxImg').src = image;
             document.getElementById('lightboxCounter').textContent = (currentLightboxIndex + 1) + ' / ' + filteredArchives.length;
             document.getElementById('lightboxNames').textContent = archive.names || archive.name || '';
             document.getElementById('lightboxDesc').textContent = archive.description || '';
 
-            const catBadge = document.getElementById('lightboxCategory');
-            catBadge.textContent = cat.label;
-            catBadge.className = 'category-badge mb-2 ' + cat.class;
-
+            const catLabel = categoryLabels[archive.category] || '';
             const date = archive.eventDate
                 ? new Date(archive.eventDate).toLocaleDateString('ar-SD')
                 : (archive.createdAt ? new Date(archive.createdAt).toLocaleDateString('ar-SD') : '');
-            const uploader = archive.uploaderName || archive.userName || 'زائر';
-            document.getElementById('lightboxMeta').textContent = (date ? date + ' • ' : '') + uploader;
+            const uploader = archive.uploaderName || archive.userName || '';
+            let meta = [];
+            if (catLabel) meta.push(catLabel);
+            if (date) meta.push(date);
+            if (uploader) meta.push(uploader);
+            document.getElementById('lightboxMeta').textContent = meta.join(' • ');
         }
 
         window.navigateLightbox = function(dir) {
@@ -491,12 +609,15 @@
         };
 
         window.closeLightbox = function(e) {
-            if (e && e.target !== e.currentTarget) return;
+            if (e && e.target !== e.currentTarget && e.target !== document.getElementById('lightboxImg')) return;
             document.getElementById('lightbox').classList.remove('active');
             document.body.style.overflow = '';
         };
 
-        // Keyboard nav
+        window.showMenu = function() {
+            alert('أرشيف الشبطاب\n\nنحفظ ذكرياتنا وتاريخنا للأجيال القادمة\n\nإعداد: سليمان صلاح الدين محمد');
+        };
+
         document.addEventListener('keydown', e => {
             if (!document.getElementById('lightbox').classList.contains('active')) return;
             if (e.key === 'Escape') closeLightbox();
@@ -504,16 +625,9 @@
             if (e.key === 'ArrowLeft') navigateLightbox(1);
         });
 
-        // Infinite scroll
-        const scrollObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !isLoading) loadMore();
-            });
-        }, { rootMargin: '200px' });
-
         function showError() {
             document.getElementById('photoGrid').innerHTML = `
-                <div class="col-span-3 text-center py-12 text-white/40">
+                <div class="col-span-2 text-center py-12" style="color:#8b7355;">
                     <i class="fas fa-exclamation-circle text-3xl mb-3"></i>
                     <p>خطأ في تحميل الصور</p>
                 </div>
@@ -522,8 +636,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadArchives();
-            // Observe load more button for infinite scroll
-            scrollObserver.observe(document.getElementById('loadMoreBtn'));
         });
     </script>
 </body>
